@@ -7,10 +7,10 @@ function reqForNum(category: string) {
   fetch("http://localhost:3001/clients", {
     method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
 
-    body: JSON.stringify({category: category})
+    body: JSON.stringify({ category: category }),
   })
     .then((response) => response.json())
     .then((data) => {
@@ -26,10 +26,18 @@ export default function Home() {
       <Header>Queue System</Header>
 
       <div className="mt-20 flex w-full flex-col items-center">
-        <GetNumButton category="Cat 1" onClick={reqForNum}>Cat 1</GetNumButton>
-        <GetNumButton category="Category 15" onClick={reqForNum}>Category 15</GetNumButton>
-        <GetNumButton category="XXX  ąć" onClick={reqForNum}>XXX ąć</GetNumButton>
-        <GetNumButton category="abaca" onClick={reqForNum}>abaca</GetNumButton>
+        <GetNumButton category="Cat 1" onClick={reqForNum}>
+          Cat 1
+        </GetNumButton>
+        <GetNumButton category="Category 15" onClick={reqForNum}>
+          Category 15
+        </GetNumButton>
+        <GetNumButton category="XXX  ąć" onClick={reqForNum}>
+          XXX ąć
+        </GetNumButton>
+        <GetNumButton category="abaca" onClick={reqForNum}>
+          abaca
+        </GetNumButton>
       </div>
     </main>
   );
