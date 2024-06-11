@@ -12,6 +12,7 @@ interface Number {
 let numbers: Array<Number> = [];
 //--------------------------
 
+//TODO
 export const addClient = (req: Request, res: Response) => {
   if (req.body.category == undefined) {
     res.status(400).send("Incorrect category");
@@ -19,6 +20,7 @@ export const addClient = (req: Request, res: Response) => {
   }
 
   counter = counter + 1;
+
   let number: Number = {
     number: counter,
     category: req.body.category,
