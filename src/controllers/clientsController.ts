@@ -3,31 +3,31 @@ import express, { Express, Request, Response } from "express";
 //DATABASE---------------------
 let counter = 0;
 
-interface Number {
-  number: number;
-  category: string;
-  status: string;
+interface ClientNumber {
+    number: number;
+    category: string;
+    status: string;
 }
 
-let numbers: Array<Number> = [];
+let numbers: Array<ClientNumber> = [];
 //--------------------------
 
 //TODO
 export const addClient = (req: Request, res: Response) => {
-  if (req.body.category == undefined) {
-    res.status(400).send("Incorrect category");
-    return;
-  }
+    if (req.body.category == undefined) {
+        res.status(400).send("Incorrect category");
+        return;
+    }
 
-  counter = counter + 1;
+    counter = counter + 1;
 
-  let number: Number = {
-    number: counter,
-    category: req.body.category,
-    status: "Waiting",
-  };
+    let number: ClientNumber = {
+        number: counter,
+        category: req.body.category,
+        status: "Waiting",
+    };
 
-  numbers.push(number);
+    numbers.push(number);
 
-  res.json(number);
+    res.json(number);
 };
