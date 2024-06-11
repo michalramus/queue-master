@@ -4,7 +4,7 @@ import Header from "@/components/header";
 import GetNumButton from "./getNumButton";
 
 function reqForNum(category: string) {
-  fetch("http://localhost:3001/clients", {
+  fetch( process.env.API + "/clients", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
