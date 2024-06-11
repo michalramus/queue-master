@@ -1,29 +1,29 @@
 interface ClientNumber {
-  number: number;
-  category: string;
-  status: string;
+    number: number;
+    category: string;
+    status: string;
 }
 
 const apiPath = "/clients";
 
 export function addClient(category: string): ClientNumber {
-  let res: ClientNumber = {} as ClientNumber;
+    let res: ClientNumber = {} as ClientNumber;
 
-  fetch(process.env.API + apiPath, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    fetch(process.env.API + apiPath, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
 
-    body: JSON.stringify({ category: category }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      res.number = data.number;
-      res.category = data.category;
-      res.status = data.status;
+        body: JSON.stringify({ category: category }),
     })
-    .catch((error) => console.log(error));
+        .then((response) => response.json())
+        .then((data) => {
+            res.number = data.number;
+            res.category = data.category;
+            res.status = data.status;
+        })
+        .catch((error) => console.log(error));
 
-  return res;
+    return res;
 }
