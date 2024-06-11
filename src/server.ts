@@ -5,9 +5,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
-const allowedOrigins = ["http://127.0.0.1", "http://localhost:3000"];
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(", ");
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins,
@@ -17,6 +17,7 @@ const options: cors.CorsOptions = {
 app.use(cors(options));
 app.use(express.json())
 
+//TODO: Add logger and error handler
 app.use((req, res, next) => {
   console.log(req.body);
   next();
@@ -25,5 +26,5 @@ app.use((req, res, next) => {
 app.use('/clients', require('./routes/api/clients'));
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Queue System Frontend APP listening on port ${port}`);
 });
