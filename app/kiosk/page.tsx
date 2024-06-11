@@ -2,22 +2,12 @@
 
 import Header from "@/components/header";
 import GetNumButton from "./getNumButton";
+import * as clientsApi from "@/api/clients";
 
 function reqForNum(category: string) {
-  fetch( process.env.API + "/clients", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-
-    body: JSON.stringify({ category: category }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      window.alert(data.number);
-    })
-    .catch((error) => console.log(error));
+  let res = clientsApi.addClient(category);
+  console.log(res);
+  alert(res.number);
 }
 
 export default function Home() {
