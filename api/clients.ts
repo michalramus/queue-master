@@ -23,3 +23,22 @@ export async function addClient(category: string): Promise<ClientNumber> {
 
     return res;
 }
+
+
+export async function setClientAsInService(client: ClientNumber): Promise<ClientNumber | undefined>
+{
+    return undefined;
+}
+
+export async function getClients(): Promise<Array<ClientNumber>>
+{
+    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        method: "GET",
+    });
+
+    const data = await response.json();
+    let res: Array<ClientNumber> = data;
+
+    return res;
+}
+

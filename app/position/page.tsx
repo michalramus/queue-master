@@ -1,7 +1,37 @@
+"use client";
+
 import Header from "@/components/header";
 import ClientRow from "./clientRow";
+import { ClientNumber, getClients, setClientAsInService } from "@/api/clients";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 export default function Home() {
+    const [clientsNumbers, setClientNumbers] = useState(Array<ClientNumber>);
+
+    //Api data fetch
+    useEffect(() => {
+        const fetchData = async () => {
+            const clients = await getClients();
+            setClientNumbers(clients);
+        };
+        fetchData();
+    }, []);
+
+    //Socket.io
+    useEffect(() => {
+        const socket = io(process.env.NEXT_PUBLIC_WS_API ?? "");
+
+        function onNewClient(client: ClientNumber) {
+            setClientNumbers((clientNumbers) => [...clientNumbers, client]);
+        }
+
+        socket.on("newClient", onNewClient);
+        return () => {
+            socket.off("newClient", onNewClient);
+        };
+    }, []);
+
     return (
         <main className="pb24- min-h-screen px-10 pt-10 lg:px-24">
             <Header>Queue System</Header>
@@ -20,15 +50,14 @@ export default function Home() {
                             </tr>
                         </thead>
                         <tbody>
-                            <ClientRow number={1} category="abc"></ClientRow>
-                            <ClientRow
-                                number={2}
-                                category="lkjalkjflkaj"
-                            ></ClientRow>
-                            <ClientRow
-                                number={3}
-                                category="fhiaifiasjifioasjoifjioasijf"
-                            ></ClientRow>
+                            {clientsNumbers.map((client) => (
+                                <ClientRow
+                                    key={client.number}
+                                    category={client.category}
+                                    number={client.number}
+                                    onClick={(number) => {}}
+                                ></ClientRow>
+                            ))}
                         </tbody>
                     </table>
                 </div>
