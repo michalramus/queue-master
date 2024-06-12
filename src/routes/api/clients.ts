@@ -1,11 +1,11 @@
 import express, { Express, Request, Response } from "express";
-import { addClient } from "../../controllers/clientsController";
+import { addClient, getClients } from "../../controllers/clientsController";
 
 export const router = express.Router();
 
 router
     .route("/")
-    // .get(employeesController.getAllEmployees)
+    .get(getClients)
 
     .post(addClient);
 // .put(employeesController.updateEmployee)

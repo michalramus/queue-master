@@ -33,4 +33,8 @@ export function addClient(req: Request, res: Response) {
     io.emit("newClient", number);
 
     res.json(number);
-};
+}
+
+export function getClients(req: Request, res: Response) {
+    res.json(numbers);
+}
