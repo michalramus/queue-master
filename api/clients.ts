@@ -1,4 +1,4 @@
-interface ClientNumber {
+export interface ClientNumber {
     number: number;
     category: string;
     status: string;
