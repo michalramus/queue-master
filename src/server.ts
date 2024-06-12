@@ -1,13 +1,15 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import * as socket from "./io";
 
 dotenv.config();
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(", ");
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const httpServer = require("http").createServer(app);
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(", ");
+const io = socket.crateIO(httpServer, allowedOrigins);
 
 const options: cors.CorsOptions = {
     origin: allowedOrigins,
@@ -23,8 +25,15 @@ app.use((req, res, next) => {
     next();
 });
 
+//Routes
 app.use("/clients", require("./routes/api/clients"));
 
-app.listen(port, () => {
-    console.log(`Queue System Frontend APP listening on port ${port}`);
+
+app.listen(process.env.PORT, () => {
+    console.log(`Queue System Frontend APP listening on port ${process.env.PORT}`);
+});
+
+//WS
+httpServer.listen(process.env.WS_PORT, () => {
+    console.log("Websocket started at port ", process.env.WS_PORT);
 });

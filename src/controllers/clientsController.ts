@@ -1,5 +1,7 @@
 import express, { Express, Request, Response } from "express";
 
+import { io } from "../io";
+
 //DATABASE---------------------
 let counter = 0;
 
@@ -13,7 +15,7 @@ let numbers: Array<ClientNumber> = [];
 //--------------------------
 
 //TODO
-export const addClient = (req: Request, res: Response) => {
+export function addClient(req: Request, res: Response) {
     if (req.body.category == undefined) {
         res.status(400).send("Incorrect category");
         return;
@@ -28,6 +30,7 @@ export const addClient = (req: Request, res: Response) => {
     };
 
     numbers.push(number);
+    io.emit("newClient", number);
 
     res.json(number);
 };
