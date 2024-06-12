@@ -1,5 +1,5 @@
 interface ClientRowProps {
-    onClick: (category: number) => void;
+    onClick: (number: number) => void;
     number: number;
     category: string;
 }
