@@ -6,24 +6,20 @@ interface ClientNumber {
 
 const apiPath = "/clients";
 
-export function addClient(category: string): ClientNumber {
+export async function addClient(category: string): Promise<ClientNumber> {
     let res: ClientNumber = {} as ClientNumber;
 
-    fetch(process.env.API + apiPath, {
+    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
 
         body: JSON.stringify({ category: category }),
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            res.number = data.number;
-            res.category = data.category;
-            res.status = data.status;
-        })
-        .catch((error) => console.log(error));
+    });
+
+    const data = await response.json();
+    res = data;
 
     return res;
 }

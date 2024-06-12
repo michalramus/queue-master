@@ -3,10 +3,12 @@
 import Header from "@/components/header";
 import GetNumButton from "./getNumButton";
 import * as clientsApi from "@/api/clients";
+import {ClientNumber} from '@/api/clients';
 
-function reqForNum(category: string) {
-    let res = clientsApi.addClient(category);
+async function reqForNum(category: string) {
+    let res:ClientNumber = await clientsApi.addClient(category);
     console.log(res);
+    console.log(res.number);
     alert(res.number);
 }
 
