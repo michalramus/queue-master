@@ -9,6 +9,21 @@ import { io } from "socket.io-client";
 export default function Home() {
     const [clientsNumbers, setClientNumbers] = useState(Array<ClientNumber>);
 
+    const position: number = 1;
+
+    function clientRowOnClick(number: number) {
+        const index = clientsNumbers.map((e) => e.number).indexOf(number);
+
+        if (index > -1) {
+            const client = clientsNumbers[index];
+            const clients = [...clientsNumbers];
+            clients.splice(index, 1);
+
+            setClientNumbers(clients);
+            setClientAsInService(client, position);
+        }
+    }
+
     //Api data fetch
     useEffect(() => {
         const fetchData = async () => {
@@ -55,13 +70,13 @@ export default function Home() {
                                     key={client.number}
                                     category={client.category}
                                     number={client.number}
-                                    onClick={(number) => {}}
+                                    onClick={clientRowOnClick}
                                 ></ClientRow>
                             ))}
                         </tbody>
                     </table>
                 </div>
-                <div className="w-6/12"></div>
+                <div className="w-full lg:w-6/12"></div>
             </div>
         </main>
     );

@@ -2,6 +2,7 @@ export interface ClientNumber {
     number: number;
     category: string;
     status: string;
+    position: number | undefined;
 }
 
 const apiPath = "/clients";
@@ -25,9 +26,19 @@ export async function addClient(category: string): Promise<ClientNumber> {
 }
 
 
-export async function setClientAsInService(client: ClientNumber): Promise<ClientNumber | undefined>
+export async function setClientAsInService(client: ClientNumber, position: number)
 {
-    return undefined;
+    client.position = position;
+    client.status = "In Service";
+
+    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(client),
+    });
 }
 
 export async function getClients(): Promise<Array<ClientNumber>>
