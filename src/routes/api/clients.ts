@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from "express";
-import { addClient, getClients } from "../../controllers/clientsController";
+import { addClient, getClients, setClientAsInService } from "../../controllers/clientsController";
 
 export const router = express.Router();
 
@@ -7,8 +7,8 @@ router
     .route("/")
     .get(getClients)
 
-    .post(addClient);
-// .put(employeesController.updateEmployee)
+    .post(addClient)
+    .put(setClientAsInService);
 // .delete(employeesController.deleteEmployee);
 
 // router.route('/:id')
