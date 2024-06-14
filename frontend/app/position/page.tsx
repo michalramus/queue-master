@@ -6,7 +6,7 @@ import { ClientNumber, getClients, setClientAsInService } from "@/api/clients";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-export default function Home() {
+export default function PositionPage() {
     const [clientsNumbers, setClientNumbers] = useState<ClientNumber[]>([]);
 
     const position = 1;

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
 
-export default function Home() {
+export default function TVPage() {
     const [currentClient, setCurrentClient] = useState<ClientNumber | null>();
 
     //Socket.io

@@ -13,7 +13,7 @@ async function reqForNum(category: string) {
     }
 }
 
-export default function Home() {
+export default function KioskPage() {
     return (
         <main className="flex min-h-screen flex-col items-center p-24">
             <Header>Queue System</Header>
