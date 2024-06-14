@@ -75,7 +75,7 @@ export default function Home() {
                                     number={client.number}
                                     creationDate={client.creationDate}
                                     onClick={clientRowOnClick}
-                                ></ClientTableRow>
+                                />
                             ))}
                         </tbody>
                     </table>

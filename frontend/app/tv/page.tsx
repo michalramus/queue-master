@@ -30,7 +30,7 @@ export default function Home() {
                 <CurrentNumberWidget
                     number={currentClient?.number ?? ""}
                     position={currentClient?.position ?? ""}
-                ></CurrentNumberWidget>
+                />
                 <div className="w-full pt-10 lg:w-6/12">
                     <p className="text-center text-2xl">Ogłoszenia</p>
                 </div>
