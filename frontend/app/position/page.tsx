@@ -7,16 +7,16 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
 export default function PositionPage() {
-    const [clientsNumbers, setClientNumbers] = useState<ClientNumber[]>([]);
+    const [clientNumbers, setClientNumbers] = useState<ClientNumber[]>([]);
 
     const position = 1;
 
     function clientRowOnClick(number: number) {
-        const index = clientsNumbers.findIndex((e) => e.number === number);
+        const index = clientNumbers.findIndex((e) => e.number === number);
 
         if (index > -1) {
-            const client = clientsNumbers[index];
-            const clients = [...clientsNumbers];
+            const client = clientNumbers[index];
+            const clients = [...clientNumbers];
             clients.splice(index, 1);
 
             setClientNumbers(clients);
@@ -68,7 +68,7 @@ export default function PositionPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {clientsNumbers.map((client) => (
+                            {clientNumbers.map((client) => (
                                 <ClientTableRow
                                     key={client.number}
                                     category={client.category}
