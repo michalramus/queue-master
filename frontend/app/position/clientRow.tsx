@@ -2,12 +2,14 @@ interface ClientRowProps {
     onClick: (number: number) => void;
     number: number;
     category: string;
+    creationDate: string;
 }
 
 export default function ClientRow({
     onClick,
     number,
     category,
+    creationDate,
 }: ClientRowProps) {
     return (
         <tr className="border-b border-gray-700 odd:bg-gray-900 even:bg-gray-800">
@@ -18,6 +20,7 @@ export default function ClientRow({
                 {number}
             </th>
             <td className="px-6 py-4">{category}</td>
+            <td className="px-6 py-4">{creationDate}</td>
             <td className="px-6 py-4">
                 <button
                     type="button"

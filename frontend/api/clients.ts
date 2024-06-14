@@ -3,6 +3,7 @@ export interface ClientNumber {
     category: string;
     status: string;
     position: number | undefined;
+    creationDate: string;
 }
 
 const apiPath = "/clients";
@@ -16,7 +17,7 @@ export async function addClient(category: string): Promise<ClientNumber> {
             "Content-Type": "application/json",
         },
 
-        body: JSON.stringify({ category: category }),
+        body: JSON.stringify({ category: category}),
     });
 
     const data = await response.json();

@@ -61,6 +61,9 @@ export default function Home() {
                                 <th scope="col" className="px-6 py-3">
                                     Category
                                 </th>
+                                <th scope="col" className="px-6 py-3">
+                                    Creation Date
+                                </th>
                                 <th scope="col" className="px-6 py-3"></th>
                             </tr>
                         </thead>
@@ -70,6 +73,7 @@ export default function Home() {
                                     key={client.number}
                                     category={client.category}
                                     number={client.number}
+                                    creationDate={client.creationDate}
                                     onClick={clientRowOnClick}
                                 ></ClientRow>
                             ))}

@@ -9,13 +9,12 @@ interface ClientNumber {
     number: number;
     category: string;
     status: string;
+    creationDate: string;
     position: number | undefined;
 }
 
 let numbers: Array<ClientNumber> = [];
 //--------------------------
-
-//TODO
 export function addClient(req: Request, res: Response) {
     if (req.body.category == undefined) {
         res.status(400).send("Incorrect category");
@@ -23,12 +22,16 @@ export function addClient(req: Request, res: Response) {
     }
 
     counter = counter + 1;
-
+    let date = new Date();
+    // let dateString = date.toLocaleDateString('pl-PL') + "\n" + date.toLocaleTimeString('en-EN', { hour12: false });
+    let dateString = date.toLocaleTimeString('en-EN', { hour12: false });
+    
     let number: ClientNumber = {
         number: counter,
         category: req.body.category,
         status: "Waiting",
-        position: undefined
+        position: undefined,
+        creationDate: dateString,
     };
 
     numbers.push(number);
