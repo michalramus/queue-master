@@ -1,17 +1,7 @@
-"use client";
-
 import Header from "@/components/Header";
 import NumberGetterButton from "./NumberGetterButton";
-import * as clientsApi from "@/api/clients";
 
-async function reqForNum(category: string) {
-    let res = await clientsApi.addClient(category);
-    console.log(res);
 
-    if (res != null) {
-        alert(res.number);
-    }
-}
 
 export default function KioskPage() {
     return (
@@ -19,16 +9,16 @@ export default function KioskPage() {
             <Header>Queue System</Header>
 
             <div className="mt-20 flex w-full flex-col items-center">
-                <NumberGetterButton category="Cat 1" onClick={reqForNum}>
+                <NumberGetterButton category="Cat 1">
                     Cat 1
                 </NumberGetterButton>
-                <NumberGetterButton category="Category 15" onClick={reqForNum}>
+                <NumberGetterButton category="Category 15">
                     Category 15
                 </NumberGetterButton>
-                <NumberGetterButton category="XXX  ąć" onClick={reqForNum}>
+                <NumberGetterButton category="XXX  ąć">
                     XXX ąć
                 </NumberGetterButton>
-                <NumberGetterButton category="abaca" onClick={reqForNum}>
+                <NumberGetterButton category="abaca">
                     abaca
                 </NumberGetterButton>
             </div>
