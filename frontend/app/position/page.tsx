@@ -1,7 +1,7 @@
 "use client";
 
-import Header from "@/components/header";
-import ClientRow from "./clientRow";
+import Header from "@/components/Header";
+import ClientTableRow from "./ClientTableRow";
 import { ClientNumber, getClients, setClientAsInService } from "@/api/clients";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
@@ -69,13 +69,13 @@ export default function Home() {
                         </thead>
                         <tbody>
                             {clientsNumbers.map((client) => (
-                                <ClientRow
+                                <ClientTableRow
                                     key={client.number}
                                     category={client.category}
                                     number={client.number}
                                     creationDate={client.creationDate}
                                     onClick={clientRowOnClick}
-                                ></ClientRow>
+                                ></ClientTableRow>
                             ))}
                         </tbody>
                     </table>

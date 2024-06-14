@@ -1,6 +1,6 @@
 "use client";
 
-import Header from "@/components/header";
+import Header from "@/components/Header";
 import NumberGetterButton from "./NumberGetterButton";
 import * as clientsApi from "@/api/clients";
 import {ClientNumber} from '@/api/clients';

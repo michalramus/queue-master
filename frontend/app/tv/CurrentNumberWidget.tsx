@@ -1,12 +1,12 @@
-interface CurrentNumberProps {
+interface CurrentNumberWidgetProps {
     number: number | string;
     position: number | string;
 }
 
-export default function CurrentNumber({
+export default function CurrentNumberWidget({
     number,
     position,
-}: CurrentNumberProps) {
+}: CurrentNumberWidgetProps) {
     return (
         <div className="w-full rounded-md border-2 bg-white bg-opacity-5 p-6 text-center lg:w-6/12">
             <h1 className="text-5xl pb-5">Current number: <span className="font-bold">{number}</span></h1>

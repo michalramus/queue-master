@@ -1,16 +1,16 @@
-interface ClientRowProps {
+interface ClientTableRowProps {
     onClick: (number: number) => void;
     number: number;
     category: string;
     creationDate: string;
 }
 
-export default function ClientRow({
+export default function ClientTableRow({
     onClick,
     number,
     category,
     creationDate,
-}: ClientRowProps) {
+}: ClientTableRowProps) {
     return (
         <tr className="border-b border-gray-700 odd:bg-gray-900 even:bg-gray-800">
             <th
