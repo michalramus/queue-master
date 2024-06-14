@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "@/components/header";
-import GetNumButton from "./getNumButton";
+import NumberGetterButton from "./NumberGetterButton";
 import * as clientsApi from "@/api/clients";
 import {ClientNumber} from '@/api/clients';
 
@@ -18,18 +18,18 @@ export default function Home() {
             <Header>Queue System</Header>
 
             <div className="mt-20 flex w-full flex-col items-center">
-                <GetNumButton category="Cat 1" onClick={reqForNum}>
+                <NumberGetterButton category="Cat 1" onClick={reqForNum}>
                     Cat 1
-                </GetNumButton>
-                <GetNumButton category="Category 15" onClick={reqForNum}>
+                </NumberGetterButton>
+                <NumberGetterButton category="Category 15" onClick={reqForNum}>
                     Category 15
-                </GetNumButton>
-                <GetNumButton category="XXX  ąć" onClick={reqForNum}>
+                </NumberGetterButton>
+                <NumberGetterButton category="XXX  ąć" onClick={reqForNum}>
                     XXX ąć
-                </GetNumButton>
-                <GetNumButton category="abaca" onClick={reqForNum}>
+                </NumberGetterButton>
+                <NumberGetterButton category="abaca" onClick={reqForNum}>
                     abaca
-                </GetNumButton>
+                </NumberGetterButton>
             </div>
         </main>
     );

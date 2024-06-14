@@ -1,16 +1,16 @@
 import { ReactNode } from "react";
 
-interface GetNumButtonProps {
+interface NumberGetterButtonProps {
     children: ReactNode;
     onClick: (category: string) => void;
     category: string;
 }
 
-export default function GetNumButton({
+export default function NumberGetterButton({
     children,
     onClick,
     category,
-}: GetNumButtonProps) {
+}: NumberGetterButtonProps) {
     return (
         <button
             onClick={() => {
