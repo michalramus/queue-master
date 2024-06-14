@@ -8,7 +8,9 @@ export interface ClientNumber {
 
 const apiPath = "/clients";
 
-export async function addClient(category: string): Promise<ClientNumber | null>{
+export async function addClient(
+    category: string,
+): Promise<ClientNumber | null> {
     let res: ClientNumber | null = null;
 
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
@@ -17,7 +19,7 @@ export async function addClient(category: string): Promise<ClientNumber | null>{
             "Content-Type": "application/json",
         },
 
-        body: JSON.stringify({ category: category}),
+        body: JSON.stringify({ category: category }),
     });
 
     const data = await response.json();
@@ -26,9 +28,10 @@ export async function addClient(category: string): Promise<ClientNumber | null>{
     return res;
 }
 
-
-export async function setClientAsInService(client: ClientNumber, position: number)
-{
+export async function setClientAsInService(
+    client: ClientNumber,
+    position: number,
+) {
     client.position = position;
     client.status = "In Service";
 
@@ -42,8 +45,7 @@ export async function setClientAsInService(client: ClientNumber, position: numbe
     });
 }
 
-export async function getClients(): Promise<ClientNumber[]>
-{
+export async function getClients(): Promise<ClientNumber[]> {
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
         method: "GET",
     });
@@ -53,4 +55,3 @@ export async function getClients(): Promise<ClientNumber[]>
 
     return res;
 }
-

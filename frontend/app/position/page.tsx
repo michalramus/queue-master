@@ -64,7 +64,7 @@ export default function PositionPage() {
                                 <th scope="col" className="px-6 py-3">
                                     Creation Date
                                 </th>
-                                <th scope="col" className="px-6 py-3"></th>
+                                <th scope="col" className="px-6 py-3" />
                             </tr>
                         </thead>
                         <tbody>
@@ -80,7 +80,7 @@ export default function PositionPage() {
                         </tbody>
                     </table>
                 </div>
-                <div className="w-full lg:w-6/12"></div>
+                <div className="w-full lg:w-6/12" />
             </div>
         </main>
     );
