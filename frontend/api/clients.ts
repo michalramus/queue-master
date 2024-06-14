@@ -2,14 +2,14 @@ export interface ClientNumber {
     number: number;
     category: string;
     status: string;
-    position: number | undefined;
+    position: number | null;
     creationDate: string;
 }
 
 const apiPath = "/clients";
 
-export async function addClient(category: string): Promise<ClientNumber> {
-    let res: ClientNumber = {} as ClientNumber;
+export async function addClient(category: string): Promise<ClientNumber | null>{
+    let res: ClientNumber | null = null;
 
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
         method: "POST",
