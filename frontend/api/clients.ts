@@ -42,14 +42,14 @@ export async function setClientAsInService(client: ClientNumber, position: numbe
     });
 }
 
-export async function getClients(): Promise<Array<ClientNumber>>
+export async function getClients(): Promise<ClientNumber[]>
 {
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
         method: "GET",
     });
 
     const data = await response.json();
-    let res: Array<ClientNumber> = data;
+    let res = data;
 
     return res;
 }

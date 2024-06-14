@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
 export default function Home() {
-    const [clientsNumbers, setClientNumbers] = useState(Array<ClientNumber>);
+    const [clientsNumbers, setClientNumbers] = useState<ClientNumber[]>([]);
 
-    const position: number = 1;
+    const position = 1;
 
     function clientRowOnClick(number: number) {
-        const index = clientsNumbers.map((e) => e.number).indexOf(number);
+        const index = clientsNumbers.findIndex((e) => e.number === number);
 
         if (index > -1) {
             const client = clientsNumbers[index];
