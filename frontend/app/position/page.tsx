@@ -11,7 +11,7 @@ export default function PositionPage() {
 
     const position = 1;
 
-    function clientRowOnClick(number: number) {
+    function handleClientRowAcceptClient(number: number) {
         const index = clientNumbers.findIndex((e) => e.number === number);
 
         if (index > -1) {
@@ -74,7 +74,7 @@ export default function PositionPage() {
                                     category={client.category}
                                     number={client.number}
                                     creationDate={client.creationDate}
-                                    onClick={clientRowOnClick}
+                                    onClick={handleClientRowAcceptClient}
                                 />
                             ))}
                         </tbody>
