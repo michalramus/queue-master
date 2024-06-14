@@ -25,6 +25,7 @@ export default function ClientTableRow({
                 <button
                     type="button"
                     className="me-2 inline-flex items-center rounded-full bg-green-600 p-2.5 text-center text-sm font-medium text-white hover:bg-green-700"
+                    aria-label="Accept new client"
                     onClick={() => onClick(number)}
                 >
                     <svg
