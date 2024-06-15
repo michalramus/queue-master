@@ -2,7 +2,7 @@ export interface ClientNumber {
     number: number;
     category: string;
     status: string;
-    position: number | null;
+    seat: number | null;
     creationDate: string;
 }
 
@@ -30,9 +30,9 @@ export async function addClient(
 
 export async function setClientAsInService(
     client: ClientNumber,
-    position: number,
+    seat: number,
 ) {
-    client.position = position;
+    client.seat = seat;
     client.status = "In Service";
 
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
