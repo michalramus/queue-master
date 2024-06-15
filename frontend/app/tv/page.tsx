@@ -29,7 +29,7 @@ export default function TVPage() {
             <div className="flex w-full flex-row flex-wrap self-start pt-10">
                 <CurrentNumberWidget
                     number={currentClient?.number ?? ""}
-                    position={currentClient?.position ?? ""}
+                    seat={currentClient?.seat ?? ""}
                 />
                 <div className="w-full pt-10 lg:w-6/12">
                     <p className="text-center text-2xl">Ogłoszenia</p>

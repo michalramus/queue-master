@@ -10,7 +10,7 @@ interface ClientNumber {
     category: string;
     status: string;
     creationDate: string;
-    position: number | undefined;
+    seat: number | undefined;
 }
 
 let numbers: Array<ClientNumber> = [];
@@ -30,7 +30,7 @@ export function addClient(req: Request, res: Response) {
         number: counter,
         category: req.body.category,
         status: "Waiting",
-        position: undefined,
+        seat: undefined,
         creationDate: dateString,
     };
 

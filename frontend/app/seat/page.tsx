@@ -6,10 +6,10 @@ import { ClientNumber, getClients, setClientAsInService } from "@/api/clients";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-export default function PositionPage() {
+export default function SeatPage() {
     const [clientNumbers, setClientNumbers] = useState<ClientNumber[]>([]);
 
-    const position = 1;
+    const seat = 1;
 
     function handleClientRowAcceptClient(number: number) {
         const index = clientNumbers.findIndex((e) => e.number === number);
@@ -20,7 +20,7 @@ export default function PositionPage() {
             clients.splice(index, 1);
 
             setClientNumbers(clients);
-            setClientAsInService(client, position);
+            setClientAsInService(client, seat);
         }
     }
 
