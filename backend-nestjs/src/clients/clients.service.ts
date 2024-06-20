@@ -58,7 +58,7 @@ export class ClientsService {
 
     async findAll() {
         return this.databaseService.client.findMany({
-            orderBy: [{ number: "asc" }],
+            orderBy: [{ creationDate: "asc" }],
             select: {
                 number: true,
                 categoryId: true,
