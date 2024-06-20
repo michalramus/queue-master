@@ -15,7 +15,11 @@ export default function SeatPage() {
     const queryClient = useQueryClient();
 
     //Api data fetch
-    const { data: clients, isLoading } = useQuery({ queryKey: ["clients"], queryFn: getClients });
+    const { data: clients, isLoading } = useQuery({
+        queryKey: ["clients"],
+        queryFn: () =>
+            getClients().then((res) => res.filter((client) => client.status === "Waiting")),
+    });
 
     //Socket.io update clients when clients changed
     useEffect(() => {
@@ -54,15 +58,17 @@ export default function SeatPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {clients
-                                ?.filter((client) => (client.status == "Waiting") && (categoryIds.includes(client.categoryId)))
-                                .map((client) => (
-                                    <ClientTableRow
-                                        key={client.number}
-                                        clientNumber={client}
-                                        seat={seat}
-                                    />
-                                ))}
+                            {clients?.map((client) => {
+                                if (categoryIds.includes(client.categoryId)) {
+                                    return (
+                                        <ClientTableRow
+                                            key={client.number}
+                                            clientNumber={client}
+                                            seat={seat}
+                                        />
+                                    );
+                                }
+                            })}
                         </tbody>
                     </table>
                 </div>
