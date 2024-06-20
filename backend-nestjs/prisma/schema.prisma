@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model Client {
-    number      Int @id
+    number      String @id
     categoryId  String
     category    Category @relation(fields: [categoryId], references: [id])
     status      Status
