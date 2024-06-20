@@ -3,7 +3,7 @@ import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Socket } from "socket.io";
 
 @Injectable()
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class WebsocketsService {
     @WebSocketServer()
     private server: Socket;
