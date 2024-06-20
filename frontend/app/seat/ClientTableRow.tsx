@@ -12,9 +12,6 @@ export default function ClientTableRow({
     const clientInService = useMutation({
         mutationFn: ({ clientNumber, seat }: { clientNumber: ClientNumber; seat: number }) =>
             setClientAsInService(clientNumber, seat),
-        // onSuccess: () => {
-        //     queryClient.invalidateQueries({ queryKey: ["clients"] });
-        // },
     });
 
     return (

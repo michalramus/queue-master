@@ -9,13 +9,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function SeatPage() {
     const seat = 1; //TODO: get seat from context
-    const categoryIds = null; //TODO: get categoryIds from context
+    const categoryIds = ["A", "B", "C", "D", "E", "F"]; //TODO: get categoryIds from context
 
     //React query clients fetch
     const queryClient = useQueryClient();
 
     //Api data fetch
-    const { data: clients, isLoading } = useQuery({ queryKey: ["clients"], queryFn: getClients, } );
+    const { data: clients, isLoading } = useQuery({ queryKey: ["clients"], queryFn: getClients });
 
     //Socket.io update clients when clients changed
     useEffect(() => {
@@ -54,13 +54,15 @@ export default function SeatPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {clients?.filter((client) => client.status == "Waiting").map((client) => (
-                                <ClientTableRow
-                                    key={client.number}
-                                    clientNumber={client}
-                                    seat={seat}
-                                />
-                            ))}
+                            {clients
+                                ?.filter((client) => (client.status == "Waiting") && (categoryIds.includes(client.categoryId)))
+                                .map((client) => (
+                                    <ClientTableRow
+                                        key={client.number}
+                                        clientNumber={client}
+                                        seat={seat}
+                                    />
+                                ))}
                         </tbody>
                     </table>
                 </div>
