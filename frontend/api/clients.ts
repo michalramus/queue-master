@@ -1,6 +1,7 @@
 export interface ClientNumber {
-    number: number;
-    category: string;
+    number: string;
+    categoryId: string;
+    category: { name: string };
     status: string;
     seat: number | null;
     creationDate: string;
@@ -8,41 +9,43 @@ export interface ClientNumber {
 
 const apiPath = "/clients";
 
-export async function addClient(
-    category: string,
-): Promise<ClientNumber | null> {
-    let res: ClientNumber | null = null;
+//Websocket events names
+export enum wsClientEvents {
+    ClientWaiting = "ClientWaiting",
+    ClientInService = "ClientInService",
+}
 
+export async function addClient(categoryId: string): Promise<ClientNumber | null> {
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
 
-        body: JSON.stringify({ category: category }),
+        body: JSON.stringify({ categoryId: categoryId }),
     });
 
-    const data = await response.json();
-    res = data;
+    const res = await response.json();
 
     return res;
 }
 
-export async function setClientAsInService(
-    client: ClientNumber,
-    seat: number,
-) {
-    client.seat = seat;
-    client.status = "In Service";
+export async function setClientAsInService(clientNumber: ClientNumber, seat: number): Promise<ClientNumber | null> {
+    clientNumber.seat = seat;
+    clientNumber.status = "InService";
 
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
-        method: "PUT",
+    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json",
         },
 
-        body: JSON.stringify(client),
+        body: JSON.stringify(clientNumber),
     });
+
+    const res = await response.json();
+
+    return res;
 }
 
 export async function getClients(): Promise<ClientNumber[]> {
@@ -50,8 +53,6 @@ export async function getClients(): Promise<ClientNumber[]> {
         method: "GET",
     });
 
-    const data = await response.json();
-    let res = data;
-
+    const res = await response.json();
     return res;
 }

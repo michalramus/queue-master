@@ -2,50 +2,36 @@
 
 import Header from "@/components/Header";
 import ClientTableRow from "./ClientTableRow";
-import { ClientNumber, getClients, setClientAsInService } from "@/api/clients";
+import { ClientNumber, getClients, setClientAsInService, wsClientEvents } from "@/api/clients";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function SeatPage() {
-    const [clientNumbers, setClientNumbers] = useState<ClientNumber[]>([]);
+    const seat = 1; //TODO: get seat from context
+    const categoryIds = null; //TODO: get categoryIds from context
 
-    const seat = 1;
-
-    function handleClientRowAcceptClient(number: number) {
-        const index = clientNumbers.findIndex((e) => e.number === number);
-
-        if (index > -1) {
-            const client = clientNumbers[index];
-            const clients = [...clientNumbers];
-            clients.splice(index, 1);
-
-            setClientNumbers(clients);
-            setClientAsInService(client, seat);
-        }
-    }
+    //React query clients fetch
+    const queryClient = useQueryClient();
 
     //Api data fetch
-    useEffect(() => {
-        const fetchData = async () => {
-            const clients = await getClients();
-            setClientNumbers(clients);
-        };
-        fetchData();
-    }, []);
+    const { data: clients, isLoading } = useQuery({ queryKey: ["clients"], queryFn: getClients, } );
 
-    //Socket.io
+    //Socket.io update clients when clients changed
     useEffect(() => {
-        const socket = io(process.env.NEXT_PUBLIC_WS_API ?? "");
+        const socket = io(process.env.NEXT_PUBLIC_API ?? "");
 
-        function onNewClient(client: ClientNumber) {
-            setClientNumbers((clientNumbers) => [...clientNumbers, client]);
+        function onClient(client: ClientNumber) {
+            queryClient.invalidateQueries({ queryKey: ["clients"] });
         }
 
-        socket.on("newClient", onNewClient);
+        socket.on(wsClientEvents.ClientWaiting, onClient);
+        socket.on(wsClientEvents.ClientInService, onClient); //FixMe
         return () => {
-            socket.off("newClient", onNewClient);
+            socket.off(wsClientEvents.ClientWaiting, onClient);
+            socket.off(wsClientEvents.ClientInService, onClient);
         };
-    }, []);
+    }, [queryClient]);
 
     return (
         <main className="pb24- min-h-screen px-10 pt-10 lg:px-24">
@@ -68,13 +54,11 @@ export default function SeatPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {clientNumbers.map((client) => (
+                            {clients?.filter((client) => client.status == "Waiting").map((client) => (
                                 <ClientTableRow
                                     key={client.number}
-                                    category={client.category}
-                                    number={client.number}
-                                    creationDate={client.creationDate}
-                                    onClick={handleClientRowAcceptClient}
+                                    clientNumber={client}
+                                    seat={seat}
                                 />
                             ))}
                         </tbody>
