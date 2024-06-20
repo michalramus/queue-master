@@ -5,21 +5,23 @@ import { ClientNumber } from "../../api/clients";
 import { useEffect, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
+import {wsClientEvents} from "@/api/clients"
+
 
 export default function TVPage() {
     const [currentClient, setCurrentClient] = useState<ClientNumber | null>();
 
     //Socket.io
     useEffect(() => {
-        const socket = io(process.env.NEXT_PUBLIC_WS_API ?? "");
+        const socket = io(process.env.NEXT_PUBLIC_API ?? "");
 
         function onClientInService(client: ClientNumber) {
             setCurrentClient(client);
         }
 
-        socket.on("clientInService", onClientInService);
+        socket.on(wsClientEvents.ClientInService, onClientInService);
         return () => {
-            socket.off("clientInService", onClientInService);
+            socket.off(wsClientEvents.ClientInService, onClientInService);
         };
     }, []);
 
