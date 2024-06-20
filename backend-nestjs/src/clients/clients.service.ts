@@ -40,7 +40,7 @@ export class ClientsService {
         //Create client
         const client = await this.databaseService.client.create({
             data: {
-                number: counter,
+                number: category.id + counter,
 
                 status: "Waiting",
 
@@ -70,7 +70,7 @@ export class ClientsService {
         });
     }
 
-    async update(id: number, updateClientDto: UpdateClientDto) {
+    async update(id: string, updateClientDto: UpdateClientDto) {
         // Check if client exists
         const isClient = await this.databaseService.client.findUnique({ where: { number: id } });
         if (!isClient) {
@@ -87,7 +87,7 @@ export class ClientsService {
         return client;
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         // Check if client exists
         const client = await this.databaseService.client.findUnique({ where: { number: id } });
         if (!client) {
