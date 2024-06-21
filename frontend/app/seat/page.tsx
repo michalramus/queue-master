@@ -25,15 +25,17 @@ export default function SeatPage() {
     useEffect(() => {
         const socket = io(process.env.NEXT_PUBLIC_API ?? "");
 
-        function onClient(client: ClientNumber) {
+        function onClientModification(client: ClientNumber) {
             queryClient.invalidateQueries({ queryKey: ["clients"] });
         }
 
-        socket.on(wsClientEvents.ClientWaiting, onClient);
-        socket.on(wsClientEvents.ClientInService, onClient); //FixMe
+        socket.on(wsClientEvents.ClientWaiting, onClientModification);
+        socket.on(wsClientEvents.ClientInService, onClientModification);
+        socket.on(wsClientEvents.ClientRemoved, onClientModification);
         return () => {
-            socket.off(wsClientEvents.ClientWaiting, onClient);
-            socket.off(wsClientEvents.ClientInService, onClient);
+            socket.off(wsClientEvents.ClientWaiting, onClientModification);
+            socket.off(wsClientEvents.ClientInService, onClientModification);
+            socket.off(wsClientEvents.ClientRemoved, onClientModification);
         };
     }, [queryClient]);
 
@@ -41,38 +43,72 @@ export default function SeatPage() {
         <main className="pb24- min-h-screen px-10 pt-10 lg:px-24">
             <Header>Queue System</Header>
             <div className="flex flex-row flex-wrap self-start pt-10">
-                <div className="w-full overflow-x-auto shadow-md sm:rounded-lg lg:w-6/12">
-                    <table className="w-full text-center text-sm text-gray-400 rtl:text-right">
-                        <thead className="bg-gray-700 text-xs uppercase text-gray-400">
-                            <tr>
-                                <th scope="col" className="px-6 py-3">
-                                    Number
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Category
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Creation Date
-                                </th>
-                                <th scope="col" className="px-6 py-3" />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {clients?.map((client) => {
-                                if (categoryIds.includes(client.categoryId)) {
-                                    return (
-                                        <ClientTableRow
-                                            key={client.number}
-                                            clientNumber={client}
-                                            seat={seat}
-                                        />
-                                    );
-                                }
-                            })}
-                        </tbody>
-                    </table>
+                <div className="w-full lg:w-6/12">
+                    <div className="overflow-x-auto shadow-md sm:rounded-lg">
+                        <table className="w-full text-center text-sm text-gray-400 rtl:text-right">
+                            <thead className="bg-gray-700 text-xs uppercase text-gray-400">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3">
+                                        Number
+                                    </th>
+                                    <th scope="col" className="px-6 py-3">
+                                        Category
+                                    </th>
+                                    <th scope="col" className="px-6 py-3">
+                                        Creation Date
+                                    </th>
+                                    <th scope="col" className="px-6 py-3" />
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {clients?.map((client) => {
+                                    if (categoryIds.includes(client.categoryId)) {
+                                        return (
+                                            <ClientTableRow
+                                                key={client.number}
+                                                clientNumber={client}
+                                                seat={seat}
+                                            />
+                                        );
+                                    }
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div className="w-full lg:w-6/12" />
+                <div className="w-full lg:w-6/12">
+                    <a
+                        href="#"
+                        className="block max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+                    >
+                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                            Noteworthy technology acquisitions 2021
+                        </h5>
+                        <p className="font-normal text-gray-700 dark:text-gray-400">
+                            Here are the biggest enterprise technology acquisitions of 2021 so far,
+                            in reverse chronological order.
+                        </p>
+                    </a>
+
+                    <button
+                        type="button"
+                        className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        Default
+                    </button>
+                    <button
+                        type="button"
+                        className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        Default
+                    </button>
+                    <button
+                        type="button"
+                        className="mb-2 me-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                        Default
+                    </button>
+                </div>
             </div>
         </main>
     );
