@@ -8,6 +8,7 @@ import { WebsocketsService } from "../websockets/websockets.service";
 enum wsEvents {
     ClientWaiting = "ClientWaiting",
     ClientInService = "ClientInService",
+    ClientRemoved = "ClientRemoved",
 }
 
 @Injectable()
@@ -89,11 +90,14 @@ export class ClientsService {
 
     async remove(id: string) {
         // Check if client exists
-        const client = await this.databaseService.client.findUnique({ where: { number: id } });
-        if (!client) {
+        const isClient = await this.databaseService.client.findUnique({ where: { number: id } });
+        if (!isClient) {
             throw new NotFoundException("Client not found");
         }
 
-        return this.databaseService.client.delete({ where: { number: id } });
+        const client = this.databaseService.client.delete({ where: { number: id } });
+
+        this.websocketsService.emit(wsEvents.ClientRemoved, client);
+        return client;
     }
 }

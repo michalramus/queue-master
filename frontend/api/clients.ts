@@ -13,6 +13,7 @@ const apiPath = "/clients";
 export enum wsClientEvents {
     ClientWaiting = "ClientWaiting",
     ClientInService = "ClientInService",
+    ClientRemoved = "ClientRemoved",
 }
 
 export async function addClient(categoryId: string): Promise<ClientNumber | null> {
@@ -41,6 +42,16 @@ export async function setClientAsInService(clientNumber: ClientNumber, seat: num
         },
 
         body: JSON.stringify(clientNumber),
+    });
+
+    const res = await response.json();
+
+    return res;
+}
+
+export async function removeClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
+    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
+        method: "DELETE",
     });
 
     const res = await response.json();
