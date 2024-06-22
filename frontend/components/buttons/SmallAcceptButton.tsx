@@ -1,7 +1,7 @@
 /**
  * Small round Accept button with arrow icon
  */
-export default function SmallRejectButton({ onClick }: { onClick: () => void }) {
+export default function SmallAcceptButton({ onClick }: { onClick: () => void }) {
     return (
         <button
             type="button"
