@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
-import ClientTableRow from "./ClientTableRow";
+import ClientTable from "./ClientTable";
 import { ClientNumber, getClients, setClientAsInService, wsClientEvents } from "@/api/clients";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
@@ -44,37 +44,14 @@ export default function SeatPage() {
             <Header>Queue System</Header>
             <div className="flex flex-row flex-wrap self-start pt-10">
                 <div className="w-full lg:w-6/12">
-                    <div className="overflow-x-auto shadow-md sm:rounded-lg">
-                        <table className="w-full text-center text-sm text-gray-400 rtl:text-right">
-                            <thead className="bg-gray-700 text-xs uppercase text-gray-400">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3">
-                                        Number
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        Category
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        Creation Date
-                                    </th>
-                                    <th scope="col" className="px-6 py-3" />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {clients?.map((client) => {
-                                    if (categoryIds.includes(client.categoryId)) {
-                                        return (
-                                            <ClientTableRow
-                                                key={client.number}
-                                                clientNumber={client}
-                                                seat={seat}
-                                            />
-                                        );
-                                    }
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                    {isLoading && <p>Loading...</p>}
+                    {clients && (
+                        <ClientTable
+                            clientNumbers={clients}
+                            categoryIds={categoryIds}
+                            seat={seat}
+                        />
+                    )}
                 </div>
                 <div className="w-full lg:w-6/12">
                     <a
