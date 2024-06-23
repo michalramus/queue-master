@@ -1,8 +1,8 @@
 import React from "react";
 import { ClientNumber, removeClient, setClientAsInService } from "@/api/clients";
 import { useMutation } from "@tanstack/react-query";
-import SmallAcceptButton from "@/components/buttons/SmallAcceptButton";
-import SmallRejectButton from "@/components/buttons/SmallRejectButton";
+import SmallAcceptButton from "@/components/Buttons/SmallAcceptButton";
+import SmallRejectButton from "@/components/Buttons/SmallRejectButton";
 
 /**
  * Table with clients waiting for service
@@ -57,7 +57,6 @@ export default function ClientTable({
  * Table row with client number, category, creation date and buttons to accept or reject the client
  */
 function ClientTableRow({ clientNumber, seat }: { clientNumber: ClientNumber; seat: number }) {
-    
     //----------------------------------------
     //Api calls
 
