@@ -52,7 +52,7 @@ export default function SeatPage() {
     return (
         <main className="pb24- min-h-screen px-10 pt-10 lg:px-24">
             <Header>Queue System</Header>
-            <div className="flex flex-row flex-wrap justify-center self-start pt-10">
+            <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">
                 <div className="w-full lg:w-6/12">
                     {isLoadingWaitingClients && <p>Loading...</p>}
                     {waitingClients && (
@@ -64,7 +64,7 @@ export default function SeatPage() {
                     )}
                 </div>
                 {inServiceClients && (
-                    <div className="flex w-full justify-center lg:w-6/12">
+                    <div className="flex w-full justify-center mb-5 lg:w-6/12">
                         <InServicePanel
                             clientNumber={inServiceClients[0]}
                             nextClientNumber={waitingClients ? waitingClients[0] : undefined}
