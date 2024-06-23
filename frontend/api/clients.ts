@@ -14,6 +14,7 @@ export enum wsClientEvents {
     ClientWaiting = "ClientWaiting",
     ClientInService = "ClientInService",
     ClientRemoved = "ClientRemoved",
+    ClientCallAgain = "ClientCallAgain",
 }
 
 export async function addClient(categoryId: string): Promise<ClientNumber | null> {
@@ -31,18 +32,40 @@ export async function addClient(categoryId: string): Promise<ClientNumber | null
     return res;
 }
 
-export async function setClientAsInService(clientNumber: ClientNumber, seat: number): Promise<ClientNumber | null> {
+export async function setClientAsInService(
+    clientNumber: ClientNumber,
+    seat: number,
+): Promise<ClientNumber | null> {
     clientNumber.seat = seat;
     clientNumber.status = "InService";
 
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-        },
+    const response = await fetch(
+        process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
 
-        body: JSON.stringify(clientNumber),
-    });
+            body: JSON.stringify(clientNumber),
+        },
+    );
+
+    const res = await response.json();
+
+    return res;
+}
+
+export async function callAgainForClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
+    const response = await fetch(
+        process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number + "/call-again",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        },
+    );
 
     const res = await response.json();
 
@@ -50,9 +73,12 @@ export async function setClientAsInService(clientNumber: ClientNumber, seat: num
 }
 
 export async function removeClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
-        method: "DELETE",
-    });
+    const response = await fetch(
+        process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number,
+        {
+            method: "DELETE",
+        },
+    );
 
     const res = await response.json();
 

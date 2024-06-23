@@ -9,6 +9,7 @@ enum wsEvents {
     ClientWaiting = "ClientWaiting",
     ClientInService = "ClientInService",
     ClientRemoved = "ClientRemoved",
+    ClientCallAgain = "ClientCallAgain",
 }
 
 @Injectable()
@@ -71,12 +72,23 @@ export class ClientsService {
         });
     }
 
+    /**
+     * If any other client is in service by the same seat, it will be removed
+     * @param id
+     * @param updateClientDto
+     * @returns
+     */
     async update(id: string, updateClientDto: UpdateClientDto) {
         // Check if client exists
         const isClient = await this.databaseService.client.findUnique({ where: { number: id } });
         if (!isClient) {
             throw new NotFoundException("Client not found");
         }
+
+        // delete any other client in service by the same seat
+        await this.databaseService.client.deleteMany({
+            where: { status: "InService", seat: updateClientDto.seat },
+        });
 
         // Update client
         const client = await this.databaseService.client.update({
@@ -85,6 +97,17 @@ export class ClientsService {
         });
 
         this.websocketsService.emit(wsEvents.ClientInService, client);
+        return client;
+    }
+
+    async callAgain(id: string) {
+        // Check if client exists
+        const client = await this.databaseService.client.findUnique({ where: { number: id } });
+        if (!client) {
+            throw new NotFoundException("Client not found");
+        }
+
+        this.websocketsService.emit(wsEvents.ClientCallAgain, client);
         return client;
     }
 

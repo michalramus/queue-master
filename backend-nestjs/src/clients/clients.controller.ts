@@ -17,14 +17,14 @@ export class ClientsController {
         return this.clientsService.findAll();
     }
 
-    // @Get(":id")
-    // findOne(@Param("id") id: string) {
-    //     return this.clientsService.findOne(+id);
-    // }
-
     @Patch(":id")
     update(@Param("id") id: string, @Body(ValidationPipe) updateClientDto: UpdateClientDto) {
         return this.clientsService.update(id, updateClientDto);
+    }
+
+    @Post(":id/call-again")
+    findOne(@Param("id") id: string) {
+        return this.clientsService.callAgain(id);
     }
 
     @Delete(":id")
