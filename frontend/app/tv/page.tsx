@@ -11,11 +11,18 @@ import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 async function playAudio(client: ClientNumber) {
     //TODO wait for audio to finish
 
-    const audio = new Audio(process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + client.number); //TODO: Move to settings
-    audio.play();
+    const number = new Audio(process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + client.number); //TODO: Move to settings
+    number.play();
     await new Promise((resolve, reject) => {
-        audio.onerror = reject;
-        audio.onended = resolve;
+        number.onerror = reject;
+        number.onended = resolve;
+    });
+    
+    const seat = new Audio(process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + "SEAT"+ client.seat); //TODO: Move to settings
+    seat.play();
+    await new Promise((resolve, reject) => {
+        seat.onerror = reject;
+        seat.onended = resolve;
     });
 }
 
