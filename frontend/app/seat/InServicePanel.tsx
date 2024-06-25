@@ -36,8 +36,8 @@ export default function InServicePanel({
     }
 
     return (
-        <div>
-            <Card>
+        <div className="w-full lg:ml-2">
+            <Card className="w-full">
                 <h5 className="mb-2 text-center text-2xl tracking-tight text-white">
                     <span className={clientNumber ? "" : "visibility: hidden"}>
                         Number:
@@ -50,7 +50,7 @@ export default function InServicePanel({
                         onClick={nextClientHandler}
                         color="green"
                         disabled={nextClientNumber ? false : true}
-                        className="h-20 min-w-32 text-lg"
+                        className="h-28 w-1/3 text-lg"
                     >
                         Next
                     </Button>
@@ -58,7 +58,7 @@ export default function InServicePanel({
                         onClick={callAgainHandler}
                         color="blue"
                         disabled={clientNumber ? false : true}
-                        className="h-20 min-w-32 text-lg"
+                        className="h-28 w-1/3 text-lg"
                     >
                         Call again
                     </Button>
@@ -66,7 +66,7 @@ export default function InServicePanel({
                         onClick={finishClientHandler}
                         color="red"
                         disabled={clientNumber ? false : true}
-                        className="h-20 min-w-32 text-lg"
+                        className="h-28 w-1/3 text-lg"
                     >
                         Finish
                     </Button>
