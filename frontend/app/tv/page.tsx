@@ -10,27 +10,16 @@ import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 
 async function playAudio(client: ClientNumber) {
     //TODO wait for audio to finish
-
-    const number = new Audio(process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + client.number); //TODO: Move to settings
-    number.play();
-    await new Promise((resolve, reject) => {
-        number.onerror = reject;
-        number.onended = resolve;
-    });
-    
-    const seat = new Audio(process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + "SEAT"+ client.seat); //TODO: Move to settings
-    seat.play();
-    await new Promise((resolve, reject) => {
-        seat.onerror = reject;
-        seat.onended = resolve;
-    });
 }
 
 export default function TVPage() {
     const [currentClient, setCurrentClient] = useState<ClientNumber | null>();
 
     const [previousClients, setPreviousClients] = useState<ClientNumber[]>([]);
-    const [newClient, setNewClient] = useState<ClientNumber | null>();
+
+    const [newClientsQueue, setNewClientsQueue] = useState<ClientNumber[]>([]);
+    const [running, setRunning] = useState(false);
+    let run = false;
 
     const maxHistory = 5; // TODO: Move to settings
 
@@ -39,7 +28,7 @@ export default function TVPage() {
         const socket = io(process.env.NEXT_PUBLIC_API ?? "");
 
         function onClientInService(client: ClientNumber) {
-            setNewClient(client);
+            setNewClientsQueue((e) => [...e, client]);
         }
 
         socket.on(wsClientEvents.ClientInService, onClientInService);
@@ -48,31 +37,59 @@ export default function TVPage() {
         };
     }, []);
 
+    useEffect(() => {
+        showNewClients();
+    }, [newClientsQueue]);
+
     /**
      * Play audio and update previousClients and currentClient in order to show it on the screen
      */
-    function showNewClient() {
-        let prevClients = previousClients; // Copy previousClients - useEffect updates are not immediate
+    async function showNewClients() {
+        console.log("begin");
 
-        if (currentClient) {
-            prevClients.unshift(currentClient);
+        if (run) {
+            return;
         }
 
-        if (prevClients.length > maxHistory) {
-            prevClients = prevClients.slice(0, -1); // Remove last element
+        run = true;
+
+        if (running) {
+            return;
+        }
+        setRunning(true);
+
+        
+
+        for (const client of newClientsQueue) {
+            if (currentClient) {
+                setPreviousClients((e) => [currentClient, ...e].slice(0, maxHistory));
+            }
+            setCurrentClient(client);
+
+
+            console.log("current client", currentClient?.number , " next client", client.number);
+
+            const number = new Audio(
+                process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + client.number,
+            ); //TODO: Move to settings
+            const seat = new Audio(
+                process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + "SEAT" + client.seat,
+            ); //TODO: Move to settings
+            number.play();
+            await new Promise((resolve) => {
+                number.onended = resolve;
+            });
+            seat.play();
+            await new Promise((resolve) => {
+                seat.onended = resolve;
+            });
+
+            setNewClientsQueue((e) => e.slice(1));
         }
 
-        // Update states
-        setCurrentClient(newClient);
-        setPreviousClients(prevClients);
-
-        playAudio(newClient!);
-
-        setNewClient(null);
-    }
-
-    if (newClient) {
-        showNewClient();
+        setRunning(false);
+        run = false;
+        console.log("end");
     }
 
     return (
