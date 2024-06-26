@@ -24,13 +24,15 @@ export default function TVPage() {
     useEffect(() => {
         const socket = io(process.env.NEXT_PUBLIC_API ?? "");
 
-        function onClientInService(client: ClientNumber) {
+        function onClientToShow(client: ClientNumber) {
             setNewClientsQueue((e) => [...e, client]);
         }
 
-        socket.on(wsClientEvents.ClientInService, onClientInService);
+        socket.on(wsClientEvents.ClientInService, onClientToShow);
+        socket.on(wsClientEvents.ClientCallAgain, onClientToShow);
         return () => {
-            socket.off(wsClientEvents.ClientInService, onClientInService);
+            socket.off(wsClientEvents.ClientInService, onClientToShow);
+            socket.off(wsClientEvents.ClientCallAgain, onClientToShow);
         };
     }, []);
 
@@ -43,7 +45,7 @@ export default function TVPage() {
     /**
      * Play audio and update previousClients and currentClient in order to show it on the screen
      * Function works in a loop until newClientsQueue is empty, but it's protected from multiple calls at the same time
-     *
+     * If number is already in previousClients it won't be added again, but audio will be played
      */
     const showNewClients = useCallback(async () => {
         //Protect from multiple calls at the same time
@@ -53,14 +55,19 @@ export default function TVPage() {
         isShowNewClientsRunning.current = true;
 
         for (const client of newClientsQueue) {
-            //Update previousClients and currentClient
-            setPreviousClients((e) => {
-                const newClients = currentClientRef.current
-                    ? [currentClientRef.current, ...e]
-                    : [...e];
-                return newClients.slice(0, maxHistory);
-            });
-            setCurrentClient(client);
+            if (
+                currentClientRef.current?.number != client.number &&
+                previousClientsRef.current?.findIndex((e) => e.number === client.number) === -1
+            ) {
+                //Update previousClients and currentClient
+                setPreviousClients((e) => {
+                    const newClients = currentClientRef.current
+                        ? [currentClientRef.current, ...e]
+                        : [...e];
+                    return newClients.slice(0, maxHistory);
+                });
+                setCurrentClient(client);
+            }
 
             //Play audio
             const number = new Audio(
