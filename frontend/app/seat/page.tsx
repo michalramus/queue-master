@@ -9,8 +9,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
 
 export default function SeatPage() {
-    const seat = 1; //TODO: get seat from context
-    const categoryIds = ["A", "B", "C", "D", "E", "F"]; //TODO: get categoryIds from context
+    let seat = 1; //TODO: get seat from context
+    let categoryIds = ["A", "B", "C", "D", "E", "F"]; //TODO: get categoryIds from context
 
     //React query clients fetch
     const queryClient = useQueryClient();
