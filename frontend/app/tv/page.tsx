@@ -2,24 +2,21 @@
 
 import Header from "@/components/Header";
 import { ClientNumber } from "../../api/clients";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
 import { wsClientEvents } from "@/api/clients";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 
-async function playAudio(client: ClientNumber) {
-    //TODO wait for audio to finish
-}
-
 export default function TVPage() {
-    const [currentClient, setCurrentClient] = useState<ClientNumber | null>();
+    const [currentClient, setCurrentClient] = useState<ClientNumber | null>(null);
+    const currentClientRef = useRef<ClientNumber | null>(null);
 
     const [previousClients, setPreviousClients] = useState<ClientNumber[]>([]);
+    const previousClientsRef = useRef<ClientNumber[] | null>(null);
 
     const [newClientsQueue, setNewClientsQueue] = useState<ClientNumber[]>([]);
-    const [running, setRunning] = useState(false);
-    let run = false;
+    const isShowNewClientsRunning = useRef(false); //Protect from multiple calls at the same time - something like a mutex
 
     const maxHistory = 5; // TODO: Move to settings
 
@@ -37,38 +34,35 @@ export default function TVPage() {
         };
     }, []);
 
+    //Update Refs
     useEffect(() => {
-        showNewClients();
-    }, [newClientsQueue]);
+        currentClientRef.current = currentClient;
+        previousClientsRef.current = previousClients;
+    }, [currentClient, previousClients]);
 
     /**
      * Play audio and update previousClients and currentClient in order to show it on the screen
+     * Function works in a loop until newClientsQueue is empty, but it's protected from multiple calls at the same time
+     *
      */
-    async function showNewClients() {
-        console.log("begin");
-
-        if (run) {
+    const showNewClients = useCallback(async () => {
+        //Protect from multiple calls at the same time
+        if (isShowNewClientsRunning.current) {
             return;
         }
-
-        run = true;
-
-        if (running) {
-            return;
-        }
-        setRunning(true);
-
-        
+        isShowNewClientsRunning.current = true;
 
         for (const client of newClientsQueue) {
-            if (currentClient) {
-                setPreviousClients((e) => [currentClient, ...e].slice(0, maxHistory));
-            }
+            //Update previousClients and currentClient
+            setPreviousClients((e) => {
+                const newClients = currentClientRef.current
+                    ? [currentClientRef.current, ...e]
+                    : [...e];
+                return newClients.slice(0, maxHistory);
+            });
             setCurrentClient(client);
 
-
-            console.log("current client", currentClient?.number , " next client", client.number);
-
+            //Play audio
             const number = new Audio(
                 process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + client.number,
             ); //TODO: Move to settings
@@ -87,10 +81,12 @@ export default function TVPage() {
             setNewClientsQueue((e) => e.slice(1));
         }
 
-        setRunning(false);
-        run = false;
-        console.log("end");
-    }
+        isShowNewClientsRunning.current = false;
+    }, [currentClientRef, newClientsQueue, previousClientsRef, isShowNewClientsRunning]);
+
+    useEffect(() => {
+        showNewClients();
+    }, [newClientsQueue, showNewClients]);
 
     return (
         <main className="flex min-h-screen flex-col items-center p-24">
