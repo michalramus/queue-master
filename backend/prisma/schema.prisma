@@ -32,3 +32,15 @@ model Category {
     counter     Int
     clients     Client[]
 }
+
+model User {
+    userId      Int @id @default(autoincrement())
+    username    String @unique
+    password    String
+    role        Role
+}
+
+enum Role {
+    User
+    Admin
+}
