@@ -7,6 +7,7 @@ import { WebsocketsModule } from "./websockets/websockets.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { UsersModule } from './users/users.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { join } from "path";
                 redirect: true,
             },
         }),
+        UsersModule,
     ],
     controllers: [AppController],
     providers: [AppService],
