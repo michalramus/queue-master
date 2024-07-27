@@ -44,3 +44,9 @@ enum Role {
     User
     Admin
 }
+
+model Device {
+    deviceId    Int @id @default(autoincrement())
+    userAgent   String
+    accepted    Boolean @default(false)
+}
