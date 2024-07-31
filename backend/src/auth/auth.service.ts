@@ -63,6 +63,17 @@ export class AuthService {
 
     async refresh(user: any) {
         const payload = { sub: user.userId, type: user.type };
+
+        // Check if user still exists
+        if ((user.type == "User") && (!this.usersService.findOneById(user.userId)))
+        {
+            throw new UnauthorizedException;
+        }
+        else if (user.type == "Device" && (!this.devicesService.findOne(user.userId)))
+        {
+            throw new UnauthorizedException;
+        }
+
         return {
             access_token: await this.jwtService.signAsync(payload, {
                 expiresIn: this.accessTokenExpirationTime,
