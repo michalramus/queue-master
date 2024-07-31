@@ -1,8 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { DevicesService } from "../devices/devices.service";
+import { LoginUserDto } from "./dto/login-user.dto";
+import { Entity } from "./types/entity.class";
 
 @Injectable()
 export class AuthService {
@@ -15,8 +17,11 @@ export class AuthService {
     readonly accessTokenExpirationTime = "5m";
     readonly refreshTokenExpirationTime = "90d";
 
-    //--------------------------Devices-----------------------
-
+    /**
+     * Refresh token of device never expires
+     * @param headers 
+     * @returns 
+     */
     async RegisterDevice(headers: { "user-agent": string }) {
         const device = await this.devicesService.create(headers["user-agent"]);
 
@@ -27,26 +32,20 @@ export class AuthService {
                 expiresIn: this.accessTokenExpirationTime,
                 secret: process.env.JWT_SECRET_KEY,
             }),
+            //Refresh token never expires
             refresh_token: await this.jwtService.signAsync(payload, {
-                expiresIn: this.refreshTokenExpirationTime,
                 secret: process.env.JWT_REFRESH_TOKEN_KEY,
             }),
         };
     }
 
-    //--------------------------Users-----------------------
-    async validateUser(username: string, password: string) {
-        const user = await this.usersService.findOne(username);
+    async login(loginUserDto: LoginUserDto) {
+        const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
 
-        if (user && (await bcrypt.compare(password, user.password))) {
-            const { password, ...result } = user;
-            return result;
+        if (!user) {
+            throw new UnauthorizedException("Incorrect username or password");
         }
 
-        return null;
-    }
-
-    async login(user: any) {
         const payload = { sub: user.userId, type: "User" };
         return {
             user,
@@ -61,17 +60,14 @@ export class AuthService {
         };
     }
 
-    async refresh(user: any) {
-        const payload = { sub: user.userId, type: user.type };
+    async refresh(entity: Entity) {
+        const payload = entity.getJwtPayload();
 
-        // Check if user still exists
-        if ((user.type == "User") && (!this.usersService.findOneById(user.userId)))
-        {
-            throw new UnauthorizedException;
-        }
-        else if (user.type == "Device" && (!this.devicesService.findOne(user.userId)))
-        {
-            throw new UnauthorizedException;
+        // Check if entity still exists
+        if (entity.type == "User" && !(await this.usersService.findOneById(entity.id))) {
+            throw new UnauthorizedException();
+        } else if (entity.type == "Device" && !(await this.devicesService.findOne(entity.id)).accepted) {
+            throw new UnauthorizedException();
         }
 
         return {
@@ -84,5 +80,37 @@ export class AuthService {
                 secret: process.env.JWT_REFRESH_TOKEN_KEY,
             }),
         };
+    }
+
+    async validateUser(username: string, password: string) {
+        const user = await this.usersService.findOneByUsername(username);
+
+        if (user && (await bcrypt.compare(password, user.password))) {
+            const { password, ...result } = user;
+            return result;
+        }
+
+        return null;
+    }
+
+    async validateRoles(roles: ("Device" | "User" | "Admin")[], entity: Entity): Promise<boolean> {
+        switch (entity.type) {
+            case "User":
+                const user = await this.usersService.findOneById(entity.id);
+                if (roles.includes(user.role)) {
+                    return true;
+                }
+
+                break;
+            case "Device":
+                const device = await this.devicesService.findOne(entity.id);
+                console.log(roles.includes("Device"));
+                if (roles.includes("Device") && device.accepted) {
+                    return true;
+                }
+
+                break;
+        }
+        return false;
     }
 }

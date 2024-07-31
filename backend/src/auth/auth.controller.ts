@@ -1,7 +1,10 @@
-import { Controller, Post, UseGuards, Request } from "@nestjs/common";
+import { Controller, Post, UseGuards, Request, Body, ValidationPipe } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { JwtRefreshTokenAuthGuard } from "./guards/jwt-refreshToken-auth.guard";
+import { LoginUserDto } from "./dto/login-user.dto";
+import { Entity } from "./types/entity.class";
+import { RolesGuard } from "./guards/roles.guard";
+import { Roles } from "./roles.decorator";
 
 @Controller("auth")
 export class AuthController {
@@ -12,15 +15,15 @@ export class AuthController {
         return this.authService.RegisterDevice(req.headers);
     }
 
-    @UseGuards(LocalAuthGuard)
     @Post("login")
-    async login(@Request() req) {
-        return this.authService.login(req.user);
+    async login(@Body(ValidationPipe) loginUserDto: LoginUserDto) {
+        return this.authService.login(loginUserDto);
     }
 
-    @UseGuards(JwtRefreshTokenAuthGuard)
     @Post("refresh")
+    @Roles(["User", "Admin"])
+    @UseGuards(JwtRefreshTokenAuthGuard, RolesGuard)
     async refresh(@Request() req) {
-        return this.authService.refresh(req.user);
+        return this.authService.refresh(new Entity().convertFromReq(req));
     }
 }
