@@ -19,8 +19,8 @@ export class AuthService {
 
     /**
      * Refresh token of device never expires
-     * @param headers 
-     * @returns 
+     * @param headers
+     * @returns
      */
     async RegisterDevice(headers: { "user-agent": string }) {
         const device = await this.devicesService.create(headers["user-agent"]);
@@ -104,7 +104,7 @@ export class AuthService {
                 break;
             case "Device":
                 const device = await this.devicesService.findOne(entity.id);
-                console.log(roles.includes("Device"));
+
                 if (roles.includes("Device") && device.accepted) {
                     return true;
                 }
