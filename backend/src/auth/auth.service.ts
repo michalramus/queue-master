@@ -93,10 +93,22 @@ export class AuthService {
         return null;
     }
 
-    async validateRoles(roles: ("Device" | "User" | "Admin")[], entity: Entity): Promise<boolean> {
+    async validateRoles(
+        request: { ip; method; url; user; body },
+        roles: ("Device" | "User" | "Admin")[],
+    ): Promise<boolean> {
+        const entity = Entity.convertFromReq(request);
+        const { ip, method, url } = request;
+
         switch (entity.type) {
             case "User":
                 const user = await this.usersService.findOneById(entity.id);
+
+                if (!user) {
+                    this.logger.warn(`[${entity.name}] Deleted user tried to access ${method} ${url} from ${ip} `);
+                    throw new UnauthorizedException("User is deleted");
+                }
+
                 if (roles.includes(user.role)) {
                     return true;
                 }
@@ -105,12 +117,21 @@ export class AuthService {
             case "Device":
                 const device = await this.devicesService.findOne(entity.id);
 
+                if (!device) {
+                    this.logger.warn(`[${entity.name}] Unauthorized Exception: Deleted device tried to access ${method} ${url} from ${ip} `);
+                    throw new UnauthorizedException("Device is deleted");
+                }
+
                 if (roles.includes("Device") && device.accepted) {
                     return true;
                 }
 
                 break;
         }
-        return false;
+
+        this.logger.warn(
+            `[${entity.name}] Forbidden Exception: Too low permissions to access ${method} ${url} ${ip} ${request.body && Object.keys(request.body).length > 0 ? JSON.stringify(request.body) : ""}`,
+        );
+        throw new ForbiddenException("You do not have permissions to access this path");
     }
 }
