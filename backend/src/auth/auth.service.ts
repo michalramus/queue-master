@@ -48,7 +48,7 @@ export class AuthService {
 
         if (!user) {
             this.logger.warn(
-                `Unauthorized Exception: Failed attempt to log into "${loginUserDto.username}" account from ${ip} `,
+                `UnauthorizedException: Failed attempt to log into "${loginUserDto.username}" account from ${ip} `,
             );
             throw new UnauthorizedException("Incorrect username or password");
         }
@@ -74,7 +74,7 @@ export class AuthService {
         // Check if entity still exists
         if (entity.type == "User" && !(await this.usersService.findOneById(entity.id))) {
             this.logger.warn(
-                `[${entity.type}: ${entity.id}] Unauthorized Exception: Deleted user tried to retrieve new access token from ${ip}`,
+                `[${entity.type}: ${entity.id}] UnauthorizedException: Deleted user tried to retrieve new access token from ${ip}`,
             );
             throw new UnauthorizedException("User does not exist");
         }
@@ -114,7 +114,7 @@ export class AuthService {
                 const user = await this.usersService.findOneById(entity.id);
 
                 if (!user) {
-                    this.logger.warn(`[${entity.name}] Deleted user tried to access ${method} ${url} from ${ip} `);
+                    this.logger.warn(`[${entity.name}] UnauthorizedException: Deleted user tried to access ${method} ${url} from ${ip} `);
                     throw new UnauthorizedException("User is deleted");
                 }
 
@@ -127,7 +127,7 @@ export class AuthService {
                 const device = await this.devicesService.findOne(entity.id);
 
                 if (!device) {
-                    this.logger.warn(`[${entity.name}] Unauthorized Exception: Deleted device tried to access ${method} ${url} from ${ip} `);
+                    this.logger.warn(`[${entity.name}] UnauthorizedException: Deleted device tried to access ${method} ${url} from ${ip} `);
                     throw new UnauthorizedException("Device is deleted");
                 }
 
@@ -139,7 +139,7 @@ export class AuthService {
         }
 
         this.logger.warn(
-            `[${entity.name}] Forbidden Exception: Too low permissions to access ${method} ${url} ${ip} ${request.body && Object.keys(request.body).length > 0 ? JSON.stringify(request.body) : ""}`,
+            `[${entity.name}] ForbiddenException: Too low permissions to access ${method} ${url} ${ip} ${request.body && Object.keys(request.body).length > 0 ? JSON.stringify(request.body) : ""}`,
         );
         throw new ForbiddenException("You do not have permissions to access this path");
     }
