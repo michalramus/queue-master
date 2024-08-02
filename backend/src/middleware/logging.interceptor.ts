@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor, Logger } from "@nestjs/common";
-import { Request, Response } from "express";
 import { Observable, finalize } from "rxjs";
+import { Entity } from "src/auth/types/entity.class";
 
 const maxArrayLength = 100;
 const replacer = (key: string, value: unknown) => {
@@ -21,8 +21,8 @@ export class LoggingInterceptor implements NestInterceptor {
 
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> {
         const handler = context.switchToHttp();
-        const req = handler.getRequest<Request>();
-        const res = handler.getResponse<Response>();
+        const req = context.switchToHttp().getRequest();
+        const res = context.switchToHttp().getResponse();;
 
         const { method, ip, url, user } = req;
 
@@ -36,7 +36,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
                 if (req.user) {
                     this.logger.debug(
-                        `[Entity:${JSON.stringify(user)}] ${method} ${url} ${statusCode} ${duration}ms ${ip}`,
+                        `[${Entity.convertFromReq(req).name}] ${method} ${url} ${statusCode} ${duration}ms ${ip}`,
                     );
                 } else {
                     this.logger.debug(`${method} ${url} ${statusCode} ${duration}ms ${ip}`);
