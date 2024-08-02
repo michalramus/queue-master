@@ -1,8 +1,13 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from "@nestjs/common";
+import {
+    Injectable,
+    CanActivate,
+    ExecutionContext,
+    Logger,
+} from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Roles } from "../roles.decorator";
 import { AuthService } from "../auth.service";
-import { Entity } from "../types/entity.class";
+
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -11,14 +16,18 @@ export class RolesGuard implements CanActivate {
         private authService: AuthService,
     ) {}
 
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | boolean {
+    private logger = new Logger(RolesGuard.name);
+
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const request = context.switchToHttp().getRequest();
+
         const roles = this.reflector.get(Roles, context.getHandler());
         if (!roles) {
             return true;
         }
-        const request = context.switchToHttp().getRequest();
 
-        return this.authService.validateRoles(roles, new Entity().convertFromReq(request))
-       
+        return await this.authService.validateRoles(request, roles);
     }
+
+   
 }
