@@ -12,12 +12,12 @@ export class AuthController {
 
     @Post("register-device")
     async registerDevice(@Request() req) {
-        return this.authService.RegisterDevice(req.headers);
+        return this.authService.RegisterDevice(req.headers, req.ip);
     }
 
     @Post("login")
-    async login(@Body(ValidationPipe) loginUserDto: LoginUserDto) {
-        return this.authService.login(loginUserDto);
+    async login(@Body(ValidationPipe) loginUserDto: LoginUserDto, @Request() req) {
+        return this.authService.login(loginUserDto, req.ip);
     }
 
     @Post("refresh")
