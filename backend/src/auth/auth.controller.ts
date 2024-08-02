@@ -24,6 +24,6 @@ export class AuthController {
     @Roles(["User", "Admin"])
     @UseGuards(JwtRefreshTokenAuthGuard, RolesGuard)
     async refresh(@Request() req) {
-        return this.authService.refresh(new Entity().convertFromReq(req));
+        return this.authService.refresh(Entity.convertFromReq(req), req.ip);
     }
 }
