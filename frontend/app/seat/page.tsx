@@ -55,7 +55,7 @@ export default function SeatPage() {
     }, [queryClient]);
 
     return (
-        <main className="pb24- min-h-screen px-10 pt-10 lg:px-24">
+        <main className="pb-24 min-h-screen px-10 pt-10 lg:px-24">
             <Header>Queue System</Header>
             <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">
                 <div className="w-full lg:w-6/12">
