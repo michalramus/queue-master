@@ -13,8 +13,7 @@ export async function login(username: string, password: string) {
         credentials: "include",
     });
 
-    const res = await response.json();
-    return res;
+    return response;
 }
 
 export async function refreshJWTToken() {
@@ -26,6 +25,5 @@ export async function refreshJWTToken() {
         credentials: "include",
     });
 
-    const res = await response.json();
-    return res;
+    return response;
 }
