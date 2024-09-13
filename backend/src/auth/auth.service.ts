@@ -143,6 +143,13 @@ export class AuthService {
                     throw new UnauthorizedException("Device is deleted");
                 }
 
+                if (!device.accepted) {
+                    this.logger.warn(
+                        `[${entity.name}] UnauthorizedException: Not accepted device tried to access ${method} ${url} from ${ip} `,
+                    );
+                    throw new UnauthorizedException("Device is not accepted");
+                }
+
                 if (roles.includes("Device") && device.accepted) {
                     return true;
                 }
