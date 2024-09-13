@@ -5,6 +5,7 @@ import { JwtService } from "@nestjs/jwt";
 import { DevicesService } from "../devices/devices.service";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { Entity } from "./types/entity.class";
+import { Response } from "express";
 
 @Injectable()
 export class AuthService {
@@ -24,26 +25,28 @@ export class AuthService {
      * @param headers
      * @returns
      */
-    async RegisterDevice(headers: { "user-agent": string }, ip: string) {
+    async RegisterDevice(headers: { "user-agent": string }, ip: string, response: Response) {
         const device = await this.devicesService.create(headers["user-agent"]);
 
         this.logger.log(`Registered new device ${ip} ${JSON.stringify(device)}`);
 
         const payload = new Entity(device.deviceId, "Device", `Device ${device.deviceId}`).getJwtPayload();
-        return {
-            device,
-            access_token: await this.jwtService.signAsync(payload, {
-                expiresIn: this.accessTokenExpirationTime,
-                secret: process.env.JWT_SECRET_KEY,
-            }),
-            //Refresh token never expires
-            refresh_token: await this.jwtService.signAsync(payload, {
-                secret: process.env.JWT_REFRESH_TOKEN_KEY,
-            }),
-        };
+        const accessToken = await this.jwtService.signAsync(payload, {
+            expiresIn: this.accessTokenExpirationTime,
+            secret: process.env.JWT_SECRET_KEY,
+        });
+        //Refresh token never expires
+        const refreshToken = await this.jwtService.signAsync(payload, {
+            secret: process.env.JWT_REFRESH_TOKEN_KEY,
+        });
+
+        response.cookie("jwt", accessToken, { httpOnly: true });
+        response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
+
+        return "Device registered successfully ";
     }
 
-    async login(loginUserDto: LoginUserDto, ip: string) {
+    async login(loginUserDto: LoginUserDto, ip: string, response: Response) {
         const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
 
         if (!user) {
@@ -55,20 +58,22 @@ export class AuthService {
 
         this.logger.log(`[${loginUserDto.username}] Successful login`);
         const payload = new Entity(user.userId, "User", user.username).getJwtPayload();
-        return {
-            user,
-            access_token: await this.jwtService.signAsync(payload, {
-                expiresIn: this.accessTokenExpirationTime,
-                secret: process.env.JWT_SECRET_KEY,
-            }),
-            refresh_token: await this.jwtService.signAsync(payload, {
-                expiresIn: this.refreshTokenExpirationTime,
-                secret: process.env.JWT_REFRESH_TOKEN_KEY,
-            }),
-        };
+        const accessToken = await this.jwtService.signAsync(payload, {
+            expiresIn: this.accessTokenExpirationTime,
+            secret: process.env.JWT_SECRET_KEY,
+        });
+        const refreshToken = await this.jwtService.signAsync(payload, {
+            expiresIn: this.refreshTokenExpirationTime,
+            secret: process.env.JWT_REFRESH_TOKEN_KEY,
+        });
+
+        response.cookie("jwt", accessToken, { httpOnly: true });
+        response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
+
+        return "Successful login";
     }
 
-    async refresh(entity: Entity, ip: string) {
+    async refresh(entity: Entity, ip: string, response: Response) {
         const payload = entity.getJwtPayload();
 
         // Check if entity still exists
@@ -79,16 +84,19 @@ export class AuthService {
             throw new UnauthorizedException("User does not exist");
         }
 
-        return {
-            access_token: await this.jwtService.signAsync(payload, {
-                expiresIn: this.accessTokenExpirationTime,
-                secret: process.env.JWT_SECRET_KEY,
-            }),
-            refresh_token: await this.jwtService.signAsync(payload, {
-                expiresIn: this.refreshTokenExpirationTime,
-                secret: process.env.JWT_REFRESH_TOKEN_KEY,
-            }),
-        };
+        const accessToken = await this.jwtService.signAsync(payload, {
+            expiresIn: this.accessTokenExpirationTime,
+            secret: process.env.JWT_SECRET_KEY,
+        });
+        const refreshToken = await this.jwtService.signAsync(payload, {
+            expiresIn: this.refreshTokenExpirationTime,
+            secret: process.env.JWT_REFRESH_TOKEN_KEY,
+        });
+
+        response.cookie("jwt", accessToken, { httpOnly: true });
+        response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
+
+        return "Successful token refresh";
     }
 
     async validateUser(username: string, password: string) {
@@ -114,7 +122,9 @@ export class AuthService {
                 const user = await this.usersService.findOneById(entity.id);
 
                 if (!user) {
-                    this.logger.warn(`[${entity.name}] UnauthorizedException: Deleted user tried to access ${method} ${url} from ${ip} `);
+                    this.logger.warn(
+                        `[${entity.name}] UnauthorizedException: Deleted user tried to access ${method} ${url} from ${ip} `,
+                    );
                     throw new UnauthorizedException("User is deleted");
                 }
 
@@ -127,7 +137,9 @@ export class AuthService {
                 const device = await this.devicesService.findOne(entity.id);
 
                 if (!device) {
-                    this.logger.warn(`[${entity.name}] UnauthorizedException: Deleted device tried to access ${method} ${url} from ${ip} `);
+                    this.logger.warn(
+                        `[${entity.name}] UnauthorizedException: Deleted device tried to access ${method} ${url} from ${ip} `,
+                    );
                     throw new UnauthorizedException("Device is deleted");
                 }
 
