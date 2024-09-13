@@ -1,3 +1,5 @@
+import { fetchMiddleware } from "./fetchMiddleware";
+
 export interface ClientNumber {
     number: string;
     categoryId: string;
@@ -18,14 +20,17 @@ export enum wsClientEvents {
 }
 
 export async function addClient(categoryId: string): Promise<ClientNumber | null> {
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+    const response = await fetchMiddleware(() =>
+        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
 
-        body: JSON.stringify({ categoryId: categoryId }),
-    });
+            body: JSON.stringify({ categoryId: categoryId }),
+            credentials: "include",
+        }),
+    );
 
     const res = await response.json();
 
@@ -39,16 +44,16 @@ export async function setClientAsInService(
     clientNumber.seat = seat;
     clientNumber.status = "InService";
 
-    const response = await fetch(
-        process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number,
-        {
+    const response = await fetchMiddleware(() =>
+        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
             },
 
             body: JSON.stringify(clientNumber),
-        },
+            credentials: "include",
+        }),
     );
 
     const res = await response.json();
@@ -57,14 +62,14 @@ export async function setClientAsInService(
 }
 
 export async function callAgainForClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
-    const response = await fetch(
-        process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number + "/call-again",
-        {
+    const response = await fetchMiddleware(() =>
+        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number + "/call-again", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-        },
+            credentials: "include",
+        }),
     );
 
     const res = await response.json();
@@ -73,11 +78,11 @@ export async function callAgainForClient(clientNumber: ClientNumber): Promise<Cl
 }
 
 export async function removeClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
-    const response = await fetch(
-        process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number,
-        {
+    const response = await fetchMiddleware(() =>
+        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
             method: "DELETE",
-        },
+            credentials: "include",
+        }),
     );
 
     const res = await response.json();
@@ -86,9 +91,12 @@ export async function removeClient(clientNumber: ClientNumber): Promise<ClientNu
 }
 
 export async function getClients(): Promise<ClientNumber[]> {
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath, {
-        method: "GET",
-    });
+    const response = await fetchMiddleware(() =>
+        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+            method: "GET",
+            credentials: "include",
+        }),
+    );
 
     const res = await response.json();
     return res;
