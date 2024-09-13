@@ -2,7 +2,12 @@
 
 import Header from "@/components/Header";
 import ClientTable from "./ClientTable";
-import { ClientNumber, getClients, setClientAsInService, wsClientEvents } from "@/api/clients";
+import {
+    ClientNumber,
+    getClients,
+    setClientAsInService,
+    wsClientEvents,
+} from "@/utils/api/clients";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -64,7 +69,7 @@ export default function SeatPage() {
                     )}
                 </div>
                 {inServiceClients && (
-                    <div className="flex w-full justify-center mb-5 lg:w-6/12">
+                    <div className="mb-5 flex w-full justify-center lg:w-6/12">
                         <InServicePanel
                             clientNumber={inServiceClients[0]}
                             nextClientNumber={waitingClients ? waitingClients[0] : undefined}

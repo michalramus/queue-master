@@ -1,4 +1,4 @@
-import { ClientNumber } from "../../api/clients";
+import { ClientNumber } from "../../utils/api/clients";
 function ClientNumbersHistoryRow({ clientNumber }: { clientNumber: ClientNumber }) {
     return (
         <tr className="border-b border-gray-700 odd:bg-gray-900 even:bg-gray-800">
