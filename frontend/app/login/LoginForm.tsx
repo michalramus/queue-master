@@ -25,7 +25,7 @@ export default function LoginForm() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center p-24">
+        <div>
             <form className="mx-auto max-w-sm" onSubmit={onSubmit}>
                 <div className="mb-5">
                     <label
@@ -65,6 +65,6 @@ export default function LoginForm() {
             </form>
             {isLoading && <p>loading...</p>}
             {isError && <p>Incorrect login or password</p>}
-        </main>
+        </div>
     );
 }
