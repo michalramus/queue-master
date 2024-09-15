@@ -30,9 +30,6 @@ export async function registerDevice() {
 export async function refreshJWTToken() {
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/refresh", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
         credentials: "include",
     });
 
