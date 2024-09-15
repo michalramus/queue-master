@@ -19,7 +19,7 @@ export class AuthService {
 
     private logger = new Logger(AuthService.name);
 
-    readonly accessTokenExpirationTime = "5m";
+    readonly accessTokenExpirationTime = "1d";
     readonly refreshTokenExpirationTime = "90d";
 
     /**
