@@ -15,7 +15,6 @@ export default function LoginForm() {
         setIsLoading(true);
 
         const res = await login(event.target.username.value, event.target.password.value);
-        console.log(res.status);
         if (res.status != 201) {
             setIsLoading(false);
             setIsError(true);
