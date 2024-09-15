@@ -2,15 +2,28 @@
 
 import Header from "@/components/Header";
 import ClientTable from "./ClientTable";
-import { ClientNumber, getClients, setClientAsInService, wsClientEvents } from "@/api/clients";
+import {
+    ClientNumber,
+    getClients,
+    wsClientEvents,
+} from "@/utils/api/clients";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
+import protectPage from "@/utils/protectPage";
+import { useRouter } from "next/navigation";
 
 export default function SeatPage() {
     let seat = 1; //TODO: get seat from context
     let categoryIds = ["A", "B", "C", "D", "E", "F"]; //TODO: get categoryIds from context
+
+    //Protect page with correct permissions
+    const router = useRouter();
+    useEffect(() => {
+        protectPage(["User", "Admin"], router, "/login", "/login");
+    }, []);
+
 
     //React query clients fetch
     const queryClient = useQueryClient();
@@ -50,7 +63,7 @@ export default function SeatPage() {
     }, [queryClient]);
 
     return (
-        <main className="pb24- min-h-screen px-10 pt-10 lg:px-24">
+        <main className="min-h-screen px-10 pb-24 pt-10 lg:px-24">
             <Header>Queue System</Header>
             <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">
                 <div className="w-full lg:w-6/12">
@@ -64,7 +77,7 @@ export default function SeatPage() {
                     )}
                 </div>
                 {inServiceClients && (
-                    <div className="flex w-full justify-center mb-5 lg:w-6/12">
+                    <div className="mb-5 flex w-full justify-center lg:w-6/12">
                         <InServicePanel
                             clientNumber={inServiceClients[0]}
                             nextClientNumber={waitingClients ? waitingClients[0] : undefined}

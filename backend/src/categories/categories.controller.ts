@@ -1,7 +1,10 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, UseGuards } from "@nestjs/common";
 import { CategoriesService } from "./categories.service";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
+import { RolesGuard } from "src/auth/guards/roles.guard";
 // import { CreateCategoryDto } from "./dto/create-category.dto";
 // import { UpdateCategoryDto } from "./dto/update-category.dto";
+import { Roles } from "../auth/roles.decorator";
 
 @Controller("categories")
 export class CategoriesController {
@@ -13,6 +16,8 @@ export class CategoriesController {
     // }
 
     @Get()
+    @Roles(["Device", "User", "Admin"])
+    @UseGuards(new JwtAuthGuard(), RolesGuard)
     findAll() {
         return this.categoriesService.findAll();
     }
