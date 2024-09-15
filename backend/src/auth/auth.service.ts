@@ -6,6 +6,7 @@ import { DevicesService } from "../devices/devices.service";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
+import { DatabaseService } from "src/database/database.service";
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly devicesService: DevicesService,
         private readonly jwtService: JwtService,
+        private readonly databaseService: DatabaseService,
     ) {}
 
     private logger = new Logger(AuthService.name);
@@ -97,6 +99,18 @@ export class AuthService {
         response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
 
         return "Successful token refresh";
+    }
+
+    async getInfo(entity: Entity) {
+        if (entity.type == "Device") {
+            const device = await this.databaseService.device.findUnique({ where: { deviceId: entity.id } });
+            return { id: device.deviceId, role: "Device" };
+        } else if (entity.type == "User") {
+            const user = await this.databaseService.user.findUnique({ where: { userId: entity.id } });
+            return { id: user.userId, username: user.username, role: user.role };
+        }
+
+        return;
     }
 
     async validateUser(username: string, password: string) {
