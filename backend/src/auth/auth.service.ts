@@ -25,7 +25,7 @@ export class AuthService {
      * @param headers
      * @returns
      */
-    async RegisterDevice(headers: { "user-agent": string }, ip: string, response: Response) {
+    async registerDevice(headers: { "user-agent": string }, ip: string, response: Response) {
         const device = await this.devicesService.create(headers["user-agent"]);
 
         this.logger.log(`Registered new device ${ip} ${JSON.stringify(device)}`);
