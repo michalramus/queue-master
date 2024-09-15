@@ -14,7 +14,7 @@ export class AuthController {
 
     @Post("register-device")
     async registerDevice(@Request() req, @Res({passthrough: true}) res: Response) {
-        return this.authService.RegisterDevice(req.headers, req.ip, res);
+        return this.authService.registerDevice(req.headers, req.ip, res);
     }
 
     @Post("login")
