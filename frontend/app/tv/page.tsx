@@ -1,11 +1,11 @@
 "use client";
 
 import Header from "@/components/Header";
-import { ClientNumber } from "../../utils/api/clients";
+import { ClientNumber } from "../../utils/api/CSR/clients";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
-import { wsClientEvents } from "@/utils/api/clients";
+import { wsClientEvents } from "@/utils/api/CSR/clients";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 
 export default function TVPage() {

@@ -3,8 +3,8 @@
 import Header from "@/components/Header";
 import NumberGetterButton from "./NumberGetterButton";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "@/utils/api/categories";
-import { Category } from "@/utils/api/categories";
+import { getCategories } from "@/utils/api/CSR/categories";
+import { Category } from "@/utils/api/CSR/categories";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import protectPage from "@/utils/protectPage";
