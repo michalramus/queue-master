@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/utils/api/CSR/auth";
 import { useState } from "react";
 
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +20,13 @@ export default function LoginForm() {
             setIsLoading(false);
             setIsError(true);
         } else {
-            router.back();
+            const redirect = searchParams.get("redirect");
+
+            if (redirect) {
+                router.push(redirect);
+            } else {
+                router.push("/");
+            }
         }
     }
 
