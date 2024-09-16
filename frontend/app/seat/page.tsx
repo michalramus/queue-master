@@ -2,28 +2,15 @@
 
 import Header from "@/components/Header";
 import ClientTable from "./ClientTable";
-import {
-    ClientNumber,
-    getClients,
-    wsClientEvents,
-} from "@/utils/api/clients";
+import { ClientNumber, getClients, wsClientEvents } from "@/utils/api/CSR/clients";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
-import protectPage from "@/utils/protectPage";
-import { useRouter } from "next/navigation";
 
 export default function SeatPage() {
     let seat = 1; //TODO: get seat from context
     let categoryIds = ["A", "B", "C", "D", "E", "F"]; //TODO: get categoryIds from context
-
-    //Protect page with correct permissions
-    const router = useRouter();
-    useEffect(() => {
-        protectPage(["User", "Admin"], router, "/login", "/login");
-    }, []);
-
 
     //React query clients fetch
     const queryClient = useQueryClient();
