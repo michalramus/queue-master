@@ -1,7 +1,7 @@
 "use client";
 
-import * as clientsApi from "@/utils/api/clients";
-import { Category } from "@/utils/api/categories";
+import * as clientsApi from "@/utils/api/CSR/clients";
+import { Category } from "@/utils/api/CSR/categories";
 import { useMutation } from "@tanstack/react-query";
 
 export default function NumberGetterButton({ category }: { category: Category }) {

@@ -1,5 +1,5 @@
 import React from "react";
-import { ClientNumber, removeClient, setClientAsInService } from "@/utils/api/clients";
+import { ClientNumber, removeClient, setClientAsInService } from "@/utils/api/CSR/clients";
 import { useMutation } from "@tanstack/react-query";
 import SmallAcceptButton from "@/components/Buttons/SmallAcceptButton";
 import SmallRejectButton from "@/components/Buttons/SmallRejectButton";

@@ -4,7 +4,7 @@ import {
     callAgainForClient,
     removeClient,
     setClientAsInService,
-} from "../../utils/api/clients";
+} from "../../utils/api/CSR/clients";
 import Card from "@/components/Card";
 
 export default function InServicePanel({
