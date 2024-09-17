@@ -1,6 +1,5 @@
 import { fetchSSRMiddleware } from "./fetchSSRMiddleware";
 import { Category } from "../CSR/categories";
-import { cookies } from "next/headers";
 
 const apiPath = "/categories";
 
