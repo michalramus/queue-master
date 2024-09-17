@@ -38,7 +38,7 @@ export default function InServicePanel({
     return (
         <div className="w-full lg:ml-2">
             <Card className="w-full">
-                <h5 className="mb-2 text-center text-2xl tracking-tight text-white">
+                <h5 className="mb-2 text-center text-2xl tracking-tight">
                     <span className={clientNumber ? "" : "visibility: hidden"}>
                         Number:
                         <span className="text-3xl font-bold">{" " + clientNumber?.number}</span>
@@ -47,28 +47,29 @@ export default function InServicePanel({
 
                 <div className="mt-4 flex flex-row justify-center">
                     <Button
-                        onClick={nextClientHandler}
-                        color="green"
-                        disabled={nextClientNumber ? false : true}
-                        className="h-28 w-1/3 text-lg"
+                        onClick={finishClientHandler}
+                        color="red"
+                        disabled={clientNumber ? false : true}
+                        className="h-28 w-1/3 !text-2xl"
                     >
-                        Next
+                        Finish
                     </Button>
+
                     <Button
                         onClick={callAgainHandler}
                         color="blue"
                         disabled={clientNumber ? false : true}
-                        className="h-28 w-1/3 text-lg"
+                        className="h-28 w-1/3 !text-2xl"
                     >
                         Call again
                     </Button>
                     <Button
-                        onClick={finishClientHandler}
-                        color="red"
-                        disabled={clientNumber ? false : true}
-                        className="h-28 w-1/3 text-lg"
+                        onClick={nextClientHandler}
+                        color="green"
+                        disabled={nextClientNumber ? false : true}
+                        className="h-28 w-1/3 !text-2xl"
                     >
-                        Finish
+                        Next
                     </Button>
                 </div>
             </Card>
