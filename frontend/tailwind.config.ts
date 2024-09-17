@@ -13,9 +13,10 @@ const config: Config = {
                 "gradient-conic":
                     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
             },
-            colors: { //TODO
+            colors: {
                 primary: {
                     1: "#27CE5E",
+                    2: "#11b046",
                 },
                 secondary: {
                     1: "#DCFFDC",
@@ -26,16 +27,21 @@ const config: Config = {
                 },
 
                 green: {
-                    1: "#63cb6b", //TODO
-                    2: "#21ba2d"
+                    1: "#63cb6b",
+                    2: "#21ba2d",
                 },
                 blue: {
-                    1: "#689ff0", //TODO
+                    1: "#689ff0",
                     2: "#2071e9",
                 },
                 red: {
-                    1: "#e6705d", //TODO
-                    2:"#e04c34",
+                    1: "#e6705d",
+                    2: "#e04c34",
+                },
+
+                gray: {
+                    1: "#4b5563",
+                    2: "#B1B2B5",
                 },
             },
         },
