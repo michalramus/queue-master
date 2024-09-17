@@ -39,7 +39,7 @@ export default function Button({
         <button
             type="button"
             onClick={onClick}
-            className={`mb-2 me-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md ${colorClass} ${disabled && "cursor-not-allowed"} ${className}`}
+            className={`m-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md ${colorClass} ${disabled && "cursor-not-allowed"} ${className}`}
             disabled={disabled}
         >
             {children}
