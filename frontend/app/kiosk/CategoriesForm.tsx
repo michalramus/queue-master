@@ -8,12 +8,12 @@ export default function CategoriesForm({prefetchCategories}: {prefetchCategories
     const { data: categories } = useQuery({
         queryKey: ["categories"],
         queryFn: getCategories,
-        initialData: prefetchCategories
+        initialData: prefetchCategories,
     });
 
     return (
         <div className="mt-10 flex w-full flex-col items-center">
-            <p className="mb-5 text-4xl text-gray-600">Choose category</p>
+            <p className="mb-5 text-4xl text-gray-1">Choose category</p>
             {Array.isArray(categories) &&
                 categories?.map((category: Category) => {
                     return <NumberGetterButton key={category.id} category={category} />;
