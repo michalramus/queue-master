@@ -1,8 +1,10 @@
+import Header from "@/components/Header";
 import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
     return (
-        <main className="flex min-h-screen flex-col items-center p-24">
+        <main className="flex h-screen flex-col p-16">
+            <Header className="mb-10" />
             <LoginForm />
         </main>
     );

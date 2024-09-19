@@ -1,12 +1,14 @@
 "use client";
 
 import Button from "@/components/Buttons/Button";
-import { getInfo, registerDevice } from "@/utils/api/auth";
+import Card from "@/components/Card";
+import { getInfo, registerDevice } from "@/utils/api/CSR/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function RegisterDeviceForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const queryClient = useQueryClient();
 
     const { data: info, isLoading: isLoadingInfo } = useQuery({
@@ -16,7 +18,7 @@ export default function RegisterDeviceForm() {
 
     async function registerDeviceHandler() {
         await registerDevice();
-        queryClient.invalidateQueries({ queryKey: ["info"] }); 
+        queryClient.invalidateQueries({ queryKey: ["info"] });
     }
 
     if (isLoadingInfo) {
@@ -25,18 +27,26 @@ export default function RegisterDeviceForm() {
 
     if (info?.status == 401) {
         return (
-            <Button
-                onClick={registerDeviceHandler}
-                color="green"
-            >
-                Register Device
-            </Button>
+            <Card className="flex flex-col items-center">
+                <p className="text-lg text-center">
+                    After registering new device, <br />
+                    it is necessary to accept it in the admin panel.
+                </p>
+                <Button onClick={registerDeviceHandler} color="green">
+                    Register New Device
+                </Button>
+            </Card>
         );
     }
 
     if (info?.status == 403) {
-        return <p>Accept device inside admin panel and refresh this site</p>;
+        return <Card>Accept device inside the admin panel and refresh this site</Card>;
     }
 
-    router.back();
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+        router.push(redirect);
+    } else {
+        router.push("/");
+    }
 }

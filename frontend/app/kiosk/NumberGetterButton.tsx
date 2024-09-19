@@ -1,8 +1,7 @@
-"use client";
-
-import * as clientsApi from "@/utils/api/clients";
-import { Category } from "@/utils/api/categories";
+import * as clientsApi from "@/utils/api/CSR/clients";
+import { Category } from "@/utils/api/CSR/categories";
 import { useMutation } from "@tanstack/react-query";
+import Button from "@/components/Buttons/Button";
 
 export default function NumberGetterButton({ category }: { category: Category }) {
     // Create new client
@@ -16,13 +15,14 @@ export default function NumberGetterButton({ category }: { category: Category })
     });
 
     return (
-        <button
+        <Button
             onClick={() => {
                 mutation.mutate({ categoryId: category.id });
             }}
-            className="m-3 w-full rounded-full border-2 bg-white bg-opacity-5 p-6 text-center text-2xl hover:bg-opacity-15"
+            className="border-primary-1 !m-3 !p-6 !w-full !rounded-3xl !border-2 !text-3xl"
+            color="secondary"
         >
             {category.name}
-        </button>
+        </Button>
     );
 }
