@@ -3,12 +3,10 @@ import Table from "@/components/Table";
 interface CurrentNumberWidgetProps {
     number: number | string;
     seat: number | string;
-    className?: React.ComponentProps<'div'>['className'];
+    className?: React.ComponentProps<"div">["className"];
 }
 
 export default function CurrentNumberWidget({ number, seat, className }: CurrentNumberWidgetProps) {
-    console.log(number == "");
-
     return (
         <div className={`${className}`}>
             <Table
