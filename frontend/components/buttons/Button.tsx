@@ -11,7 +11,7 @@ export default function Button({
     onClick: () => void;
     color?: "blue" | "green" | "red" | "primary" | "secondary";
     disabled?: boolean;
-    className?: string;
+    className?: React.ComponentProps<'div'>['className'];
 }) {
     let colorClass = "";
     switch (color) {
