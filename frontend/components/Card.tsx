@@ -3,7 +3,7 @@ export default function Card({
     className,
 }: {
     children: React.ReactNode;
-    className?: string;
+    className?: React.ComponentProps<'div'>['className'];
 }) {
     return (
         <div
