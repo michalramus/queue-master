@@ -1,12 +1,13 @@
 "use client";
 
-import Header from "@/components/Header";
 import { ClientNumber } from "../../utils/api/CSR/clients";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
 import { wsClientEvents } from "@/utils/api/CSR/clients";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
+import SmallHeader from "@/components/SmallHeader";
+import Card from "@/components/Card";
 
 export default function TVPage() {
     const [currentClient, setCurrentClient] = useState<ClientNumber | null>(null);
@@ -18,7 +19,7 @@ export default function TVPage() {
     const [newClientsQueue, setNewClientsQueue] = useState<ClientNumber[]>([]);
     const isShowNewClientsRunning = useRef(false); //Protect from multiple calls at the same time - something like a mutex
 
-    const maxHistory = 5; // TODO: Move to settings
+    const maxHistory = 8; // TODO: Move to settings
 
     //Socket.io
     useEffect(() => {
@@ -96,20 +97,20 @@ export default function TVPage() {
     }, [newClientsQueue, showNewClients]);
 
     return (
-        <main className="flex min-h-screen flex-col items-center p-24">
-            <Header>Queue System</Header>
-            <div className="flex w-full flex-row flex-wrap self-start pt-10">
-                <div className="w-full lg:w-6/12">
+        <main>
+            <div className="fixed bottom-0 right-0 m-7">
+                <SmallHeader />
+            </div>
+            <div className="flex h-screen flex-row flex-nowrap p-24">
+                <ClientNumbersHistory clientNumbers={previousClients} />
+
+                <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center bg-opacity-75">
                     <CurrentNumberWidget
                         number={currentClient?.number ?? ""}
                         seat={currentClient?.seat ?? ""}
-                        className="mb-2"
+                        className="w-full"
                     />
-                    <ClientNumbersHistory clientNumbers={previousClients} />
-                </div>
-                <div className="w-full pt-10 lg:w-6/12">
-                    <p className="text-center text-2xl">Ogłoszenia</p>
-                </div>
+                </Card>
             </div>
         </main>
     );
