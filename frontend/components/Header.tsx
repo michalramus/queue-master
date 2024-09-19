@@ -1,9 +1,26 @@
-import { ReactNode } from "react";
+import Image from "next/image";
 
-export default function Header({ children }: { children: ReactNode }) {
-  return (
-    <div className="w-full rounded-full border-2 bg-white bg-opacity-10 p-6 text-center font-semibold">
-      <h1 className="text-5xl">{children}</h1>
-    </div>
-  );
+export default function Header({
+    className,
+}: {
+    className?: React.ComponentProps<"div">["className"];
+}) {
+    return (
+        <div className={`flex flex-col items-center ${className}`}>
+            <div>
+                <div className="flex items-center justify-center font-semibold">
+                    <p className="text-6xl">Queue</p>
+                    <Image
+                        src="/logo.svg"
+                        alt="logo"
+                        height={96}
+                        width={96}
+                        className="mx-2"
+                    ></Image>
+                    <p className="text-6xl">System</p>
+                </div>
+                <p className="text-right text-xl">By Michał Ramus</p>
+            </div>
+        </div>
+    );
 }
