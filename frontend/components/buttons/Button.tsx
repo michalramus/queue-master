@@ -5,13 +5,15 @@ export default function Button({
     onClick,
     color = "blue",
     disabled = false,
+    type = "button",
     className,
 }: {
     children: React.ReactNode;
     onClick: () => void;
     color?: "blue" | "green" | "red" | "primary" | "secondary";
     disabled?: boolean;
-    className?: React.ComponentProps<'div'>['className'];
+    type?: "button" | "submit";
+    className?: React.ComponentProps<"div">["className"];
 }) {
     let colorClass = "";
     switch (color) {
@@ -37,7 +39,7 @@ export default function Button({
 
     return (
         <button
-            type="button"
+            type={type}
             onClick={onClick}
             className={`m-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md ${colorClass} ${disabled && "cursor-not-allowed"} ${className}`}
             disabled={disabled}
