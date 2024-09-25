@@ -51,3 +51,15 @@ model Device {
     user_agent String
     accepted   Boolean @default(false)
 }
+
+model Global_Setting {
+    id    String @id
+    value String
+}
+
+model User_Setting {
+    id           Int    @id @default(autoincrement())
+    setting_name String
+    user_id      Int
+    value        String
+}
