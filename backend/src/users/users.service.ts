@@ -7,7 +7,7 @@ export class UsersService {
 
     async findOneById(userId: number) {
         return this.databaseService.user.findUnique({
-            where: { userId: userId },
+            where: { id: userId },
         });
     }
 

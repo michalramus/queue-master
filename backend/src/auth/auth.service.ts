@@ -32,7 +32,7 @@ export class AuthService {
 
         this.logger.log(`Registered new device ${ip} ${JSON.stringify(device)}`);
 
-        const payload = new Entity(device.deviceId, "Device", `Device ${device.deviceId}`).getJwtPayload();
+        const payload = new Entity(device.id, "Device", `Device ${device.id}`).getJwtPayload();
         const accessToken = await this.jwtService.signAsync(payload, {
             expiresIn: this.accessTokenExpirationTime,
             secret: process.env.JWT_SECRET_KEY,
@@ -59,7 +59,7 @@ export class AuthService {
         }
 
         this.logger.log(`[${loginUserDto.username}] Successful login`);
-        const payload = new Entity(user.userId, "User", user.username).getJwtPayload();
+        const payload = new Entity(user.id, "User", user.username).getJwtPayload();
         const accessToken = await this.jwtService.signAsync(payload, {
             expiresIn: this.accessTokenExpirationTime,
             secret: process.env.JWT_SECRET_KEY,
@@ -103,11 +103,11 @@ export class AuthService {
 
     async getInfo(entity: Entity) {
         if (entity.type == "Device") {
-            const device = await this.databaseService.device.findUnique({ where: { deviceId: entity.id } });
-            return { id: device.deviceId, role: "Device" };
+            const device = await this.databaseService.device.findUnique({ where: { id: entity.id } });
+            return { id: device.id, role: "Device" };
         } else if (entity.type == "User") {
-            const user = await this.databaseService.user.findUnique({ where: { userId: entity.id } });
-            return { id: user.userId, username: user.username, role: user.role };
+            const user = await this.databaseService.user.findUnique({ where: { id: entity.id } });
+            return { id: user.id, username: user.username, role: user.role };
         }
 
         return;

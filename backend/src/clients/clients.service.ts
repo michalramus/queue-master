@@ -66,7 +66,7 @@ export class ClientsService {
             orderBy: [{ creationDate: "asc" }],
             select: {
                 number: true,
-                categoryId: true,
+                category_id: true,
                 category: { select: { name: true } },
                 status: true,
                 seat: true,

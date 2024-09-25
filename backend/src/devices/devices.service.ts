@@ -7,7 +7,7 @@ export class DevicesService {
 
     async findOne(deviceId: number) {
         return this.databaseService.device.findUnique({
-            where: { deviceId: deviceId },
+            where: { id: deviceId },
         });
     }
 
@@ -19,7 +19,7 @@ export class DevicesService {
     async create(userAgent: string) {
         return await this.databaseService.device.create({
             data: {
-                userAgent: userAgent,
+                user_agent: userAgent,
             },
         });
     }
