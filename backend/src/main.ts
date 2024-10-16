@@ -1,8 +1,8 @@
-import { HttpAdapterHost, NestFactory } from "@nestjs/core";
+import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ConfigModule } from "@nestjs/config";
 import { LoggingInterceptor } from "./middleware/logging.interceptor";
-import * as cookieParser from 'cookie-parser';
+import * as cookieParser from "cookie-parser";
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 
 async function bootstrap() {
@@ -12,10 +12,10 @@ async function bootstrap() {
     app.useGlobalInterceptors(new LoggingInterceptor());
     app.use(cookieParser());
 
-    const corsOptions: CorsOptions = { 
+    const corsOptions: CorsOptions = {
         origin: process.env.FRONTEND_URL,
-        credentials: true, 
-      };
+        credentials: true,
+    };
 
     app.enableCors(corsOptions);
     await app.listen(process.env.PORT);
