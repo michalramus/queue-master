@@ -43,11 +43,15 @@ export default function ClientTable({
 
     const columns = ["Number", "Category", "Creation Date", ""];
     const rows: (string | number | ReactNode | null)[][] = [];
-    filteredClientNumbers?.forEach((client) =>
+    filteredClientNumbers?.forEach((client, index) =>
         rows.push([
-            <span className="text-2xl font-bold">{client.number}</span>,
-            <span className="text-lg text-gray-1">{client.category.name}</span>,
-            <span className="text-base">
+            <span key={index} className="text-2xl font-bold">
+                {client.number}
+            </span>,
+            <span key={index} className="text-lg text-gray-1">
+                {client.category.name}
+            </span>,
+            <span key={index} className="text-base">
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}
                 <br />
                 <span className="text-gray-1">
@@ -56,7 +60,7 @@ export default function ClientTable({
                     })}
                 </span>
             </span>,
-            <span className="flex flex-grow flex-wrap-reverse justify-center">
+            <span key={index} className="flex flex-grow flex-wrap-reverse justify-center">
                 <Button
                     onClick={() => deleteClient.mutate(client)}
                     color="red"
