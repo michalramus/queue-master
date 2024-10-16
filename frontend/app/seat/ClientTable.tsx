@@ -36,10 +36,9 @@ export default function ClientTable({
     });
     //----------------------------------------
 
-
     //Prepare table content
     const filteredClientNumbers = clientNumbers?.filter(
-        (client) => categoryIds.indexOf(client.categoryId) != -1,
+        (client) => categoryIds.indexOf(client.category_id) != -1,
     );
 
     const columns = ["Number", "Category", "Creation Date", ""];
@@ -49,15 +48,15 @@ export default function ClientTable({
             <span className="text-2xl font-bold">{client.number}</span>,
             <span className="text-lg text-gray-1">{client.category.name}</span>,
             <span className="text-base">
-                {new Date(client.creationDate).toLocaleTimeString("pl-PL")}
+                {new Date(client.creation_date).toLocaleTimeString("pl-PL")}
                 <br />
                 <span className="text-gray-1">
-                    {new Date(client.creationDate).toLocaleDateString("en-EN", {
+                    {new Date(client.creation_date).toLocaleDateString("en-EN", {
                         hour12: false,
                     })}
                 </span>
             </span>,
-            <span className="flex flex-grow flex-wrap-reverse justify-center ">
+            <span className="flex flex-grow flex-wrap-reverse justify-center">
                 <Button
                     onClick={() => deleteClient.mutate(client)}
                     color="red"

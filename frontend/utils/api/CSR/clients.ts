@@ -2,11 +2,11 @@ import { fetchMiddleware } from "./fetchMiddleware";
 
 export interface ClientNumber {
     number: string;
-    categoryId: string;
+    category_id: string;
     category: { name: string };
     status: string;
     seat: number | null;
-    creationDate: string;
+    creation_date: string;
 }
 
 const apiPath = "/clients";
