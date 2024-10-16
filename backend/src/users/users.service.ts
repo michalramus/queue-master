@@ -5,13 +5,23 @@ import { DatabaseService } from "../database/database.service";
 export class UsersService {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async findOneById(userId: number) {
+    /**
+     *
+     * @param userId
+     * @returns User with password hash
+     */
+    async findOneById(userId: number): Promise<User | null> {
         return this.databaseService.user.findUnique({
             where: { id: userId },
         });
     }
 
-    async findOneByUsername(username: string) {
+    /**
+     *
+     * @param username
+     * @returns User with password hash
+     */
+    async findOneByUsername(username: string): Promise<User | null> {
         return this.databaseService.user.findUnique({
             where: { username: username },
         });
