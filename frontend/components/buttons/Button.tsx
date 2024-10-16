@@ -9,7 +9,7 @@ export default function Button({
     className,
 }: {
     children: React.ReactNode;
-    onClick: () => void;
+    onClick(): void;
     color?: "blue" | "green" | "red" | "primary" | "secondary";
     disabled?: boolean;
     type?: "button" | "submit";
