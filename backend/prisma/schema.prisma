@@ -19,7 +19,7 @@ model Client {
     category     Category @relation(fields: [category_id], references: [id])
     status       Status
     seat         Int?
-    creationDate DateTime @default(now())
+    creation_date DateTime @default(now())
 }
 
 enum Status {
