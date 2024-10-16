@@ -18,7 +18,7 @@ export class CategoriesController {
     @Get()
     @Roles(["Device", "User", "Admin"])
     @UseGuards(new JwtAuthGuard(), RolesGuard)
-    findAll() {
+    findAll(): Promise<Category[]> {
         return this.categoriesService.findAll();
     }
 

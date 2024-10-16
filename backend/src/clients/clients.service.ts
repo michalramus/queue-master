@@ -23,7 +23,7 @@ export class ClientsService {
 
     private maxClientsCounter = 999;
 
-    async create(createClientDto: CreateClientDto, entity: Entity) {
+    async create(createClientDto: CreateClientDto, entity: Entity): Promise<Client> {
         // Check if category exists
         const category = await this.databaseService.category.findUnique({ where: { id: createClientDto.categoryId } });
         if (!category) {
@@ -65,7 +65,7 @@ export class ClientsService {
         return client;
     }
 
-    async findAll() {
+    async findAll(): Promise<Client[]> {
         const clients = await this.databaseService.client.findMany({
             orderBy: [{ creation_date: "asc" }],
             select: {
@@ -87,7 +87,7 @@ export class ClientsService {
      * @param updateClientDto
      * @returns
      */
-    async update(id: string, updateClientDto: UpdateClientDto, entity: Entity) {
+    async update(id: string, updateClientDto: UpdateClientDto, entity: Entity): Promise<Client> {
         // Check if client exists
         const isClient = await this.databaseService.client.findUnique({ where: { number: id } });
         if (!isClient) {
@@ -113,7 +113,7 @@ export class ClientsService {
         return client;
     }
 
-    async callAgain(id: string, entity: Entity) {
+    async callAgain(id: string, entity: Entity): Promise<Client> {
         // Check if client exists
         const client = await this.databaseService.client.findUnique({ where: { number: id } });
         if (!client) {

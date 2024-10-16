@@ -5,7 +5,7 @@ import { DatabaseService } from "../database/database.service";
 export class DevicesService {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async findOne(deviceId: number) {
+    async findOne(deviceId: number): Promise<Device | null> {
         return this.databaseService.device.findUnique({
             where: { id: deviceId },
         });
@@ -16,8 +16,8 @@ export class DevicesService {
      * @param userAgent
      * @returns
      */
-    async create(userAgent: string) {
-        return await this.databaseService.device.create({
+    async create(userAgent: string): Promise<Device | null> {
+        return this.databaseService.device.create({
             data: {
                 user_agent: userAgent,
             },
