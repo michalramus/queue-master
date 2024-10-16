@@ -1,13 +1,5 @@
 import { fetchSSRMiddleware } from "./fetchSSRMiddleware";
-
-export interface ClientNumber {
-    number: string;
-    categoryId: string;
-    category: { name: string };
-    status: string;
-    seat: number | null;
-    creationDate: string;
-}
+import { ClientNumber } from "@/utils/api/CSR/clients";
 
 const apiPath = "/clients";
 
