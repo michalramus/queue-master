@@ -4,7 +4,7 @@ import { Category, getCategories } from "@/utils/api/CSR/categories";
 import { useQuery } from "@tanstack/react-query";
 import NumberGetterButton from "./NumberGetterButton";
 
-export default function CategoriesForm({prefetchCategories}: {prefetchCategories: Category[]}) {
+export default function CategoriesForm({ prefetchCategories }: { prefetchCategories: Category[] }) {
     const { data: categories } = useQuery({
         queryKey: ["categories"],
         queryFn: getCategories,
