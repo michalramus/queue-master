@@ -67,7 +67,7 @@ export default function ClientTable({
                     className="flex items-center"
                 >
                     <span className="mr-2">Delete</span>
-                    <AcceptIcon />
+                    <RejectIcon />
                 </Button>
                 <Button
                     onClick={() => clientInService.mutate(client)}
@@ -75,7 +75,7 @@ export default function ClientTable({
                     className="flex items-center"
                 >
                     <span className="mr-2">Choose</span>
-                    <RejectIcon />
+                    <AcceptIcon />
                 </Button>
             </span>,
         ]),

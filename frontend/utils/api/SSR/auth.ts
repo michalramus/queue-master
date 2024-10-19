@@ -6,7 +6,7 @@ export async function refreshJWTTokenSSR(cookie: string) {
     const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/refresh", {
         method: "POST",
         credentials: "include",
-        headers: {Cookie: cookie}
+        headers: { Cookie: cookie },
     });
 
     return response;
