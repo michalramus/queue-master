@@ -22,7 +22,7 @@ export class LoggingInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> {
         const handler = context.switchToHttp();
         const req = context.switchToHttp().getRequest();
-        const res = context.switchToHttp().getResponse();;
+        const res = context.switchToHttp().getResponse();
 
         const { method, ip, url, user } = req;
 
