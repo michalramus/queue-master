@@ -14,11 +14,11 @@ datasource db {
 }
 
 model Client {
-    number       String   @id
-    category_id  String
-    category     Category @relation(fields: [category_id], references: [id])
-    status       Status
-    seat         Int?
+    number        String   @id
+    category_id   String
+    category      Category @relation(fields: [category_id], references: [id])
+    status        Status
+    seat          Int?
     creation_date DateTime @default(now())
 }
 
@@ -53,13 +53,13 @@ model Device {
 }
 
 model Global_Setting {
-    id    String @id
+    key   String @id //key of settings
     value String
 }
 
 model User_Setting {
-    id           Int    @id @default(autoincrement())
-    setting_name String
-    user_id      Int
-    value        String
+    id      String @id //concatenation of user_id and key
+    user_id Int
+    key     String //key of settings
+    value   String
 }
