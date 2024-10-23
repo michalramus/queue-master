@@ -16,9 +16,9 @@ export class GlobalSettingsService {
         const settings: { [key: string]: SettingSupportedTypes } = {};
 
         Object.keys(globalSettingsList).forEach((key) => {
-            if (rawSettings.some((setting) => setting.id === key)) {
+            if (rawSettings.some((setting) => setting.key === key)) {
                 const setting = globalSettingsList[key].convertSettingFromString(
-                    rawSettings.find((setting) => setting.id === key).value,
+                    rawSettings.find((setting) => setting.key === key).value,
                 );
                 settings[key] = setting;
             } else {
@@ -47,13 +47,13 @@ export class GlobalSettingsService {
 
             await this.databaseService.global_Setting.upsert({
                 where: {
-                    id: key.toString(),
+                    key: key.toString(),
                 },
                 update: {
                     value: setting.toString(),
                 },
                 create: {
-                    id: key.toString(),
+                    key: key.toString(),
                     value: setting.toString(),
                 },
             });
