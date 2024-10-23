@@ -6,6 +6,7 @@ import {
     setClientAsInService,
 } from "../../utils/api/CSR/clients";
 import Card from "@/components/Card";
+import { useState } from "react";
 
 export default function InServicePanel({
     clientNumber,
@@ -16,6 +17,8 @@ export default function InServicePanel({
     nextClientNumber?: ClientNumber;
     seat: number;
 }) {
+    const [lockNextClientButton, setLockNextClientButton] = useState(false); //Lock the next button to avoid miss clicks
+
     //Handlers
     function finishClientHandler() {
         if (clientNumber) {
@@ -23,10 +26,14 @@ export default function InServicePanel({
         }
     }
 
-    function nextClientHandler() {
+    async function nextClientHandler() {
+        setLockNextClientButton(true);
         if (nextClientNumber) {
             setClientAsInService(nextClientNumber, seat);
         }
+        setTimeout(() => {
+            setLockNextClientButton(false);
+        }, 500);
     }
 
     function callAgainHandler() {
@@ -66,7 +73,7 @@ export default function InServicePanel({
                     <Button
                         onClick={nextClientHandler}
                         color="green"
-                        disabled={nextClientNumber ? false : true}
+                        disabled={nextClientNumber && !lockNextClientButton ? false : true}
                         className="h-28 w-1/3 !text-2xl"
                     >
                         Next
