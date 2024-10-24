@@ -13,7 +13,7 @@ async function bootstrap() {
     app.use(cookieParser());
 
     const corsOptions: CorsOptions = {
-        origin: process.env.FRONTEND_URL,
+        origin: true,
         credentials: true,
     };
 
