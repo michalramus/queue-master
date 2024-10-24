@@ -1,7 +1,5 @@
 import { Logger } from "@nestjs/common";
 
-//TODO add validation for interfaces as types(f.ex. JSON objects)
-
 /**
  * Setting class for storing settings
  * @param T - use only string, number, Date - conversions are not implemented for other types
@@ -10,37 +8,49 @@ import { Logger } from "@nestjs/common";
 export class Setting<T> {
     key: string;
     defaultValue: T;
-    possibleValues: { [key: string]: T } | undefined;
+    possibleStringValues: { [key: string]: T } | undefined;
+    numberRange: { min: number; max: number } | undefined;
     private logger = new Logger("Setting");
 
-    constructor(key: string, defaultValue: T, possibleValues: { [key: string]: T } | undefined = undefined) {
+    /**
+     *
+     * @param key Name of setting
+     * @param defaultValue Default value of setting
+     * @param possibleValues Dictionary of all possible string values
+     * @param numberRange Range of possible number values
+     */
+    constructor(
+        key: string,
+        defaultValue: T,
+        possibleValues: { [key: string]: T } | undefined = undefined,
+        numberRange: { min: number; max: number } | undefined = undefined,
+    ) {
         this.key = key;
         this.defaultValue = defaultValue;
-        this.possibleValues = possibleValues;
+        this.possibleStringValues = possibleValues;
+        this.numberRange = numberRange;
     }
 
     /**
-     * Use this method to convert and validate setting from string //TODO
-     * At the moment function only cast string to T
+     * Use this method to convert setting from string
+     * Function also calls isValueCorrect() to validate the value
      * @param value
      * @returns
      */
     convertSettingFromString(value: string): T {
-        //     //TODO
-        //     try {
-        //         if (typeof this.defaultValue === "number") {
-        //             return <T>(<unknown>parseInt(value));
-        //         } else if (typeof this.defaultValue === "string") {
-        //             return <T>(<unknown>value);
-        //         } else if (this.defaultValue instanceof Date) {
-        //             return <T>(<unknown>new Date(value));
-        //         }
+        if (!this.isValueCorrect(value)) {
+            return this.defaultValue;
+        }
 
-        return <T>(<unknown>value);
-        //     } catch (e) {
-        //         this.logger.warn(`Error converting setting '${this.key}' from string: ${e} - returning default value`);
-        //         return this.defaultValue;
-        //     }
+        if (typeof this.defaultValue === "number") {
+            return <T>(<unknown>parseInt(value));
+        } else if (typeof this.defaultValue === "string") {
+            return <T>(<unknown>value);
+        } else if (this.defaultValue instanceof Date) {
+            return <T>(<unknown>new Date(value));
+        }
+
+        return this.defaultValue;
     }
 
     /**
@@ -51,8 +61,8 @@ export class Setting<T> {
      */
     isValueCorrect(value: string | number): boolean {
         //check possible values
-        if (this.possibleValues != undefined) {
-            if (Object.values(this.possibleValues).includes(<T>(<unknown>value))) {
+        if (this.possibleStringValues != undefined) {
+            if (Object.values(this.possibleStringValues).includes(<T>(<unknown>value))) {
                 return true;
             } else {
                 this.logger.debug(`Error validating setting '${this.key}' from string: '${value}'`);
@@ -61,6 +71,13 @@ export class Setting<T> {
         } else if (typeof this.defaultValue === "number") {
             //check if value is number
             if (!isNaN(<number>(<unknown>value))) {
+                if (this.numberRange != undefined) {
+                    const numValue = <number>(<unknown>value);
+                    if (numValue < this.numberRange.min || numValue > this.numberRange.max) {
+                        this.logger.debug(`Error validating setting '${this.key}' from string: '${value}'`);
+                        return false;
+                    }
+                }
                 return true;
             }
         } else if (this.defaultValue instanceof Date) {
@@ -75,29 +92,6 @@ export class Setting<T> {
         this.logger.debug(`Error validating setting '${this.key}' from string: '${value}'`);
         return false; // if type value is correct or is not supported, return true
     }
-
-    // convertDefaultValueToString(): string {
-    //     if (typeof this.defaultValue === "number") {
-    //         return this.defaultValue.toString();
-    //     } else if (typeof this.defaultValue === "string") {
-    //         return this.defaultValue;
-    //     } else if (this.defaultValue instanceof Date) {
-    //         return this.defaultValue.toISOString();
-    //     }
-
-    //     return this.defaultValue.toString();
-    // }
-
-    /**
-    //  *
-    //  * @param name Name of setting to find
-    //  * @param settings Array of settings to search in
-    //  * @returns Setting with the given name
-    //  */
-    // static findSettingByName<T>(name: string, settings: { [key: string]: Setting<T> }): Setting<T> {
-    //     return settings[name];
-    //     // return settings[name] find((setting) => setting.key === name);
-    // }
 }
 
 export type SettingSupportedTypes = string | number | Date;
