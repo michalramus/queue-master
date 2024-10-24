@@ -12,6 +12,7 @@ import { UsersModule } from "./users/users.module";
 import { DevicesModule } from "./devices/devices.module";
 import { GlobalSettingsModule } from "./global-settings/global-settings.module";
 import { SettingsModule } from "./settings/settings.module";
+import { UserSettingsModule } from "./user-settings/user-settings.module";
 
 @Module({
     imports: [
@@ -32,6 +33,7 @@ import { SettingsModule } from "./settings/settings.module";
         DevicesModule,
         GlobalSettingsModule,
         SettingsModule,
+        UserSettingsModule,
     ],
     controllers: [AppController],
     providers: [AppService],
