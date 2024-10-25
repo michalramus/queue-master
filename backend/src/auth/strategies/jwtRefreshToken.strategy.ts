@@ -2,8 +2,8 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { PassportStrategy } from "@nestjs/passport";
 import { Injectable } from "@nestjs/common";
 
-var cookieExtractor = function (req: any) {
-    var token = null;
+const cookieExtractor = function (req: any) {
+    let token = null;
     if (req && req.cookies) {
         token = req.cookies["jwt_refresh"];
     }

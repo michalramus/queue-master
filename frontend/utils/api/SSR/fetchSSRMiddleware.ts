@@ -10,7 +10,7 @@ import { refreshJWTTokenSSR } from "../SSR/auth";
 export async function fetchSSRMiddleware(
     fetch: (cookie: string) => Promise<Response>,
 ): Promise<Response> {
-    const cookie = cookies().toString();
+    const cookie = (await cookies()).toString();
     const res = await fetch(cookie);
 
     if (res.status == 401) {

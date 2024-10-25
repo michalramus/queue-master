@@ -10,7 +10,7 @@ export class CategoriesService {
     //     return "This action adds a new category";
     // }
 
-    findAll() {
+    findAll(): Promise<Category[]> {
         return this.databaseService.category.findMany({
             orderBy: [
                 {

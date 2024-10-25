@@ -19,7 +19,7 @@ export default function NumberGetterButton({ category }: { category: Category })
             onClick={() => {
                 mutation.mutate({ categoryId: category.id });
             }}
-            className="border-primary-1 !m-3 !p-6 !w-full !rounded-3xl !border-2 !text-3xl"
+            className="!m-3 !w-full !rounded-3xl !border-2 border-primary-1 !p-6 !text-3xl"
             color="secondary"
         >
             {category.name}

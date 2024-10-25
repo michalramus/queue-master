@@ -3,10 +3,12 @@ import QueuePanel from "./QueuePanel";
 import SmallHeader from "@/components/SmallHeader";
 import { getInfoSSR } from "@/utils/api/SSR/auth";
 import UserPanel from "./UserPanel";
+import { getUserSettingsSSR } from "@/utils/api/SSR/settings";
 
 export default async function SeatPage() {
     const clients = await getClientsSSR();
     const user = await (await getInfoSSR()).json();
+    const userSettings = await getUserSettingsSSR();
 
     return (
         <main className="min-h-screen px-8 pb-24 pt-10 lg:px-10">
@@ -17,7 +19,7 @@ export default async function SeatPage() {
                     adminButton={user.role === "Admin" ? true : false}
                 />
             </div>
-            <QueuePanel clients={clients} />
+            <QueuePanel clients={clients} userSettings={userSettings} />
         </main>
     );
 }

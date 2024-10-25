@@ -5,20 +5,21 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
+
 model Client {
-    number      String @id
-    categoryId  String
-    category    Category @relation(fields: [categoryId], references: [id])
-    status      Status
+    number        String   @id
+    category_id   String
+    category      Category @relation(fields: [category_id], references: [id])
+    status        Status
     seat          Int?
-    creationDate  DateTime @default(now())
+    creation_date DateTime @default(now())
 }
 
 enum Status {
@@ -27,17 +28,17 @@ enum Status {
 }
 
 model Category {
-    id          String @id
-    name        String
-    counter     Int
-    clients     Client[]
+    id      String   @id
+    name    String
+    counter Int
+    clients Client[]
 }
 
 model User {
-    userId      Int @id @default(autoincrement())
-    username    String @unique
-    password    String
-    role        Role
+    id       Int    @id @default(autoincrement())
+    username String @unique
+    password String
+    role     Role
 }
 
 enum Role {
@@ -46,7 +47,19 @@ enum Role {
 }
 
 model Device {
-    deviceId    Int @id @default(autoincrement())
-    userAgent   String
-    accepted    Boolean @default(false)
+    id         Int     @id @default(autoincrement())
+    user_agent String
+    accepted   Boolean @default(false)
+}
+
+model Global_Setting {
+    key   String @id //key of settings
+    value String
+}
+
+model User_Setting {
+    id      String @id //concatenation of user_id and key
+    user_id Int
+    key     String //key of settings
+    value   String
 }

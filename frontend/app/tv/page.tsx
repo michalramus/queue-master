@@ -23,7 +23,7 @@ export default function TVPage() {
 
     //Socket.io
     useEffect(() => {
-        const socket = io(process.env.NEXT_PUBLIC_API ?? "");
+        const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL ?? "");
 
         function onClientToShow(client: ClientNumber) {
             setNewClientsQueue((e) => [...e, client]);
@@ -72,10 +72,10 @@ export default function TVPage() {
 
             //Play audio
             const number = new Audio(
-                process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + client.number,
+                process.env.NEXT_PUBLIC_BACKEND_URL + "/audio-samples/pl/" + client.number,
             ); //TODO: Move to settings
             const seat = new Audio(
-                process.env.NEXT_PUBLIC_API + "/audio-samples/pl/" + "SEAT" + client.seat,
+                process.env.NEXT_PUBLIC_BACKEND_URL + "/audio-samples/pl/" + "SEAT" + client.seat,
             ); //TODO: Move to settings
             number.play();
             await new Promise((resolve) => {
