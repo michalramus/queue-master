@@ -101,6 +101,13 @@ export class AuthService {
         return "Successful token refresh";
     }
 
+    async logout(entity: Entity, response: Response) {
+        response.clearCookie("jwt", { httpOnly: true });
+        response.clearCookie("jwt_refresh", { httpOnly: true });
+
+        return "Logged out successfully";
+    }
+
     async getInfo(entity: Entity) {
         if (entity.type == "Device") {
             const device = await this.databaseService.device.findUnique({ where: { id: entity.id } });
@@ -115,9 +122,8 @@ export class AuthService {
 
     async validateUser(username: string, password: string) {
         const user = await this.usersService.findOneByUsername(username);
-
         if (user && (await bcrypt.compare(password, user.password))) {
-            const { password, ...result } = user;
+            const { password, ...result } = user; // eslint-disable-line
             return result;
         }
 
