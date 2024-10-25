@@ -1,3 +1,4 @@
+"use client";
 import { fetchMiddleware } from "./fetchMiddleware";
 
 export interface Category {
