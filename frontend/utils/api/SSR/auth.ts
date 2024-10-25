@@ -3,7 +3,7 @@ import { fetchSSRMiddleware } from "./fetchSSRMiddleware";
 const apiPath = "/auth";
 
 export async function refreshJWTTokenSSR(cookie: string) {
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/refresh", {
+    const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/refresh", {
         method: "POST",
         credentials: "include",
         headers: { Cookie: cookie },
@@ -17,7 +17,7 @@ export async function refreshJWTTokenSSR(cookie: string) {
  */
 export async function getInfoSSR() {
     const response = await fetchSSRMiddleware((cookie) =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/get-info", {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/get-info", {
             method: "GET",
             credentials: "include",
             headers: { Cookie: cookie },
