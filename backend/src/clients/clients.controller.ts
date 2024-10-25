@@ -14,35 +14,39 @@ export class ClientsController {
     @Post()
     @Roles(["Device", "User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    create(@Body(ValidationPipe) createClientDto: CreateClientDto, @Request() req) {
+    create(@Body(ValidationPipe) createClientDto: CreateClientDto, @Request() req): Promise<Client> {
         return this.clientsService.create(createClientDto, Entity.convertFromReq(req));
     }
 
     @Get()
     @Roles(["Device", "User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    findAll() {
+    findAll(): Promise<Client[]> {
         return this.clientsService.findAll();
     }
 
     @Patch(":id")
     @Roles(["User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    update(@Param("id") id: string, @Body(ValidationPipe) updateClientDto: UpdateClientDto, @Request() req) {
+    update(
+        @Param("id") id: string,
+        @Body(ValidationPipe) updateClientDto: UpdateClientDto,
+        @Request() req,
+    ): Promise<Client> {
         return this.clientsService.update(id, updateClientDto, Entity.convertFromReq(req));
     }
 
     @Post(":id/call-again")
     @Roles(["User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    findOne(@Param("id") id: string, @Request() req) {
+    findOne(@Param("id") id: string, @Request() req): Promise<Client> {
         return this.clientsService.callAgain(id, Entity.convertFromReq(req));
     }
 
     @Delete(":id")
     @Roles(["User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    remove(@Param("id") id: string, @Request() req) {
+    remove(@Param("id") id: string, @Request() req): Promise<Client> {
         return this.clientsService.remove(id, Entity.convertFromReq(req));
     }
 }

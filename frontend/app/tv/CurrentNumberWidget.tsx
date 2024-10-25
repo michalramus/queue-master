@@ -10,14 +10,22 @@ export default function CurrentNumberWidget({ number, seat, className }: Current
     return (
         <div className={`${className}`}>
             <Table
-                columns={[<span className="font-light">Number</span>]}
+                columns={[
+                    <span key={"Number"} className="font-light">
+                        Number
+                    </span>,
+                ]}
                 rows={[[number != "" ? number : <br />]]}
                 theadClassName="text-text-1 text-5xl"
                 tbodyClassName="text-primary-1 !border-0 text-7xl font-medium"
                 className="mb-20"
             />
             <Table
-                columns={[<span className="font-light">Seat</span>]}
+                columns={[
+                    <span key={"Seat"} className="font-light">
+                        Seat
+                    </span>,
+                ]}
                 rows={[[seat != "" ? seat : <br />]]}
                 theadClassName="text-text-1 text-5xl"
                 tbodyClassName="text-primary-1 !border-0 text-7xl font-medium"

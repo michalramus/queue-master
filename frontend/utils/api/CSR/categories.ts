@@ -9,7 +9,7 @@ const apiPath = "/categories";
 
 export async function getCategories(): Promise<Category[]> {
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "GET",
             credentials: "include",
         }),

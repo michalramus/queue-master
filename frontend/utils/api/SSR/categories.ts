@@ -5,7 +5,7 @@ const apiPath = "/categories";
 
 export async function getCategoriesSSR(): Promise<Category[]> {
     const response = await fetchSSRMiddleware((cookie) =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "GET",
             credentials: "include",
             headers: { Cookie: cookie },

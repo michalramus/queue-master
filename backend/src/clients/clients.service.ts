@@ -23,18 +23,22 @@ export class ClientsService {
 
     private maxClientsCounter = 999;
 
-    async create(createClientDto: CreateClientDto, entity: Entity) {
+    async create(createClientDto: CreateClientDto, entity: Entity): Promise<Client> {
         // Check if category exists
         const category = await this.databaseService.category.findUnique({ where: { id: createClientDto.categoryId } });
         if (!category) {
-            this.logger.warn(`NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`);
+            this.logger.warn(
+                `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
+            );
             throw new NotFoundException("Category not found");
         }
 
         // Prepare client number
         let counter = category.counter + 1;
         if (counter > this.maxClientsCounter) {
-            this.logger.log(`Counter exceeded ${this.maxClientsCounter}. Resetting counter to 1 for category ${category.id}`);
+            this.logger.log(
+                `Counter exceeded ${this.maxClientsCounter}. Resetting counter to 1 for category ${category.id}`,
+            );
             counter = 1;
         }
 
@@ -61,16 +65,16 @@ export class ClientsService {
         return client;
     }
 
-    async findAll() {
+    async findAll(): Promise<Client[]> {
         const clients = await this.databaseService.client.findMany({
-            orderBy: [{ creationDate: "asc" }],
+            orderBy: [{ creation_date: "asc" }],
             select: {
                 number: true,
-                categoryId: true,
+                category_id: true,
                 category: { select: { name: true } },
                 status: true,
                 seat: true,
-                creationDate: true,
+                creation_date: true,
             },
         });
         this.logger.debug(`Fetched ${clients.length} clients`);
@@ -83,7 +87,7 @@ export class ClientsService {
      * @param updateClientDto
      * @returns
      */
-    async update(id: string, updateClientDto: UpdateClientDto, entity: Entity) {
+    async update(id: string, updateClientDto: UpdateClientDto, entity: Entity): Promise<Client> {
         // Check if client exists
         const isClient = await this.databaseService.client.findUnique({ where: { number: id } });
         if (!isClient) {
@@ -103,11 +107,13 @@ export class ClientsService {
         });
 
         this.websocketsService.emit(wsEvents.ClientInService, client);
-        this.logger.log(`[${entity.name}] Client with number ${id} updated with status ${updateClientDto.status} and seat ${updateClientDto.seat}`);
+        this.logger.log(
+            `[${entity.name}] Client with number ${id} updated with status ${updateClientDto.status} and seat ${updateClientDto.seat}`,
+        );
         return client;
     }
 
-    async callAgain(id: string, entity: Entity) {
+    async callAgain(id: string, entity: Entity): Promise<Client> {
         // Check if client exists
         const client = await this.databaseService.client.findUnique({ where: { number: id } });
         if (!client) {

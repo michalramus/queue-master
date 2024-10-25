@@ -21,6 +21,6 @@ export class Entity {
     }
 
     getJwtPayload() {
-        return { sub: this.id, type: this.type, name: this.name };  //IMPORTANT: If changing this, update also jwt strategies
+        return { sub: this.id, type: this.type, name: this.name }; //IMPORTANT: If changing this, update also jwt strategies
     }
 }

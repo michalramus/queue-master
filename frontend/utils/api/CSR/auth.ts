@@ -3,7 +3,7 @@ import { fetchMiddleware } from "./fetchMiddleware";
 const apiPath = "/auth";
 
 export async function login(username: string, password: string) {
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/login", {
+    const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/login", {
         method: "POST",
         body: JSON.stringify({
             username,
@@ -19,16 +19,19 @@ export async function login(username: string, password: string) {
 }
 
 export async function registerDevice() {
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/register-device", {
-        method: "POST",
-        credentials: "include",
-    });
+    const response = await fetch(
+        process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/register-device",
+        {
+            method: "POST",
+            credentials: "include",
+        },
+    );
 
     return response;
 }
 
 export async function refreshJWTToken() {
-    const response = await fetch(process.env.NEXT_PUBLIC_API + apiPath + "/refresh", {
+    const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/refresh", {
         method: "POST",
         credentials: "include",
     });
@@ -41,7 +44,7 @@ export async function refreshJWTToken() {
  */
 export async function getInfo() {
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/get-info", {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/get-info", {
             method: "GET",
             credentials: "include",
         }),

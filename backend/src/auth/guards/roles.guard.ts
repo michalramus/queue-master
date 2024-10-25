@@ -1,13 +1,7 @@
-import {
-    Injectable,
-    CanActivate,
-    ExecutionContext,
-    Logger,
-} from "@nestjs/common";
+import { Injectable, CanActivate, ExecutionContext, Logger } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Roles } from "../roles.decorator";
 import { AuthService } from "../auth.service";
-
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -28,6 +22,4 @@ export class RolesGuard implements CanActivate {
 
         return await this.authService.validateRoles(request, roles);
     }
-
-   
 }

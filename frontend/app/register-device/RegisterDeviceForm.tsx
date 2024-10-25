@@ -28,7 +28,7 @@ export default function RegisterDeviceForm() {
     if (info?.status == 401) {
         return (
             <Card className="flex flex-col items-center">
-                <p className="text-lg text-center">
+                <p className="text-center text-lg">
                     After registering new device, <br />
                     it is necessary to accept it in the admin panel.
                 </p>

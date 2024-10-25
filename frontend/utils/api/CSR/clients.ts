@@ -2,11 +2,11 @@ import { fetchMiddleware } from "./fetchMiddleware";
 
 export interface ClientNumber {
     number: string;
-    categoryId: string;
+    category_id: string;
     category: { name: string };
     status: string;
     seat: number | null;
-    creationDate: string;
+    creation_date: string;
 }
 
 const apiPath = "/clients";
@@ -21,7 +21,7 @@ export enum wsClientEvents {
 
 export async function addClient(categoryId: string): Promise<ClientNumber | null> {
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function setClientAsInService(
     clientNumber.status = "InService";
 
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.number, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -63,13 +63,20 @@ export async function setClientAsInService(
 
 export async function callAgainForClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number + "/call-again", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+        fetch(
+            process.env.NEXT_PUBLIC_BACKEND_URL +
+                apiPath +
+                "/" +
+                clientNumber.number +
+                "/call-again",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
             },
-            credentials: "include",
-        }),
+        ),
     );
 
     const res = await response.json();
@@ -79,7 +86,7 @@ export async function callAgainForClient(clientNumber: ClientNumber): Promise<Cl
 
 export async function removeClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.number, {
             method: "DELETE",
             credentials: "include",
         }),
@@ -92,7 +99,7 @@ export async function removeClient(clientNumber: ClientNumber): Promise<ClientNu
 
 export async function getClients(): Promise<ClientNumber[]> {
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "GET",
             credentials: "include",
         }),
