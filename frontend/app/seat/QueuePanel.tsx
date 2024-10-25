@@ -6,9 +6,16 @@ import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
+import { UserSettingsInterface } from "../../utils/api/CSR/settings";
 
-export default function QueuePanel({ clients }: { clients: ClientNumber[] }) {
-    let seat = 1; //TODO: get seat from context
+export default function QueuePanel({
+    clients,
+    userSettings,
+}: {
+    clients: ClientNumber[];
+    userSettings: UserSettingsInterface;
+}) {
+    let seat = userSettings.seat;
     let categoryIds = ["A", "B", "C", "D", "E", "F"]; //TODO: get categoryIds from context
 
     //React query clients fetch
@@ -59,7 +66,7 @@ export default function QueuePanel({ clients }: { clients: ClientNumber[] }) {
                     <ClientTable
                         clientNumbers={waitingClients}
                         categoryIds={categoryIds}
-                        seat={seat}
+                        seat={seat ? seat : 1}
                     />
                 )}
             </div>
@@ -68,7 +75,7 @@ export default function QueuePanel({ clients }: { clients: ClientNumber[] }) {
                     <InServicePanel
                         clientNumber={inServiceClients[0]}
                         nextClientNumber={waitingClients ? waitingClients[0] : undefined}
-                        seat={seat}
+                        seat={seat ? seat : 1}
                     />
                 </div>
             )}
