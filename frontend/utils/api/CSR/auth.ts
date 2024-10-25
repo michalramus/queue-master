@@ -1,3 +1,4 @@
+"use client";
 import { fetchMiddleware } from "./fetchMiddleware";
 
 const apiPath = "/auth";
@@ -32,6 +33,15 @@ export async function registerDevice() {
 
 export async function refreshJWTToken() {
     const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/refresh", {
+        method: "POST",
+        credentials: "include",
+    });
+
+    return response;
+}
+
+export async function logout() {
+    const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/logout", {
         method: "POST",
         credentials: "include",
     });

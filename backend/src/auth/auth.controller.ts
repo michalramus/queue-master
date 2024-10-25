@@ -32,6 +32,12 @@ export class AuthController {
         return this.authService.refresh(Entity.convertFromReq(req), req.ip, res);
     }
 
+    @Post("logout")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    async logout(@Request() req, @Res({ passthrough: true }) res: Response) {
+        return this.authService.logout(Entity.convertFromReq(req), res);
+    }
+
     /**
      *
      * @returns Info about logged user or device
