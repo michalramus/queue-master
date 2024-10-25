@@ -13,7 +13,7 @@ export enum wsClientEvents {
 
 export async function addClientSSR(categoryId: string): Promise<ClientNumber | null> {
     const response = await fetchSSRMiddleware((cookie) =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export async function setClientAsInServiceSSR(
     clientNumber.status = "InService";
 
     const response = await fetchSSRMiddleware((cookie) =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.number, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -59,14 +59,21 @@ export async function callAgainForClientSSR(
     clientNumber: ClientNumber,
 ): Promise<ClientNumber | null> {
     const response = await fetchSSRMiddleware((cookie) =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number + "/call-again", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Cookie: cookie,
+        fetch(
+            process.env.NEXT_PUBLIC_BACKEND_URL +
+                apiPath +
+                "/" +
+                clientNumber.number +
+                "/call-again",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookie,
+                },
+                credentials: "include",
             },
-            credentials: "include",
-        }),
+        ),
     );
 
     const res = await response.json();
@@ -76,7 +83,7 @@ export async function callAgainForClientSSR(
 
 export async function removeClientSSR(clientNumber: ClientNumber): Promise<ClientNumber | null> {
     const response = await fetchSSRMiddleware((cookie) =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath + "/" + clientNumber.number, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.number, {
             method: "DELETE",
             credentials: "include",
             headers: { Cookie: cookie },
@@ -90,7 +97,7 @@ export async function removeClientSSR(clientNumber: ClientNumber): Promise<Clien
 
 export async function getClientsSSR(): Promise<ClientNumber[]> {
     const response = await fetchSSRMiddleware((cookie) =>
-        fetch(process.env.NEXT_PUBLIC_API + apiPath, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "GET",
             credentials: "include",
             headers: {
