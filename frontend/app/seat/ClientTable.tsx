@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { ClientNumber, removeClient, setClientAsInService } from "@/utils/api/CSR/clients";
+import { ClientInterface, removeClient, setClientAsInService } from "@/utils/api/CSR/clients";
 import { useMutation } from "@tanstack/react-query";
 import Table from "@/components/Table";
 import Button from "@/components/Buttons/Button";
@@ -18,8 +18,8 @@ export default function ClientTable({
     categoryIds,
     seat,
 }: {
-    clientNumbers: ClientNumber[] | undefined;
-    categoryIds: string[];
+    clientNumbers: ClientInterface[] | undefined;
+    categoryIds: number[];
     seat: number;
 }) {
     //----------------------------------------
@@ -27,12 +27,12 @@ export default function ClientTable({
 
     // set client as in service
     const clientInService = useMutation({
-        mutationFn: (clientNumber: ClientNumber) => setClientAsInService(clientNumber, seat),
+        mutationFn: (clientNumber: ClientInterface) => setClientAsInService(clientNumber, seat),
     });
 
     // remove client
     const deleteClient = useMutation({
-        mutationFn: (clientNumber: ClientNumber) => removeClient(clientNumber),
+        mutationFn: (clientNumber: ClientInterface) => removeClient(clientNumber),
     });
     //----------------------------------------
 
@@ -46,10 +46,10 @@ export default function ClientTable({
     filteredClientNumbers?.forEach((client, index) =>
         rows.push([
             <span key={index} className="text-2xl font-bold">
-                {client.number}
+                {client.category?.short_name + client.number}
             </span>,
             <span key={index} className="text-lg text-gray-1">
-                {client.category.name}
+                {client.category?.name}
             </span>,
             <span key={index} className="text-base">
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}

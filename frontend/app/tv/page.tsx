@@ -1,6 +1,6 @@
 "use client";
 
-import { ClientNumber } from "../../utils/api/CSR/clients";
+import { ClientInterface } from "../../utils/api/CSR/clients";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
@@ -10,13 +10,13 @@ import SmallHeader from "@/components/SmallHeader";
 import Card from "@/components/Card";
 
 export default function TVPage() {
-    const [currentClient, setCurrentClient] = useState<ClientNumber | null>(null);
-    const currentClientRef = useRef<ClientNumber | null>(null);
+    const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
+    const currentClientRef = useRef<ClientInterface | null>(null);
 
-    const [previousClients, setPreviousClients] = useState<ClientNumber[]>([]);
-    const previousClientsRef = useRef<ClientNumber[] | null>(null);
+    const [previousClients, setPreviousClients] = useState<ClientInterface[]>([]);
+    const previousClientsRef = useRef<ClientInterface[] | null>(null);
 
-    const [newClientsQueue, setNewClientsQueue] = useState<ClientNumber[]>([]);
+    const [newClientsQueue, setNewClientsQueue] = useState<ClientInterface[]>([]);
     const isShowNewClientsRunning = useRef(false); //Protect from multiple calls at the same time - something like a mutex
 
     const maxHistory = 8; // TODO: Move to settings
@@ -25,7 +25,7 @@ export default function TVPage() {
     useEffect(() => {
         const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL ?? "");
 
-        function onClientToShow(client: ClientNumber) {
+        function onClientToShow(client: ClientInterface) {
             setNewClientsQueue((e) => [...e, client]);
         }
 
@@ -72,7 +72,10 @@ export default function TVPage() {
 
             //Play audio
             const number = new Audio(
-                process.env.NEXT_PUBLIC_BACKEND_URL + "/audio-samples/pl/" + client.number,
+                process.env.NEXT_PUBLIC_BACKEND_URL +
+                    "/audio-samples/pl/" +
+                    client.category?.short_name +
+                    client.number,
             ); //TODO: Move to settings
             const seat = new Audio(
                 process.env.NEXT_PUBLIC_BACKEND_URL + "/audio-samples/pl/" + "SEAT" + client.seat,
@@ -106,6 +109,7 @@ export default function TVPage() {
 
                 <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center bg-opacity-75">
                     <CurrentNumberWidget
+                        category_short_name={currentClient?.category?.short_name ?? ""}
                         number={currentClient?.number ?? ""}
                         seat={currentClient?.seat ?? ""}
                         className="w-full"

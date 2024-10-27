@@ -1,15 +1,15 @@
 import * as clientsApi from "@/utils/api/CSR/clients";
-import { Category } from "@/utils/api/CSR/categories";
+import { CategoryInterface } from "@/utils/api/CSR/categories";
 import { useMutation } from "@tanstack/react-query";
 import Button from "@/components/Buttons/Button";
 
-export default function NumberGetterButton({ category }: { category: Category }) {
+export default function NumberGetterButton({ category }: { category: CategoryInterface }) {
     // Create new client
     const mutation = useMutation({
-        mutationFn: ({ categoryId }: { categoryId: string }) => clientsApi.addClient(categoryId),
+        mutationFn: ({ categoryId }: { categoryId: number }) => clientsApi.addClient(categoryId),
         onSuccess: (data) => {
             if (data != null) {
-                alert(data.number);
+                alert((data.category?.short_name ? data.category.short_name : "") + data.number);
             }
         },
     });

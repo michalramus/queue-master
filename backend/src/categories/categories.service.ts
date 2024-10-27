@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 // import { CreateCategoryDto } from "./dto/create-category.dto";
 // import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { DatabaseService } from "../database/database.service";
+import { Category } from "./types/category.interface";
 
 @Injectable()
 export class CategoriesService {
@@ -20,6 +21,7 @@ export class CategoriesService {
 
             select: {
                 id: true,
+                short_name: true,
                 name: true,
             },
         });
