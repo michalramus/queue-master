@@ -1,9 +1,9 @@
 import { fetchSSRMiddleware } from "./fetchSSRMiddleware";
-import { Category } from "../CSR/categories";
+import { CategoryInterface } from "../CSR/categories";
 
 const apiPath = "/categories";
 
-export async function getCategoriesSSR(): Promise<Category[]> {
+export async function getCategoriesSSR(): Promise<CategoryInterface[]> {
     const response = await fetchSSRMiddleware((cookie) =>
         fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "GET",

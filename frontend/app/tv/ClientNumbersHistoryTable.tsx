@@ -1,16 +1,30 @@
 import Table from "@/components/Table";
-import { ClientNumber } from "../../utils/api/CSR/clients";
+import { ClientInterface } from "../../utils/api/CSR/clients";
 import { ReactNode } from "react";
 
-export default function ClientNumbersHistory({ clientNumbers }: { clientNumbers: ClientNumber[] }) {
+export default function ClientNumbersHistory({
+    clientNumbers,
+}: {
+    clientNumbers: ClientInterface[];
+}) {
     const rows: (string | number | ReactNode | null)[][] = [];
-    clientNumbers.map((clientNumber) => rows.push([clientNumber.number, clientNumber.seat]));
+    clientNumbers.map((clientNumber) =>
+        rows.push([
+            (clientNumber.category?.short_name ? clientNumber.category.short_name : "") +
+                clientNumber.number,
+            clientNumber.seat,
+        ]),
+    );
 
     return (
         <Table
             columns={[
-                <span className="font-light">Number</span>,
-                <span className="font-light">Seat</span>,
+                <span key={"Number"} className="font-light">
+                    Number
+                </span>,
+                <span key={"Seat"} className="font-light">
+                    Seat
+                </span>,
             ]}
             rows={rows}
             theadClassName="text-4xl"

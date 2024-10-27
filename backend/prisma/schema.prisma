@@ -14,8 +14,9 @@ datasource db {
 }
 
 model Client {
-    number        String   @id
-    category_id   String
+    id            Int      @id @default(autoincrement())
+    number        Int
+    category_id   Int
     category      Category @relation(fields: [category_id], references: [id])
     status        Status
     seat          Int?
@@ -28,10 +29,41 @@ enum Status {
 }
 
 model Category {
-    id      String   @id
-    name    String
-    counter Int
-    clients Client[]
+    id                 Int                 @id @default(autoincrement())
+    short_name         Category_Short_Name @unique
+    name               String
+    counter            Int
+    last_counter_reset DateTime
+    clients            Client[]
+}
+
+enum Category_Short_Name {
+    A
+    B
+    C
+    D
+    E
+    F
+    G
+    H
+    I
+    J
+    K
+    L
+    M
+    N
+    O
+    P
+    Q
+    R
+    S
+    T
+    U
+    V
+    W
+    X
+    Y
+    Z
 }
 
 model User {
@@ -53,12 +85,13 @@ model Device {
 }
 
 model Global_Setting {
-    key   String @id //key of settings
+    id    Int    @id @default(autoincrement())
+    key   String @unique //key of settings
     value String
 }
 
 model User_Setting {
-    id      String @id //concatenation of user_id and key
+    id      Int    @id @default(autoincrement())
     user_id Int
     key     String //key of settings
     value   String

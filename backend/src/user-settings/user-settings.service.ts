@@ -13,6 +13,11 @@ export class UserSettingsService {
         return this.findUserSettings(entity.id);
     }
 
+    /**
+     *
+     * @param id user id
+     * @returns
+     */
     async findUserSettings(id: number): Promise<string> {
         //find all settings in database and complete with default values
 
@@ -41,6 +46,13 @@ export class UserSettingsService {
         return this.updateUserSettings(entity.id, settings, entity);
     }
 
+    /**
+     *
+     * @param id user id
+     * @param settings
+     * @param entity
+     * @returns
+     */
     async updateUserSettings(
         id: number,
         settings: { [key: string]: string | number },
@@ -64,17 +76,15 @@ export class UserSettingsService {
                 continue;
             }
 
-            await this.databaseService.user_Setting.upsert({
+            await this.databaseService.user_Setting.deleteMany({
                 where: {
-                    id: key.toString() + id.toString(),
                     user_id: id,
                     key: key.toString(),
                 },
-                update: {
-                    value: setting.toString(),
-                },
-                create: {
-                    id: key.toString() + id.toString(),
+            });
+
+            await this.databaseService.user_Setting.create({
+                data: {
                     user_id: id,
                     key: key.toString(),
                     value: setting.toString(),
