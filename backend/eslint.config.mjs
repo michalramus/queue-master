@@ -36,7 +36,7 @@ export default [
 
             parserOptions: {
                 project: "tsconfig.json",
-                tsconfigRootDir: "/Users/michal/IT/queue-system/backend",
+                tsconfigRootDir: path.resolve(__dirname),
             },
         },
 
