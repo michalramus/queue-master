@@ -1,7 +1,7 @@
 "use client";
 
 import ClientTable from "./ClientTable";
-import { ClientNumber, getClients, wsClientEvents } from "@/utils/api/CSR/clients";
+import { ClientInterface, getClients, wsClientEvents } from "@/utils/api/CSR/clients";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,11 +12,11 @@ export default function QueuePanel({
     clients,
     userSettings,
 }: {
-    clients: ClientNumber[];
+    clients: ClientInterface[];
     userSettings: UserSettingsInterface;
 }) {
     let seat = userSettings.seat;
-    let categoryIds = ["A", "B", "C", "D", "E", "F"]; //TODO: get categoryIds from context
+    let categoryIds = [1, 2, 3, 4, 5, 6]; //TODO: get categoryIds from context | What if category will be removed after user settings are saved?
 
     //React query clients fetch
     const queryClient = useQueryClient();
@@ -44,7 +44,7 @@ export default function QueuePanel({
     useEffect(() => {
         const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL ?? "");
 
-        function onClientModification(client: ClientNumber) {
+        function onClientModification(client: ClientInterface) {
             queryClient.invalidateQueries({ queryKey: ["waitingClients"] });
             queryClient.invalidateQueries({ queryKey: ["inServiceClients"] });
         }

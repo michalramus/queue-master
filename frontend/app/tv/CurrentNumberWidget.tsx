@@ -1,12 +1,18 @@
 import Table from "@/components/Table";
 
 interface CurrentNumberWidgetProps {
+    category_short_name: string;
     number: number | string;
     seat: number | string;
     className?: React.ComponentProps<"div">["className"];
 }
 
-export default function CurrentNumberWidget({ number, seat, className }: CurrentNumberWidgetProps) {
+export default function CurrentNumberWidget({
+    category_short_name,
+    number,
+    seat,
+    className,
+}: CurrentNumberWidgetProps) {
     return (
         <div className={`${className}`}>
             <Table
@@ -15,7 +21,16 @@ export default function CurrentNumberWidget({ number, seat, className }: Current
                         Number
                     </span>,
                 ]}
-                rows={[[number != "" ? number : <br />]]}
+                //Generate string in the format of "category_short_name + number" or a line break if number is empty
+                rows={[
+                    [
+                        number != "" ? (
+                            (category_short_name ? category_short_name : "") + number
+                        ) : (
+                            <br />
+                        ),
+                    ],
+                ]}
                 theadClassName="text-text-1 text-5xl"
                 tbodyClassName="text-primary-1 !border-0 text-7xl font-medium"
                 className="mb-20"

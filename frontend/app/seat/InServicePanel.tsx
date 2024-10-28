@@ -1,6 +1,6 @@
 import Button from "@/components/Buttons/Button";
 import {
-    ClientNumber,
+    ClientInterface,
     callAgainForClient,
     removeClient,
     setClientAsInService,
@@ -13,8 +13,8 @@ export default function InServicePanel({
     nextClientNumber,
     seat,
 }: {
-    clientNumber?: ClientNumber;
-    nextClientNumber?: ClientNumber;
+    clientNumber?: ClientInterface;
+    nextClientNumber?: ClientInterface;
     seat: number;
 }) {
     const [lockNextClientButton, setLockNextClientButton] = useState(false); //Lock the next button to avoid miss clicks
@@ -48,7 +48,9 @@ export default function InServicePanel({
                 <h5 className="mb-2 text-center text-2xl tracking-tight">
                     <span className={clientNumber ? "" : "visibility: hidden"}>
                         Number:
-                        <span className="text-3xl font-bold">{" " + clientNumber?.number}</span>
+                        <span className="text-3xl font-bold">
+                            {" " + clientNumber?.category?.short_name + clientNumber?.number}
+                        </span>
                     </span>
                 </h5>
 

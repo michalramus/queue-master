@@ -1,13 +1,14 @@
 "use client";
 import { fetchMiddleware } from "./fetchMiddleware";
 
-export interface ClientNumber {
-    number: string;
-    category_id: string;
-    category: { name: string };
-    status: string;
+export interface ClientInterface {
+    id: number;
+    number: number;
+    category_id: number;
+    category: { id: number; short_name: string; name: string; counter?: number };
+    status: "Waiting" | "InService";
     seat: number | null;
-    creation_date: string;
+    creation_date: Date;
 }
 
 const apiPath = "/clients";
@@ -20,7 +21,7 @@ export enum wsClientEvents {
     ClientCallAgain = "ClientCallAgain",
 }
 
-export async function addClient(categoryId: string): Promise<ClientNumber | null> {
+export async function addClient(categoryId: number): Promise<ClientInterface | null> {
     const response = await fetchMiddleware(() =>
         fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "POST",
@@ -39,14 +40,14 @@ export async function addClient(categoryId: string): Promise<ClientNumber | null
 }
 
 export async function setClientAsInService(
-    clientNumber: ClientNumber,
+    clientNumber: ClientInterface,
     seat: number,
-): Promise<ClientNumber | null> {
+): Promise<ClientInterface | null> {
     clientNumber.seat = seat;
     clientNumber.status = "InService";
 
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.number, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.id, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -62,14 +63,12 @@ export async function setClientAsInService(
     return res;
 }
 
-export async function callAgainForClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
+export async function callAgainForClient(
+    clientNumber: ClientInterface,
+): Promise<ClientInterface | null> {
     const response = await fetchMiddleware(() =>
         fetch(
-            process.env.NEXT_PUBLIC_BACKEND_URL +
-                apiPath +
-                "/" +
-                clientNumber.number +
-                "/call-again",
+            process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.id + "/call-again",
             {
                 method: "POST",
                 headers: {
@@ -85,9 +84,9 @@ export async function callAgainForClient(clientNumber: ClientNumber): Promise<Cl
     return res;
 }
 
-export async function removeClient(clientNumber: ClientNumber): Promise<ClientNumber | null> {
+export async function removeClient(clientNumber: ClientInterface): Promise<ClientInterface | null> {
     const response = await fetchMiddleware(() =>
-        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.number, {
+        fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath + "/" + clientNumber.id, {
             method: "DELETE",
             credentials: "include",
         }),
@@ -98,7 +97,7 @@ export async function removeClient(clientNumber: ClientNumber): Promise<ClientNu
     return res;
 }
 
-export async function getClients(): Promise<ClientNumber[]> {
+export async function getClients(): Promise<ClientInterface[]> {
     const response = await fetchMiddleware(() =>
         fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
             method: "GET",
