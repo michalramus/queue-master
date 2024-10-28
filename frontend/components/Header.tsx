@@ -11,7 +11,7 @@ export default function Header({
                 <div className="flex items-center justify-center font-semibold">
                     <p className="text-6xl">Queue</p>
                     <Image src="/logo.svg" alt="logo" height={96} width={96} className="mx-2" />
-                    <p className="text-6xl">System</p>
+                    <p className="text-6xl">Master</p>
                 </div>
                 <p className="text-right text-xl">By Michał Ramus</p>
             </div>

@@ -6,8 +6,8 @@ import ReactQueryProvider from "@/utils/providers/reactQueryProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Queue System",
-    description: "Queue System by Michał Ramus",
+    title: "Queue Master",
+    description: "Queue Master by Michał Ramus",
 };
 
 export default function RootLayout({
