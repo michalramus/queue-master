@@ -5,6 +5,7 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 // import { CreateCategoryDto } from "./dto/create-category.dto";
 // import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { Roles } from "../auth/roles.decorator";
+import { Category } from "./types/category.interface";
 
 @Controller("categories")
 export class CategoriesController {

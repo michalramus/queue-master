@@ -45,14 +45,14 @@ export class GlobalSettingsService {
                 continue;
             }
 
-            await this.databaseService.global_Setting.upsert({
+            await this.databaseService.global_Setting.deleteMany({
                 where: {
                     key: key.toString(),
                 },
-                update: {
-                    value: setting.toString(),
-                },
-                create: {
+            });
+
+            await this.databaseService.global_Setting.create({
+                data: {
                     key: key.toString(),
                     value: setting.toString(),
                 },

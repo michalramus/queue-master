@@ -1,7 +1,7 @@
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateClientDto {
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
-    categoryId: string;
+    categoryId: number;
 }
