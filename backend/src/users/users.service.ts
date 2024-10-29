@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
+import { User } from "./types/user.interface";
 
 @Injectable()
 export class UsersService {
