@@ -10,7 +10,7 @@ export default function Button({
 }: {
     children: React.ReactNode;
     onClick(): void;
-    color?: "blue" | "green" | "red" | "primary" | "secondary";
+    color?: "blue" | "green" | "red" | "gray" | "primary" | "secondary";
     disabled?: boolean;
     type?: "button" | "submit";
     className?: React.ComponentProps<"div">["className"];
@@ -26,6 +26,9 @@ export default function Button({
             break;
         case "red":
             colorClass = "bg-red-1 hover:bg-red-2";
+            break;
+        case "gray":
+            colorClass = "bg-gray-2 hover:bg-gray-1";
             break;
 
         case "primary":
