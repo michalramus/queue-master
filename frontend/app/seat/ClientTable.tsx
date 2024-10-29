@@ -1,12 +1,14 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { ClientInterface, removeClient, setClientAsInService } from "@/utils/api/CSR/clients";
 import { useMutation } from "@tanstack/react-query";
 import Table from "@/components/Table";
 import Button from "@/components/Buttons/Button";
 import AcceptIcon from "../../components/svg/AcceptIcon";
 import RejectIcon from "@/components/svg/RejectIcon";
+import DeleteNumberModal from "./DeleteNumberModal";
+import ChooseNumberModal from "./ChooseNumberModal";
 
 /**
  * Table with clients waiting for service
@@ -22,6 +24,11 @@ export default function ClientTable({
     categoryIds: number[];
     seat: number;
 }) {
+    const [deleteNumberModalHidden, setDeleteNumberModalHidden] = useState(true);
+    const [clientToDelete, setClientToDelete] = useState<ClientInterface | null>(null);
+
+    const [chooseNumberModalHidden, setChooseNumberModalHidden] = useState(true);
+    const [clientToChoose, setClientToChoose] = useState<ClientInterface | null>(null);
     //----------------------------------------
     //Api calls
 
@@ -62,7 +69,10 @@ export default function ClientTable({
             </span>,
             <span key={index} className="flex flex-grow flex-wrap-reverse justify-center">
                 <Button
-                    onClick={() => deleteClient.mutate(client)}
+                    onClick={() => {
+                        setClientToDelete(client);
+                        setDeleteNumberModalHidden(false);
+                    }}
                     color="red"
                     className="flex items-center"
                 >
@@ -70,7 +80,10 @@ export default function ClientTable({
                     <RejectIcon />
                 </Button>
                 <Button
-                    onClick={() => clientInService.mutate(client)}
+                    onClick={() => {
+                        setClientToChoose(client);
+                        setChooseNumberModalHidden(false);
+                    }}
                     color="green"
                     className="flex items-center"
                 >
@@ -81,5 +94,36 @@ export default function ClientTable({
         ]),
     );
 
-    return <Table columns={columns} rows={rows} />;
+    return (
+        <div>
+            <DeleteNumberModal
+                number={
+                    (clientToDelete?.category.short_name ?? "") + (clientToDelete?.number ?? "")
+                }
+                hidden={deleteNumberModalHidden}
+                deleteHandler={() => {
+                    deleteClient.mutate(clientToDelete!);
+                    setDeleteNumberModalHidden(true);
+                }}
+                cancelHandler={() => {
+                    setDeleteNumberModalHidden(true);
+                }}
+            />
+
+            <ChooseNumberModal
+                number={
+                    (clientToChoose?.category.short_name ?? "") + (clientToChoose?.number ?? "")
+                }
+                hidden={chooseNumberModalHidden}
+                chooseHandler={() => {
+                    clientInService.mutate(clientToChoose!);
+                    setChooseNumberModalHidden(true);
+                }}
+                cancelHandler={() => {
+                    setChooseNumberModalHidden(true);
+                }}
+            />
+            <Table columns={columns} rows={rows} />
+        </div>
+    );
 }
