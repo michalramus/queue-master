@@ -7,7 +7,6 @@ import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
 import { UserSettingsInterface } from "../../utils/api/CSR/settings";
-import DeleteNumberModal from "./DeleteNumberModal";
 
 export default function QueuePanel({
     clients,
