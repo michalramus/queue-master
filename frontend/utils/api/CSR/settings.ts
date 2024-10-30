@@ -4,7 +4,24 @@ import { fetchMiddleware } from "./fetchMiddleware";
 export interface UserSettingsInterface {
     seat?: number;
 }
-export interface GlobalSettingsInterface {}
+export interface GlobalSettingsInterface {
+    //colors
+    color_primary_1: string;
+    color_primary_2: string;
+    color_secondary_1: string;
+    color_secondary_2: string;
+    color_accent_1: string;
+    color_green_1: string;
+    color_green_2: string;
+    color_blue_1: string;
+    color_blue_2: string;
+    color_red_1: string;
+    color_red_2: string;
+    color_gray_1: string;
+    color_gray_2: string;
+    color_text_1: string;
+    color_text_2: string;
+}
 
 const apiPathGlobalSettings = "/settings/global";
 const apiPathUserSettings = "/settings/user";
