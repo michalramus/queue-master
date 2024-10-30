@@ -28,7 +28,7 @@ export default function Button({
             colorClass = "bg-red-1 hover:bg-red-2";
             break;
         case "gray":
-            colorClass = "bg-gray-2 hover:bg-gray-1";
+            colorClass = "bg-gray-1 hover:bg-gray-2";
             break;
 
         case "primary":
