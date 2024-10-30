@@ -27,26 +27,26 @@ const config: Config = {
                 },
 
                 green: {
-                    1: "#63cb6b",
-                    2: "#21ba2d",
+                    1: "var(--color-green-1)",
+                    2: "var(--color-green-2)",
                 },
                 blue: {
-                    1: "#689ff0",
-                    2: "#2071e9",
+                    1: "var(--color-blue-1)",
+                    2: "var(--color-blue-2)",
                 },
                 red: {
-                    1: "#e6705d",
-                    2: "#e04c34",
+                    1: "var(--color-red-1)",
+                    2: "var(--color-red-2)",
                 },
 
                 gray: {
-                    1: "#B1B2B5",
-                    2: "#949494",
+                    1: "var(--color-gray-1)",
+                    2: "var(--color-gray-2)",
                 },
 
                 text: {
-                    1: "#050315",
-                    2: "#4b5563",
+                    1: "var(--color-text-1)",
+                    2: "var(--color-text-2)",
                 },
             },
         },

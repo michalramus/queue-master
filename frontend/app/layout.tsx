@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/utils/providers/reactQueryProvider";
+import { getGlobalSettingsSSR } from "@/utils/api/SSR/settings";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,14 +11,34 @@ export const metadata: Metadata = {
     description: "Queue Master by Michał Ramus",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const globalSettings = await getGlobalSettingsSSR();
+
     return (
         <html lang="en">
             <body className={inter.className}>
+                {/* Setup global colors */}
+                <style>{`:root { 
+                ${globalSettings.color_primary_1 ? `--color-primary-1: ${globalSettings.color_primary_1};` : ""}
+                ${globalSettings.color_primary_2 ? `--color-primary-2: ${globalSettings.color_primary_2};` : ""}
+                ${globalSettings.color_secondary_1 ? `--color-secondary-1: ${globalSettings.color_secondary_1};` : ""}
+                ${globalSettings.color_secondary_2 ? `--color-secondary-2: ${globalSettings.color_secondary_2};` : ""}
+                ${globalSettings.color_accent_1 ? `--color-accent-1: ${globalSettings.color_accent_1};` : ""}
+                ${globalSettings.color_green_1 ? `--color-green-1: ${globalSettings.color_green_1};` : ""}
+                ${globalSettings.color_green_2 ? `--color-green-2: ${globalSettings.color_green_2};` : ""}
+                ${globalSettings.color_blue_1 ? `--color-blue-1: ${globalSettings.color_blue_1};` : ""}
+                ${globalSettings.color_blue_2 ? `--color-blue-2: ${globalSettings.color_blue_2};` : ""}
+                ${globalSettings.color_red_1 ? `--color-red-1: ${globalSettings.color_red_1};` : ""}
+                ${globalSettings.color_red_2 ? `--color-red-2: ${globalSettings.color_red_2};` : ""}
+                ${globalSettings.color_gray_1 ? `--color-gray-1: ${globalSettings.color_gray_1};` : ""}
+                ${globalSettings.color_gray_2 ? `--color-gray-2: ${globalSettings.color_gray_2};` : ""}
+                ${globalSettings.color_text_1 ? `--color-text-1: ${globalSettings.color_text_1};` : ""}
+                ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2};` : ""}
+                 }`}</style>
                 <ReactQueryProvider>
                     <main>{children}</main>
                 </ReactQueryProvider>
