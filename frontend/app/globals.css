@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 :root {
-    --foreground-rgb: 5, 3, 21;
-    --background-rgb: 251, 254, 251;
+    --foreground-rgb: rgb(5, 3, 21);
+    --background-rgb: rgb(251, 254, 251);
+    --color-primary-1: hsl(139.8, 68.2%, 48%);
+    --color-primary-2: hsl(140, 82.4%, 37.8%);
+    --color-secondary-1: hsl(120, 100%, 93.1%);
+    --color-secondary-2: hsl(139.8, 63%, 73.5%);
+    --color-accent-1: hsl(136.8, 100%, 61.6%);
 }
 
 body {

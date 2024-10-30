@@ -15,15 +15,15 @@ const config: Config = {
             },
             colors: {
                 primary: {
-                    1: "#27CE5E",
-                    2: "#11b046",
+                    1: "var(--color-primary-1)",
+                    2: "var(--color-primary-2)",
                 },
                 secondary: {
-                    1: "#DCFFDC",
-                    2: "#91e6ad",
+                    1: "var(--color-secondary-1)",
+                    2: "var(--color-secondary-2)",
                 },
                 accent: {
-                    1: "#3BFF72",
+                    1: "var(--color-accent-1)",
                 },
 
                 green: {
