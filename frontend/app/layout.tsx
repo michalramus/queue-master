@@ -23,6 +23,7 @@ export default async function RootLayout({
             <body className={inter.className}>
                 {/* Setup global colors */}
                 <style>{`:root { 
+                ${globalSettings.color_background ? `--color-background: ${globalSettings.color_background};` : ""}
                 ${globalSettings.color_primary_1 ? `--color-primary-1: ${globalSettings.color_primary_1};` : ""}
                 ${globalSettings.color_primary_2 ? `--color-primary-2: ${globalSettings.color_primary_2};` : ""}
                 ${globalSettings.color_secondary_1 ? `--color-secondary-1: ${globalSettings.color_secondary_1};` : ""}
@@ -38,7 +39,7 @@ export default async function RootLayout({
                 ${globalSettings.color_gray_2 ? `--color-gray-2: ${globalSettings.color_gray_2};` : ""}
                 ${globalSettings.color_text_1 ? `--color-text-1: ${globalSettings.color_text_1};` : ""}
                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2};` : ""}
-                 }`}</style>
+                }`}</style>
                 <ReactQueryProvider>
                     <main>{children}</main>
                 </ReactQueryProvider>

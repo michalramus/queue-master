@@ -6,6 +6,7 @@ export interface UserSettingsInterface {
 }
 export interface GlobalSettingsInterface {
     //colors
+    color_background: string;
     color_primary_1: string;
     color_primary_2: string;
     color_secondary_1: string;
