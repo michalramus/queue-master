@@ -1,4 +1,5 @@
 import { Logger } from "@nestjs/common";
+import { CustomSettingValue } from "./types/customSettingValue.class";
 
 /**
  * Setting class for storing settings
@@ -8,27 +9,16 @@ import { Logger } from "@nestjs/common";
 export class Setting<T> {
     key: string;
     defaultValue: T;
-    possibleStringValues: { [key: string]: T } | undefined;
-    numberRange: { min: number; max: number } | undefined;
     private logger = new Logger("Setting");
 
     /**
      *
      * @param key Name of setting
      * @param defaultValue Default value of setting
-     * @param possibleValues Dictionary of all possible string values
-     * @param numberRange Range of possible number values
      */
-    constructor(
-        key: string,
-        defaultValue: T,
-        possibleValues: { [key: string]: T } | undefined = undefined,
-        numberRange: { min: number; max: number } | undefined = undefined,
-    ) {
+    constructor(key: string, defaultValue: T) {
         this.key = key;
         this.defaultValue = defaultValue;
-        this.possibleStringValues = possibleValues;
-        this.numberRange = numberRange;
     }
 
     /**
@@ -42,47 +32,35 @@ export class Setting<T> {
             return this.defaultValue;
         }
 
-        if (typeof this.defaultValue === "number") {
+        if (this.defaultValue instanceof CustomSettingValue) {
+            return <T>(<unknown>(<CustomSettingValue>this.defaultValue).convertSettingFromString(value));
+        } else if (typeof this.defaultValue === "number") {
             return <T>(<unknown>parseInt(value));
         } else if (typeof this.defaultValue === "string") {
             return <T>(<unknown>value);
-        } else if (this.defaultValue instanceof Date) {
-            return <T>(<unknown>new Date(value));
         }
 
         return this.defaultValue;
     }
 
     /**
-     * Function always returns true if setting type is string and possibleValues are not defined
+     * Function always returns true if setting type is string
      * and false if type is not supported
      * @param value Value to validate
      *
      */
     isValueCorrect(value: string | number): boolean {
-        //check possible values
-        if (this.possibleStringValues != undefined) {
-            if (Object.values(this.possibleStringValues).includes(<T>(<unknown>value))) {
-                return true;
-            } else {
+        //check if custom setting value is correct
+        if (this.defaultValue instanceof CustomSettingValue) {
+            const correct = (<CustomSettingValue>this.defaultValue).isValueCorrect(<string>value);
+
+            if (!correct) {
                 this.logger.debug(`Error validating setting '${this.key}' from string: '${value}'`);
-                return false;
             }
+            return correct;
         } else if (typeof this.defaultValue === "number") {
             //check if value is number
             if (!isNaN(<number>(<unknown>value))) {
-                if (this.numberRange != undefined) {
-                    const numValue = <number>(<unknown>value);
-                    if (numValue < this.numberRange.min || numValue > this.numberRange.max) {
-                        this.logger.debug(`Error validating setting '${this.key}' from string: '${value}'`);
-                        return false;
-                    }
-                }
-                return true;
-            }
-        } else if (this.defaultValue instanceof Date) {
-            //check if value is date
-            if (!isNaN(Date.parse(<string>(<unknown>value)))) {
                 return true;
             }
         } else if (typeof this.defaultValue === "string") {
@@ -94,4 +72,4 @@ export class Setting<T> {
     }
 }
 
-export type SettingSupportedTypes = string | number | Date;
+export type SettingSupportedTypes = string | number | CustomSettingValue;

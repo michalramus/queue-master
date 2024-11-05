@@ -13,7 +13,7 @@ export default function Modal({
         <div
             id="popup-modal"
             tabIndex={-1}
-            className={`fixed ${hidden ? "hidden" : ""} inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-2 bg-opacity-75`}
+            className={`fixed ${hidden ? "hidden" : ""} inset-0 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-1 bg-opacity-75`}
         >
             <Card shadow={false}>{children}</Card>
         </div>

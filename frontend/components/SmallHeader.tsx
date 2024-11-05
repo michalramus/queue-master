@@ -1,11 +1,11 @@
-import Image from "next/image";
+import Logo from "./svg/logo";
 
 export default function SmallHeader() {
     return (
         <div className="flex flex-col items-center">
             <div className="flex items-center font-semibold">
                 <p className="text-xl">Queue</p>
-                <Image src="/logo.svg" alt="logo" height={48} width={48} className="mx-1" />
+                <Logo width={48} height={48} className="mx-1" />
                 <p className="text-xl">Master</p>
             </div>
             <p className="mt-2 text-base">Michał Ramus</p>
