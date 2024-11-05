@@ -1,6 +1,6 @@
-import { customSettingValue } from "./customSettingValue.class";
+import { CustomSettingValue } from "./customSettingValue.class";
 
-export class hexColorSettingValue extends customSettingValue {
+export class HexColorSettingValue extends CustomSettingValue {
     private color: string = "#000000";
 
     constructor(color?: string) {
@@ -16,8 +16,8 @@ export class hexColorSettingValue extends customSettingValue {
         return this.color;
     }
 
-    convertSettingFromString(value: string): hexColorSettingValue {
-        return new hexColorSettingValue(value);
+    convertSettingFromString(value: string): HexColorSettingValue {
+        return new HexColorSettingValue(value);
     }
 
     isValueCorrect(value: string | number): boolean {
