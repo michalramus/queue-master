@@ -1,4 +1,5 @@
 import { Logger } from "@nestjs/common";
+import { customSettingValue } from "./types/customSettingValue.class";
 
 /**
  * Setting class for storing settings
@@ -42,12 +43,12 @@ export class Setting<T> {
             return this.defaultValue;
         }
 
-        if (typeof this.defaultValue === "number") {
+        if (this.defaultValue instanceof customSettingValue) {
+            return <T>(<unknown>(<customSettingValue>this.defaultValue).convertSettingFromString(value));
+        } else if (typeof this.defaultValue === "number") {
             return <T>(<unknown>parseInt(value));
         } else if (typeof this.defaultValue === "string") {
             return <T>(<unknown>value);
-        } else if (this.defaultValue instanceof Date) {
-            return <T>(<unknown>new Date(value));
         }
 
         return this.defaultValue;
@@ -80,11 +81,9 @@ export class Setting<T> {
                 }
                 return true;
             }
-        } else if (this.defaultValue instanceof Date) {
-            //check if value is date
-            if (!isNaN(Date.parse(<string>(<unknown>value)))) {
-                return true;
-            }
+        } else if (this.defaultValue instanceof customSettingValue) {
+            //check if custom setting value is correct
+            return (<customSettingValue>this.defaultValue).isValueCorrect(<string>value);
         } else if (typeof this.defaultValue === "string") {
             return true;
         }
@@ -94,4 +93,4 @@ export class Setting<T> {
     }
 }
 
-export type SettingSupportedTypes = string | number | Date;
+export type SettingSupportedTypes = string | number | customSettingValue;
