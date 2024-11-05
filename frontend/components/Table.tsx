@@ -18,7 +18,7 @@ export default function Table({
     return (
         <div className={`mx-2 overflow-x-auto ${className}`}>
             <table className="w-full text-center">
-                <thead className={`text-md border-b-2 border-gray-2 text-gray-1 ${theadClassName}`}>
+                <thead className={`text-md border-b-2 border-gray-1 text-text-2 ${theadClassName}`}>
                     <tr>
                         {columns.map((column, index) => (
                             <th key={index} scope="col" className="px-6 py-1">
@@ -31,7 +31,7 @@ export default function Table({
                     {rows.map((row, index) => (
                         <tr
                             key={index}
-                            className={`border-b-2 border-gray-2 border-opacity-50 ${tbodyClassName}`}
+                            className={`border-b-2 border-gray-1 border-opacity-50 ${tbodyClassName}`}
                         >
                             {row.map((element, elementIndex) => (
                                 <td key={elementIndex} className={`px-6 py-2 ${tdBodyClassName}`}>

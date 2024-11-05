@@ -15,37 +15,38 @@ const config: Config = {
             },
             colors: {
                 primary: {
-                    1: "#27CE5E",
-                    2: "#11b046",
+                    1: "var(--color-primary-1)",
+                    2: "var(--color-primary-2)",
                 },
                 secondary: {
-                    1: "#DCFFDC",
-                    2: "#91e6ad",
+                    1: "var(--color-secondary-1)",
+                    2: "var(--color-secondary-2)",
                 },
                 accent: {
-                    1: "#3BFF72",
+                    1: "var(--color-accent-1)",
                 },
 
                 green: {
-                    1: "#63cb6b",
-                    2: "#21ba2d",
+                    1: "var(--color-green-1)",
+                    2: "var(--color-green-2)",
                 },
                 blue: {
-                    1: "#689ff0",
-                    2: "#2071e9",
+                    1: "var(--color-blue-1)",
+                    2: "var(--color-blue-2)",
                 },
                 red: {
-                    1: "#e6705d",
-                    2: "#e04c34",
+                    1: "var(--color-red-1)",
+                    2: "var(--color-red-2)",
                 },
 
                 gray: {
-                    1: "#4b5563",
-                    2: "#B1B2B5",
+                    1: "var(--color-gray-1)",
+                    2: "var(--color-gray-2)",
                 },
 
                 text: {
-                    1: "#050315",
+                    1: "var(--color-text-1)",
+                    2: "var(--color-text-2)",
                 },
             },
         },

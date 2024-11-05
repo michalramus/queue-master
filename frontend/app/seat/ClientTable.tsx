@@ -55,13 +55,13 @@ export default function ClientTable({
             <span key={index} className="text-2xl font-bold">
                 {client.category?.short_name + client.number}
             </span>,
-            <span key={index} className="text-lg text-gray-1">
+            <span key={index} className="text-lg text-text-2">
                 {client.category?.name}
             </span>,
             <span key={index} className="text-base">
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}
                 <br />
-                <span className="text-gray-1">
+                <span className="text-text-2">
                     {new Date(client.creation_date).toLocaleDateString("en-EN", {
                         hour12: false,
                     })}
