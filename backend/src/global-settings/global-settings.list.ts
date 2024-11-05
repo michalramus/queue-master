@@ -1,9 +1,9 @@
 import { HexColorSettingValue } from "src/settings/types/hexColorSettingValue.class";
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
-import { EnumSettingValue } from "src/settings/types/enumSettingValue.class";
 
 export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes> } = {
     //colors
+    color_background: new Setting<HexColorSettingValue>("color_background", new HexColorSettingValue("#fbfefb")),
     color_primary_1: new Setting<HexColorSettingValue>("color_primary_1", new HexColorSettingValue("#27ce5e")),
     color_primary_2: new Setting<HexColorSettingValue>("color_primary_2", new HexColorSettingValue("#11b046")),
     color_secondary_1: new Setting<HexColorSettingValue>("color_secondary_1", new HexColorSettingValue("#dcffdc")),
@@ -19,8 +19,6 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
     color_gray_2: new Setting<HexColorSettingValue>("color_gray_2", new HexColorSettingValue("#949494")),
     color_text_1: new Setting<HexColorSettingValue>("color_text_1", new HexColorSettingValue("#050315")),
     color_text_2: new Setting<HexColorSettingValue>("color_text_2", new HexColorSettingValue("#4b5563")),
-
-    test: new Setting<EnumSettingValue>("test", new EnumSettingValue("test1", ["test1", "test2", "test3"])),
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;
