@@ -1,7 +1,10 @@
-export class customSettingValue {
+/**
+ * Abstract class that can be used to store custom setting values in setting class
+ */
+export class CustomSettingValue {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    convertSettingFromString(value: string): customSettingValue {
-        return new customSettingValue();
+    convertSettingFromString(value: string): CustomSettingValue {
+        return new CustomSettingValue();
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
