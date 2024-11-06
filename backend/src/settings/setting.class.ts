@@ -67,7 +67,9 @@ export class Setting<T> {
             return true;
         }
 
-        this.logger.debug(`Error validating setting '${this.key}' from string: '${value}'`);
+        this.logger.debug(
+            `Error validating setting '${this.key}' from string: '${value}'  - setting type is not supported`,
+        );
         return false; // if type value is correct or is not supported, return true
     }
 }
