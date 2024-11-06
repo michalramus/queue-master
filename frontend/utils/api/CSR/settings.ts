@@ -22,6 +22,8 @@ export interface GlobalSettingsInterface {
     color_gray_2: string;
     color_text_1: string;
     color_text_2: string;
+
+    kiosk_markdown: string;
 }
 
 const apiPathGlobalSettings = "/settings/global";
