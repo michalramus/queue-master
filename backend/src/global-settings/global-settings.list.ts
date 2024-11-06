@@ -19,6 +19,8 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
     color_gray_2: new Setting<HexColorSettingValue>("color_gray_2", new HexColorSettingValue("#949494")),
     color_text_1: new Setting<HexColorSettingValue>("color_text_1", new HexColorSettingValue("#050315")),
     color_text_2: new Setting<HexColorSettingValue>("color_text_2", new HexColorSettingValue("#4b5563")),
+
+    kiosk_markdown: new Setting<string>("kiosk_markdown", ""), //markdown text shown on kiosk page
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;
