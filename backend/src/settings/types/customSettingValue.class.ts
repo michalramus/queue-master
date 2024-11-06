@@ -1,18 +1,10 @@
 /**
  * Abstract class that can be used to store custom setting values in setting class
  */
-export class CustomSettingValue {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    convertSettingFromString(value: string): CustomSettingValue {
-        return new CustomSettingValue();
-    }
+export abstract class CustomSettingValue {
+    abstract convertSettingFromString(value: string): CustomSettingValue;
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isValueCorrect(value: string | number): boolean {
-        return false;
-    }
+    abstract isValueCorrect(value: string | number): boolean;
 
-    toJSON(): string {
-        return "";
-    }
+    abstract toJSON(): string;
 }
