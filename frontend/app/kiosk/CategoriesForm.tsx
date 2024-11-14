@@ -3,7 +3,7 @@
 import { CategoryInterface, getCategories } from "@/utils/api/CSR/categories";
 import { useQuery } from "@tanstack/react-query";
 import NumberGetterButton from "./NumberGetterButton";
-import MarkdownToHtml from "@/components/MarkdownToHtml";
+import MarkdownToHtml from "@/components/utils/MarkdownToHtml";
 import { GlobalSettingsInterface } from "@/utils/api/CSR/settings";
 
 export default function CategoriesForm({

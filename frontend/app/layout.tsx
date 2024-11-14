@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/utils/providers/reactQueryProvider";
 import { getGlobalSettingsSSR } from "@/utils/api/SSR/settings";
+import RefreshOnGlobalSettingsChanged from "@/components/utils/RefreshOnGlobalSettingsChanged";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,9 +41,7 @@ export default async function RootLayout({
                 ${globalSettings.color_text_1 ? `--color-text-1: ${globalSettings.color_text_1};` : ""}
                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2};` : ""}
                 }`}</style>
-                <ReactQueryProvider>
-                    <main>{children}</main>
-                </ReactQueryProvider>
+                <RefreshOnGlobalSettingsChanged />
             </body>
         </html>
     );

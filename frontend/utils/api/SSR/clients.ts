@@ -3,14 +3,6 @@ import { ClientInterface } from "@/utils/api/CSR/clients";
 
 const apiPath = "/clients";
 
-//Websocket events names
-export enum wsClientEvents {
-    ClientWaiting = "ClientWaiting",
-    ClientInService = "ClientInService",
-    ClientRemoved = "ClientRemoved",
-    ClientCallAgain = "ClientCallAgain",
-}
-
 export async function addClientSSR(categoryId: number): Promise<ClientInterface | null> {
     const response = await fetchSSRMiddleware((cookie) =>
         fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {
