@@ -4,14 +4,13 @@ import { CategoryInterface, getCategories } from "@/utils/api/CSR/categories";
 import { useQuery } from "@tanstack/react-query";
 import NumberGetterButton from "./NumberGetterButton";
 import MarkdownToHtml from "@/components/utils/MarkdownToHtml";
-import { GlobalSettingsInterface } from "@/utils/api/CSR/settings";
+
+import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 
 export default function CategoriesForm({
     prefetchCategories,
-    prefetchGlobalSettings,
 }: {
     prefetchCategories: CategoryInterface[];
-    prefetchGlobalSettings: GlobalSettingsInterface;
 }) {
     const { data: categories } = useQuery({
         queryKey: ["categories"],
@@ -19,10 +18,7 @@ export default function CategoriesForm({
         initialData: prefetchCategories,
     });
 
-    const { data: globalSettings } = useQuery({
-        queryKey: ["globalSettings"],
-        initialData: prefetchGlobalSettings,
-    });
+    const globalSettings = useGlobalSettings();
 
     return (
         <div className="mt-10 flex w-full flex-col items-center">
