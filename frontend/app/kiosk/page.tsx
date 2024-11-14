@@ -9,10 +9,7 @@ export default async function KioskPage() {
     return (
         <main className="flex min-h-screen flex-col items-center p-16">
             <Header />
-            <CategoriesForm
-                prefetchGlobalSettings={globalSettings}
-                prefetchCategories={categories}
-            />
+            <CategoriesForm prefetchCategories={categories} />
         </main>
     );
 }
