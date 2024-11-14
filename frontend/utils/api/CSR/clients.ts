@@ -13,14 +13,6 @@ export interface ClientInterface {
 
 const apiPath = "/clients";
 
-//Websocket events names
-export enum wsClientEvents {
-    ClientWaiting = "ClientWaiting",
-    ClientInService = "ClientInService",
-    ClientRemoved = "ClientRemoved",
-    ClientCallAgain = "ClientCallAgain",
-}
-
 export async function addClient(categoryId: number): Promise<ClientInterface | null> {
     const response = await fetchMiddleware(() =>
         fetch(process.env.NEXT_PUBLIC_BACKEND_URL + apiPath, {

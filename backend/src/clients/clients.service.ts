@@ -6,14 +6,7 @@ import { WebsocketsService } from "../websockets/websockets.service";
 import { Entity } from "src/auth/types/entity.class";
 import { Client } from "./types/client.interface";
 import { userSettingsList } from "src/user-settings/user-settings.list";
-
-// Websockets events names
-enum wsEvents {
-    ClientWaiting = "ClientWaiting",
-    ClientInService = "ClientInService",
-    ClientRemoved = "ClientRemoved",
-    ClientCallAgain = "ClientCallAgain",
-}
+import { wsEvents } from "src/websockets/wsEvents.enum";
 
 @Injectable()
 export class ClientsService {

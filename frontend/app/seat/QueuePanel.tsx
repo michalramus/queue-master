@@ -1,12 +1,13 @@
 "use client";
 
 import ClientTable from "./ClientTable";
-import { ClientInterface, getClients, wsClientEvents } from "@/utils/api/CSR/clients";
+import { ClientInterface, getClients } from "@/utils/api/CSR/clients";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
 import { UserSettingsInterface } from "../../utils/api/CSR/settings";
+import { wsEvents } from "@/utils/wsEvents";
 
 export default function QueuePanel({
     clients,
@@ -49,13 +50,13 @@ export default function QueuePanel({
             queryClient.invalidateQueries({ queryKey: ["inServiceClients"] });
         }
 
-        socket.on(wsClientEvents.ClientWaiting, onClientModification);
-        socket.on(wsClientEvents.ClientInService, onClientModification);
-        socket.on(wsClientEvents.ClientRemoved, onClientModification);
+        socket.on(wsEvents.ClientWaiting, onClientModification);
+        socket.on(wsEvents.ClientInService, onClientModification);
+        socket.on(wsEvents.ClientRemoved, onClientModification);
         return () => {
-            socket.off(wsClientEvents.ClientWaiting, onClientModification);
-            socket.off(wsClientEvents.ClientInService, onClientModification);
-            socket.off(wsClientEvents.ClientRemoved, onClientModification);
+            socket.off(wsEvents.ClientWaiting, onClientModification);
+            socket.off(wsEvents.ClientInService, onClientModification);
+            socket.off(wsEvents.ClientRemoved, onClientModification);
         };
     }, [queryClient]);
 

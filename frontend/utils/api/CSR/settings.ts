@@ -23,6 +23,7 @@ export interface GlobalSettingsInterface {
     color_text_1: string;
     color_text_2: string;
 
+    locale: string;
     kiosk_markdown: string;
 }
 

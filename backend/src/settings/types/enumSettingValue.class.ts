@@ -1,21 +1,21 @@
 import { CustomSettingValue } from "./customSettingValue.class";
 
 export class EnumSettingValue extends CustomSettingValue {
-    private value: string;
+    private defaultValue: string;
     private possibleValues: string[];
 
     constructor(value: string, possibleValues: string[]) {
         super();
         this.possibleValues = possibleValues;
         if (this.isValueCorrect(value)) {
-            this.value = value;
+            this.defaultValue = value;
         } else {
-            this.value = possibleValues[0];
+            this.defaultValue = possibleValues[0];
         }
     }
 
     getValue(): string {
-        return this.value;
+        return this.defaultValue;
     }
 
     convertSettingFromString(value: string): EnumSettingValue {
@@ -30,6 +30,6 @@ export class EnumSettingValue extends CustomSettingValue {
     }
 
     toJSON(): string {
-        return this.value;
+        return this.defaultValue;
     }
 }

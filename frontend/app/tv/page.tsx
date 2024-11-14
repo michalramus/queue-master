@@ -4,10 +4,10 @@ import { ClientInterface } from "../../utils/api/CSR/clients";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
-import { wsClientEvents } from "@/utils/api/CSR/clients";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import SmallHeader from "@/components/SmallHeader";
 import Card from "@/components/Card";
+import { wsEvents } from "@/utils/wsEvents";
 
 export default function TVPage() {
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
@@ -29,11 +29,11 @@ export default function TVPage() {
             setNewClientsQueue((e) => [...e, client]);
         }
 
-        socket.on(wsClientEvents.ClientInService, onClientToShow);
-        socket.on(wsClientEvents.ClientCallAgain, onClientToShow);
+        socket.on(wsEvents.ClientInService, onClientToShow);
+        socket.on(wsEvents.ClientCallAgain, onClientToShow);
         return () => {
-            socket.off(wsClientEvents.ClientInService, onClientToShow);
-            socket.off(wsClientEvents.ClientCallAgain, onClientToShow);
+            socket.off(wsEvents.ClientInService, onClientToShow);
+            socket.off(wsEvents.ClientCallAgain, onClientToShow);
         };
     }, []);
 
