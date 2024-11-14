@@ -38,7 +38,8 @@ export class NumRangeValue extends CustomSettingValue {
         return false;
     }
 
-    toJSON(): string {
-        return this.value.toString();
+    // Usage of return type 'any' is intentional, because we need to return number - toJSON only returns string or any
+    toJSON(): any {
+        return this.value;
     }
 }
