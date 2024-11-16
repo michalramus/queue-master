@@ -8,8 +8,10 @@ import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import SmallHeader from "@/components/SmallHeader";
 import Card from "@/components/Card";
 import { wsEvents } from "@/utils/wsEvents";
+import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 
 export default function TVPage() {
+    const globalSettings = useGlobalSettings();
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
     const currentClientRef = useRef<ClientInterface | null>(null);
 
@@ -73,13 +75,19 @@ export default function TVPage() {
             //Play audio
             const number = new Audio(
                 process.env.NEXT_PUBLIC_BACKEND_URL +
-                    "/audio-samples/pl/" +
+                    "/audio-samples/" +
+                    globalSettings.locale +
+                    "/" +
                     client.category?.short_name +
                     client.number,
-            ); //TODO: Move to settings
+            );
             const seat = new Audio(
-                process.env.NEXT_PUBLIC_BACKEND_URL + "/audio-samples/pl/" + "SEAT" + client.seat,
-            ); //TODO: Move to settings
+                process.env.NEXT_PUBLIC_BACKEND_URL +
+                    "/audio-samples/" +
+                    globalSettings.locale +
+                    "/SEAT" +
+                    client.seat,
+            );
             number.play();
             await new Promise((resolve) => {
                 number.onended = resolve;
@@ -93,7 +101,13 @@ export default function TVPage() {
         }
 
         isShowNewClientsRunning.current = false;
-    }, [currentClientRef, newClientsQueue, previousClientsRef, isShowNewClientsRunning]);
+    }, [
+        currentClientRef,
+        newClientsQueue,
+        previousClientsRef,
+        isShowNewClientsRunning,
+        globalSettings.locale,
+    ]);
 
     useEffect(() => {
         showNewClients();
