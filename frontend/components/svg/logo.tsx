@@ -1,4 +1,3 @@
-import { GlobalSettingsInterface } from "@/utils/api/CSR/settings";
 import React from "react";
 
 export default function Logo({
