@@ -18,10 +18,20 @@ export default function LanguageSwitcher() {
     return (
         <div className="flex w-full items-end justify-end">
             <a onClick={() => flagClickHandler("pl")} className="cursor-pointer">
-                <Image src={plFlag} alt="PL" height={48} className="m-0.5 border border-text-1" />
+                <Image
+                    src={plFlag}
+                    alt="PL"
+                    height={48}
+                    className="m-1 rounded-lg border-2 border-gray-2"
+                />
             </a>
             <a onClick={() => flagClickHandler("en")} className="cursor-pointer">
-                <Image src={gbFlag} alt="GB" height={48} className="m-0.5 border border-text-1" />
+                <Image
+                    src={gbFlag}
+                    alt="GB"
+                    height={48}
+                    className="m-1 rounded-lg border-2 border-gray-2"
+                />
             </a>
         </div>
     );
