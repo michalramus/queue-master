@@ -1,5 +1,6 @@
 import Button from "@/components/Buttons/Button";
 import Modal from "@/components/Modal";
+import { useTranslations } from "next-intl";
 
 export default function ChooseNumberModal({
     number,
@@ -12,20 +13,26 @@ export default function ChooseNumberModal({
     cancelHandler: () => void;
     hidden: boolean;
 }) {
+    const t = useTranslations();
+
     return (
         <Modal hidden={hidden}>
             <div className="mb-2 flex flex-col items-center justify-center">
                 <p className="mb-1 text-lg">
-                    Do you want to <span className="underline decoration-2">choose</span> ticket{" "}
+                    {t.rich("do_you_want_to_choose_ticket", {
+                        underline: (chunks) => (
+                            <span className="underline decoration-2">{chunks}</span>
+                        ),
+                    })}
                 </p>
                 <p className="text-2xl font-bold">{number}</p>
             </div>
             <div className="flex justify-center">
                 <Button onClick={cancelHandler} color="gray" className="flex items-center">
-                    <span>Cancel</span>
+                    <span>{t("cancel")}</span>
                 </Button>
                 <Button onClick={chooseHandler} color="green" className="flex items-center">
-                    <span>Choose</span>
+                    <span>{t("choose")}</span>
                 </Button>
             </div>
         </Modal>

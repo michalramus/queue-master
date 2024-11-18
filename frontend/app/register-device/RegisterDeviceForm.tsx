@@ -5,8 +5,10 @@ import Card from "@/components/Card";
 import { getInfo, registerDevice } from "@/utils/api/CSR/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function RegisterDeviceForm() {
+    const t = useTranslations();
     const router = useRouter();
     const searchParams = useSearchParams();
     const queryClient = useQueryClient();
@@ -22,25 +24,36 @@ export default function RegisterDeviceForm() {
     }
 
     if (isLoadingInfo) {
-        return <p>Loading...</p>;
+        return <p>{t("loading")}</p>;
     }
 
     if (info?.status == 401) {
         return (
             <Card className="flex flex-col items-center">
                 <p className="text-center text-lg">
-                    After registering new device, <br />
-                    it is necessary to accept it in the admin panel.
+                    {t("register_device_instruction_before_registration")}
                 </p>
                 <Button onClick={registerDeviceHandler} color="green">
-                    Register New Device
+                    {t("register_new_device")}
                 </Button>
             </Card>
         );
     }
 
     if (info?.status == 403) {
-        return <Card>Accept device inside the admin panel and refresh this site</Card>;
+        return (
+            <Card className="flex flex-col items-center">
+                <p className="text-center text-lg">
+                    {t("register_device_instruction_after_registration")}
+                </p>
+                <Button
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ["info"] })}
+                    color="primary"
+                >
+                    {t("refresh_this_site")}
+                </Button>
+            </Card>
+        );
     }
 
     const redirect = searchParams.get("redirect");
