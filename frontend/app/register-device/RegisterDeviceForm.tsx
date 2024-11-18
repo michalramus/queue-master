@@ -6,6 +6,7 @@ import { getInfo, registerDevice } from "@/utils/api/CSR/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
 export default function RegisterDeviceForm() {
     const t = useTranslations();
@@ -21,6 +22,24 @@ export default function RegisterDeviceForm() {
     async function registerDeviceHandler() {
         await registerDevice();
         queryClient.invalidateQueries({ queryKey: ["info"] });
+    }
+
+    // Redirect after registration
+    const [canRedirect, setCanRedirect] = useState(false);
+
+    useEffect(() => {
+        if (canRedirect) {
+            const redirect = searchParams.get("redirect");
+            if (redirect) {
+                router.push(redirect);
+            } else {
+                router.push("/");
+            }
+        }
+    }, [searchParams, router, canRedirect]);
+
+    if (canRedirect) {
+        return t("redirecting");
     }
 
     if (isLoadingInfo) {
@@ -56,10 +75,6 @@ export default function RegisterDeviceForm() {
         );
     }
 
-    const redirect = searchParams.get("redirect");
-    if (redirect) {
-        router.push(redirect);
-    } else {
-        router.push("/");
-    }
+    setCanRedirect(true);
+    return t("error_occurred");
 }
