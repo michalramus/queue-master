@@ -7,6 +7,7 @@ import {
 } from "../../utils/api/CSR/clients";
 import Card from "@/components/Card";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function InServicePanel({
     clientNumber,
@@ -18,6 +19,7 @@ export default function InServicePanel({
     seat: number;
 }) {
     const [lockNextClientButton, setLockNextClientButton] = useState(false); //Lock the next button to avoid miss clicks
+    const t = useTranslations();
 
     //Handlers
     function finishClientHandler() {
@@ -47,7 +49,7 @@ export default function InServicePanel({
             <Card className="w-full">
                 <h5 className="mb-2 text-center text-2xl tracking-tight">
                     <span className={clientNumber ? "" : "visibility: hidden"}>
-                        Number:
+                        {t("number")}:
                         <span className="text-3xl font-bold">
                             {" " + clientNumber?.category?.short_name + clientNumber?.number}
                         </span>
@@ -61,7 +63,7 @@ export default function InServicePanel({
                         disabled={clientNumber ? false : true}
                         className="h-28 w-1/3 !text-2xl"
                     >
-                        Finish
+                        {t("finish")}
                     </Button>
 
                     <Button
@@ -70,7 +72,7 @@ export default function InServicePanel({
                         disabled={clientNumber ? false : true}
                         className="h-28 w-1/3 !text-2xl"
                     >
-                        Call again
+                        {t("call_again")}
                     </Button>
                     <Button
                         onClick={nextClientHandler}
@@ -78,7 +80,7 @@ export default function InServicePanel({
                         disabled={nextClientNumber && !lockNextClientButton ? false : true}
                         className="h-28 w-1/3 !text-2xl"
                     >
-                        Next
+                        {t("next")}
                     </Button>
                 </div>
             </Card>
