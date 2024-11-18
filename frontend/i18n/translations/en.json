@@ -9,6 +9,7 @@
     "delete": "Delete",
     "do_you_want_to_choose_ticket": "Do you really want to <underline>choose</underline> ticket",
     "do_you_want_to_delete_ticket": "Do you really want to <underline>delete</underline> ticket",
+    "error_occurred": "An error occurred. Check the console for more information.",
     "finish": "Finish",
     "incorrect_login_or_password": "Incorrect login or password",
     "loading": "Loading...",
@@ -24,5 +25,6 @@
     "seat": "Seat",
     "settings": "Settings",
     "user": "User",
-    "username": "Username"
+    "username": "Username",
+    "redirecting": "Redirecting..."
 }

@@ -9,6 +9,7 @@
     "delete": "Usuń",
     "do_you_want_to_choose_ticket": "Czy na pewno chcesz <underline>wybrać</underline> bilet",
     "do_you_want_to_delete_ticket": "Czy na pewno chcesz <underline>usunąć</underline> bilet",
+    "error_occurred": "Wystąpił błąd. Sprawdź konsolę w celu uzyskania dodatkowych informacji.",
     "finish": "Zakończ",
     "incorrect_login_or_password": "Nieprawidłowy login lub hasło",
     "loading": "Ładowanie...",
@@ -24,5 +25,6 @@
     "seat": "Miejsce",
     "settings": "Ustawienia",
     "user": "Użytkownik",
-    "username": "Nazwa użytkownika"
+    "username": "Nazwa użytkownika",
+    "redirecting": "Przekierowywanie..."
 }
