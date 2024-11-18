@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import { LoggingInterceptor } from "./middleware/logging.interceptor";
 import * as cookieParser from "cookie-parser";
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
     ConfigModule.forRoot();
@@ -18,6 +19,13 @@ async function bootstrap() {
     };
 
     app.enableCors(corsOptions);
+
+    if (process.env.NODE_ENV !== "production") {
+        const config = new DocumentBuilder().setTitle("Queue Master API Documentation").setVersion("1.0").build();
+        const document = SwaggerModule.createDocument(app, config);
+        SwaggerModule.setup("api", app, document);
+    }
+
     await app.listen(process.env.PORT);
 }
 bootstrap();
