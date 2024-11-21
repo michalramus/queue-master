@@ -5,8 +5,11 @@ import Card from "@/components/Card";
 import { getInfo, registerDevice } from "@/utils/api/CSR/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
 export default function RegisterDeviceForm() {
+    const t = useTranslations();
     const router = useRouter();
     const searchParams = useSearchParams();
     const queryClient = useQueryClient();
@@ -21,32 +24,57 @@ export default function RegisterDeviceForm() {
         queryClient.invalidateQueries({ queryKey: ["info"] });
     }
 
+    // Redirect after registration
+    const [canRedirect, setCanRedirect] = useState(false);
+
+    useEffect(() => {
+        if (canRedirect) {
+            const redirect = searchParams.get("redirect");
+            if (redirect) {
+                router.push(redirect);
+            } else {
+                router.push("/");
+            }
+        }
+    }, [searchParams, router, canRedirect]);
+
+    if (canRedirect) {
+        return t("redirecting");
+    }
+
     if (isLoadingInfo) {
-        return <p>Loading...</p>;
+        return <p>{t("loading")}</p>;
     }
 
     if (info?.status == 401) {
         return (
             <Card className="flex flex-col items-center">
                 <p className="text-center text-lg">
-                    After registering new device, <br />
-                    it is necessary to accept it in the admin panel.
+                    {t("register_device_instruction_before_registration")}
                 </p>
                 <Button onClick={registerDeviceHandler} color="green">
-                    Register New Device
+                    {t("register_new_device")}
                 </Button>
             </Card>
         );
     }
 
     if (info?.status == 403) {
-        return <Card>Accept device inside the admin panel and refresh this site</Card>;
+        return (
+            <Card className="flex flex-col items-center">
+                <p className="text-center text-lg">
+                    {t("register_device_instruction_after_registration")}
+                </p>
+                <Button
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ["info"] })}
+                    color="primary"
+                >
+                    {t("refresh_this_site")}
+                </Button>
+            </Card>
+        );
     }
 
-    const redirect = searchParams.get("redirect");
-    if (redirect) {
-        router.push(redirect);
-    } else {
-        router.push("/");
-    }
+    setCanRedirect(true);
+    return t("error_occurred");
 }

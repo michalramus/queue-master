@@ -4,8 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/utils/api/CSR/auth";
 import { useState } from "react";
 import Button from "@/components/Buttons/Button";
+import { useTranslations } from "next-intl";
 
 export default function LoginForm() {
+    const t = useTranslations();
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -37,7 +39,7 @@ export default function LoginForm() {
             <form className="mx-auto max-w-sm" onSubmit={onSubmit}>
                 <div className="mb-5">
                     <label htmlFor="username" className="mb-2 block text-sm font-medium">
-                        Username
+                        {t("username")}
                     </label>
                     <input
                         type="text"
@@ -48,7 +50,7 @@ export default function LoginForm() {
                 </div>
                 <div className="mb-5">
                     <label htmlFor="password" className="mb-2 block text-sm font-medium">
-                        Password
+                        {t("password")}
                     </label>
                     <input
                         type="password"
@@ -57,12 +59,14 @@ export default function LoginForm() {
                         required
                     />
                 </div>
-                {isLoading && <p className="mb-5 text-center">loading...</p>}
+                {isLoading && <p className="mb-5 text-center">{t("loading")}</p>}
                 {isError && (
-                    <p className="mb-5 text-center text-red-2">Incorrect login or password</p>
+                    <p className="mb-5 text-center text-red-2">
+                        {t("incorrect_login_or_password")}
+                    </p>
                 )}
                 <Button type="submit" color="primary" className="mx-0" onClick={() => {}}>
-                    Submit
+                    {t("login")}
                 </Button>
             </form>
         </div>

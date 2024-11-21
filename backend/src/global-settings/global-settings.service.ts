@@ -3,10 +3,15 @@ import { DatabaseService } from "../database/database.service";
 import { globalSettingsList } from "./global-settings.list";
 import { SettingSupportedTypes } from "src/settings/setting.class";
 import { Entity } from "src/auth/types/entity.class";
+import { WebsocketsService } from "../websockets/websockets.service";
+import { wsEvents } from "src/websockets/wsEvents.enum";
 
 @Injectable()
 export class GlobalSettingsService {
-    constructor(private readonly databaseService: DatabaseService) {}
+    constructor(
+        private readonly databaseService: DatabaseService,
+        private readonly websocketsService: WebsocketsService,
+    ) {}
     private logger = new Logger(GlobalSettingsService.name);
 
     async findAll(): Promise<string> {
@@ -59,6 +64,11 @@ export class GlobalSettingsService {
             });
         }
 
-        return this.findAll();
+        const newSettings = this.findAll();
+
+        //emit webSocket on globalSettings change
+        this.websocketsService.emit(wsEvents.GlobalSettingsChanged, newSettings);
+
+        return newSettings;
     }
 }

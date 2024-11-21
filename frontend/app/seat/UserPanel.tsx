@@ -3,6 +3,7 @@ import { logout } from "@/utils/api/CSR/auth";
 import Button from "../../components/Buttons/Button";
 import Card from "../../components/Card";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function UserPanel({
     username,
@@ -12,24 +13,26 @@ export default function UserPanel({
     adminButton: boolean;
 }) {
     const router = useRouter();
+    const t = useTranslations();
 
     function logoutHandler() {
         logout();
         router.replace("/login");
     }
     return (
-        //TODO
         <Card className="flex flex-nowrap items-center !py-0">
-            <p className="mr-2">User: {username}</p>
-            {adminButton && <Button color="blue">Admin Dashboard</Button>}
-            <Button color="primary">Settings</Button>
+            <p className="mr-2">
+                {t("user")}: {username}
+            </p>
+            {adminButton && <Button color="blue">{t("admin_dashboard")}</Button>}
+            <Button color="primary">{t("settings")}</Button>
             <Button
                 color="red"
                 onClick={() => {
                     logoutHandler();
                 }}
             >
-                Logout
+                {t("logout")}
             </Button>
         </Card>
     );

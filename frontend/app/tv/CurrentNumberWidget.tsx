@@ -1,4 +1,5 @@
 import Table from "@/components/Table";
+import { useTranslations } from "next-intl";
 
 interface CurrentNumberWidgetProps {
     category_short_name: string;
@@ -13,12 +14,14 @@ export default function CurrentNumberWidget({
     seat,
     className,
 }: CurrentNumberWidgetProps) {
+    const t = useTranslations();
+
     return (
         <div className={`${className}`}>
             <Table
                 columns={[
                     <span key={"Number"} className="font-light">
-                        Number
+                        {t("number")}
                     </span>,
                 ]}
                 //Generate string in the format of "category_short_name + number" or a line break if number is empty
@@ -38,7 +41,7 @@ export default function CurrentNumberWidget({
             <Table
                 columns={[
                     <span key={"Seat"} className="font-light">
-                        Seat
+                        {t("seat")}
                     </span>,
                 ]}
                 rows={[[seat != "" ? seat : <br />]]}

@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import ReactQueryProvider from "@/utils/providers/reactQueryProvider";
+import ReactQueryProvider from "@/utils/providers/ReactQueryProvider";
 import { getGlobalSettingsSSR } from "@/utils/api/SSR/settings";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import RefreshOnGlobalSettingsChanged from "@/components/utils/RefreshOnGlobalSettingsChanged";
+import { GlobalSettingsProvider } from "@/utils/providers/GlobalSettingsProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +22,11 @@ export default async function RootLayout({
 }>) {
     const globalSettings = await getGlobalSettingsSSR();
 
+    const locale = await getLocale();
+    const messages = await getMessages();
+
     return (
-        <html lang="en">
+        <html lang={locale}>
             <body className={inter.className}>
                 {/* Setup global colors */}
                 <style>{`:root { 
@@ -40,9 +47,14 @@ export default async function RootLayout({
                 ${globalSettings.color_text_1 ? `--color-text-1: ${globalSettings.color_text_1};` : ""}
                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2};` : ""}
                 }`}</style>
-                <ReactQueryProvider>
-                    <main>{children}</main>
-                </ReactQueryProvider>
+                <RefreshOnGlobalSettingsChanged />
+                <NextIntlClientProvider messages={messages}>
+                    <GlobalSettingsProvider globalSettings={globalSettings}>
+                        <ReactQueryProvider>
+                            <main>{children}</main>
+                        </ReactQueryProvider>
+                    </GlobalSettingsProvider>
+                </NextIntlClientProvider>
             </body>
         </html>
     );
