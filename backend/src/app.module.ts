@@ -13,6 +13,7 @@ import { DevicesModule } from "./devices/devices.module";
 import { GlobalSettingsModule } from "./global-settings/global-settings.module";
 import { SettingsModule } from "./settings/settings.module";
 import { UserSettingsModule } from "./user-settings/user-settings.module";
+import { MultilingualTextModule } from "./multilingual-text/multilingual-text.module";
 
 @Module({
     imports: [
@@ -34,6 +35,7 @@ import { UserSettingsModule } from "./user-settings/user-settings.module";
         GlobalSettingsModule,
         SettingsModule,
         UserSettingsModule,
+        MultilingualTextModule,
     ],
     controllers: [AppController],
     providers: [AppService],

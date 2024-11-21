@@ -21,6 +21,7 @@ model Client {
     status        Status
     seat          Int?
     creation_date DateTime @default(now())
+    @@unique([number, category_id])
 }
 
 enum Status {
@@ -29,12 +30,12 @@ enum Status {
 }
 
 model Category {
-    id                 Int                 @id @default(autoincrement())
-    short_name         Category_Short_Name @unique
-    name               String
-    counter            Int
-    last_counter_reset DateTime
-    clients            Client[]
+    id                    Int                 @id @default(autoincrement())
+    short_name            Category_Short_Name @unique
+    multilingual_text_key String
+    counter               Int
+    last_counter_reset    DateTime
+    clients               Client[]
 }
 
 enum Category_Short_Name {
@@ -95,4 +96,20 @@ model User_Setting {
     user_id Int
     key     String //key of settings
     value   String
+    @@unique([user_id, key])
+}
+
+//texts are grouped by module_name.key.lang
+model Multilingual_Text {
+    id    Int    @id @default(autoincrement())
+    module_name String
+    key   String
+    lang  Lang
+    value String
+    @@unique([key, lang, module_name])
+}
+
+enum Lang {
+    en
+    pl
 }
