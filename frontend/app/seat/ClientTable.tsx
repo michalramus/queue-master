@@ -9,7 +9,7 @@ import AcceptIcon from "../../components/svg/AcceptIcon";
 import RejectIcon from "@/components/svg/RejectIcon";
 import DeleteNumberModal from "./DeleteNumberModal";
 import ChooseNumberModal from "./ChooseNumberModal";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 /**
  * Table with clients waiting for service
@@ -26,6 +26,8 @@ export default function ClientTable({
     seat: number;
 }) {
     const t = useTranslations();
+    const locale = useLocale();
+
     const [deleteNumberModalHidden, setDeleteNumberModalHidden] = useState(true);
     const [clientToDelete, setClientToDelete] = useState<ClientInterface | null>(null);
 
@@ -58,7 +60,7 @@ export default function ClientTable({
                 {client.category?.short_name + client.number}
             </span>,
             <span key={index} className="text-lg text-text-2">
-                {client.category?.name}
+                {client.category.name[locale] || client.category.short_name}
             </span>,
             <span key={index} className="text-base">
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}

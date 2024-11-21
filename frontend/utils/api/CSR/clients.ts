@@ -1,11 +1,12 @@
 "use client";
+import { CategoryInterface } from "./categories";
 import { fetchMiddleware } from "./fetchMiddleware";
 
 export interface ClientInterface {
     id: number;
     number: number;
     category_id: number;
-    category: { id: number; short_name: string; name: string; counter?: number };
+    category: CategoryInterface;
     status: "Waiting" | "InService";
     seat: number | null;
     creation_date: Date;
