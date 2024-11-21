@@ -4,7 +4,7 @@ import { fetchMiddleware } from "./fetchMiddleware";
 export interface CategoryInterface {
     id: number;
     short_name: string;
-    name: string;
+    name: { [lang: string]: string };
 }
 
 const apiPath = "/categories";
