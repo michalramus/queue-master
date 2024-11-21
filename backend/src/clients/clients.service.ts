@@ -7,12 +7,15 @@ import { Entity } from "src/auth/types/entity.class";
 import { Client } from "./types/client.interface";
 import { userSettingsList } from "src/user-settings/user-settings.list";
 import { wsEvents } from "src/websockets/wsEvents.enum";
+import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
+import { MultilingualTextCategories } from "src/multilingual-text/types/multilingualTextCategories.enum";
 
 @Injectable()
 export class ClientsService {
     constructor(
         private readonly databaseService: DatabaseService,
         private readonly websocketsService: WebsocketsService,
+        private readonly multilingualTextService: MultilingualTextService,
     ) {}
     private logger = new Logger(ClientsService.name);
 
@@ -34,7 +37,7 @@ export class ClientsService {
         let counter = category.counter + 1;
         if (counter > this.maxClientsCounter) {
             this.logger.log(
-                `Counter exceeded ${this.maxClientsCounter}. Resetting counter to 1 for category ${category.name}`,
+                `Counter exceeded ${this.maxClientsCounter}. Resetting counter to 1 for category ${category.short_name}`,
             );
             counter = 1;
         }
@@ -45,7 +48,7 @@ export class ClientsService {
         });
 
         // Create client
-        const client = await this.databaseService.client.create({
+        const dbClient = await this.databaseService.client.create({
             data: {
                 number: counter,
                 status: "Waiting",
@@ -60,27 +63,33 @@ export class ClientsService {
             },
         });
 
+        const client = await this.addCategoryNameFieldToClient(dbClient);
+
         this.websocketsService.emit(wsEvents.ClientWaiting, client);
-        this.logger.log(`[${entity.name}] Client created with number ${client.number} and status 'Waiting'`);
+        this.logger.log(
+            `[${entity.name}] Client created with number ${client.category.short_name}${client.number} and status 'Waiting'`,
+        );
         this.resetCounterAfterTime(createClientDto.categoryId);
         return client;
     }
 
     async findAll(): Promise<Client[]> {
-        const clients = await this.databaseService.client.findMany({
+        const dbClients = await this.databaseService.client.findMany({
             orderBy: [{ creation_date: "asc" }],
             select: {
                 id: true,
                 number: true,
                 category_id: true,
-                category: { select: { id: true, short_name: true, name: true } },
+                category: { select: { id: true, short_name: true, multilingual_text_key: true } },
                 status: true,
                 seat: true,
                 creation_date: true,
             },
         });
-        this.logger.debug(`Fetched ${clients.length} clients`);
-        return clients;
+
+        const clients = dbClients.map(async (client) => await this.addCategoryNameFieldToClient(client));
+        this.logger.debug(`Fetched ${dbClients.length} clients`);
+        return Promise.all(clients);
     }
 
     /**
@@ -103,7 +112,7 @@ export class ClientsService {
         });
 
         // Update client
-        const client = await this.databaseService.client.update({
+        const dbClient = await this.databaseService.client.update({
             where: { id: id },
             data: { status: updateClientDto.status, seat: updateClientDto.seat },
             include: {
@@ -111,24 +120,31 @@ export class ClientsService {
             },
         });
 
+        const client = await this.addCategoryNameFieldToClient(dbClient);
+
         this.websocketsService.emit(wsEvents.ClientInService, client);
         this.logger.log(
-            `[${entity.name}] Client with id ${id}, category id ${client.category_id} and number ${client.category.name + client.number} updated with status ${updateClientDto.status} and seat ${updateClientDto.seat}`,
+            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and seat ${updateClientDto.seat}`,
         );
         return client;
     }
 
     async callAgain(id: number, entity: Entity): Promise<Client> {
         // Check if client exists
-        const client = await this.databaseService.client.findUnique({ where: { id: id }, include: { category: true } });
-        if (!client) {
+        const dbClient = await this.databaseService.client.findUnique({
+            where: { id: id },
+            include: { category: true },
+        });
+        if (!dbClient) {
             this.logger.warn(`NotFoundException: Client with id ${id} not found when calling again`);
             throw new NotFoundException("Client not found");
         }
 
+        const client = await this.addCategoryNameFieldToClient(dbClient);
+
         this.websocketsService.emit(wsEvents.ClientCallAgain, client);
         this.logger.log(
-            `[${entity.name}] Client with id ${id}, category id ${client.category_id} and number ${client.category.name + client.number} called again`,
+            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} called again`,
         );
         return client;
     }
@@ -141,11 +157,13 @@ export class ClientsService {
             throw new NotFoundException("Client not found");
         }
 
-        const client = await this.databaseService.client.delete({ where: { id: id }, include: { category: true } });
+        const dbClient = await this.databaseService.client.delete({ where: { id: id }, include: { category: true } });
+
+        const client = await this.addCategoryNameFieldToClient(dbClient);
 
         this.websocketsService.emit(wsEvents.ClientRemoved, client);
         this.logger.log(
-            `[${entity.name}] Client with id ${id}, category id ${client.category_id} and number ${client.category.name + client.number}  deleted`,
+            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number}  deleted`,
         );
         return client;
     }
@@ -208,5 +226,32 @@ export class ClientsService {
         });
 
         this.logger.log(`Counter reset to 0 for category ${categoryId}`);
+    }
+
+    /**
+     *
+     * @param client It is client interface, but with modified category field
+     * @returns Returns client with added translations for category name
+     */
+    async addCategoryNameFieldToClient(client: {
+        id: number;
+        number: number;
+        category_id: number;
+        status: "Waiting" | "InService";
+        seat: number | null;
+        creation_date: Date;
+        category: { id: number; multilingual_text_key: string; short_name: string };
+    }): Promise<Client> {
+        const clientWithCategoryName = {
+            ...client,
+            category: {
+                ...client.category,
+                name: await this.multilingualTextService.getMultilingualText(
+                    MultilingualTextCategories.categories,
+                    client.category.multilingual_text_key,
+                ),
+            },
+        };
+        return clientWithCategoryName;
     }
 }
