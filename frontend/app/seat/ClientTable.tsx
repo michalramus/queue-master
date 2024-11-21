@@ -9,6 +9,7 @@ import AcceptIcon from "../../components/svg/AcceptIcon";
 import RejectIcon from "@/components/svg/RejectIcon";
 import DeleteNumberModal from "./DeleteNumberModal";
 import ChooseNumberModal from "./ChooseNumberModal";
+import { useLocale, useTranslations } from "next-intl";
 
 /**
  * Table with clients waiting for service
@@ -24,6 +25,9 @@ export default function ClientTable({
     categoryIds: number[];
     seat: number;
 }) {
+    const t = useTranslations();
+    const locale = useLocale();
+
     const [deleteNumberModalHidden, setDeleteNumberModalHidden] = useState(true);
     const [clientToDelete, setClientToDelete] = useState<ClientInterface | null>(null);
 
@@ -48,7 +52,7 @@ export default function ClientTable({
         (client) => categoryIds.indexOf(client.category_id) != -1,
     );
 
-    const columns = ["Number", "Category", "Creation Date", ""];
+    const columns = [t("number"), t("category"), t("creation_date"), ""];
     const rows: (string | number | ReactNode | null)[][] = [];
     filteredClientNumbers?.forEach((client, index) =>
         rows.push([
@@ -56,7 +60,7 @@ export default function ClientTable({
                 {client.category?.short_name + client.number}
             </span>,
             <span key={index} className="text-lg text-text-2">
-                {client.category?.name}
+                {client.category.name[locale] || client.category.short_name}
             </span>,
             <span key={index} className="text-base">
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}
@@ -76,7 +80,7 @@ export default function ClientTable({
                     color="red"
                     className="flex items-center"
                 >
-                    <span className="mr-2">Delete</span>
+                    <span className="mr-2">{t("delete")}</span>
                     <RejectIcon />
                 </Button>
                 <Button
@@ -87,7 +91,7 @@ export default function ClientTable({
                     color="green"
                     className="flex items-center"
                 >
-                    <span className="mr-2">Choose</span>
+                    <span className="mr-2">{t("choose")}</span>
                     <AcceptIcon />
                 </Button>
             </span>,

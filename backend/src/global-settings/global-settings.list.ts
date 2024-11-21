@@ -1,5 +1,6 @@
 import { HexColorSettingValue } from "src/settings/types/hexColorSettingValue.class";
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
+import { EnumSettingValue } from "src/settings/types/enumSettingValue.class";
 
 export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes> } = {
     //colors
@@ -21,6 +22,7 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
     color_text_2: new Setting<HexColorSettingValue>("color_text_2", new HexColorSettingValue("#4b5563")),
 
     kiosk_markdown: new Setting<string>("kiosk_markdown", ""), //markdown text shown on kiosk page
+    locale: new Setting<EnumSettingValue>("locale", new EnumSettingValue("en", ["en", "pl"])),
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;

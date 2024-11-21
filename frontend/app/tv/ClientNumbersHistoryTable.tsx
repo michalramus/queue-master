@@ -1,12 +1,15 @@
 import Table from "@/components/Table";
 import { ClientInterface } from "../../utils/api/CSR/clients";
 import { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 export default function ClientNumbersHistory({
     clientNumbers,
 }: {
     clientNumbers: ClientInterface[];
 }) {
+    const t = useTranslations();
+
     const rows: (string | number | ReactNode | null)[][] = [];
     clientNumbers.map((clientNumber) =>
         rows.push([
@@ -20,10 +23,10 @@ export default function ClientNumbersHistory({
         <Table
             columns={[
                 <span key={"Number"} className="font-light">
-                    Number
+                    {t("number")}
                 </span>,
                 <span key={"Seat"} className="font-light">
-                    Seat
+                    {t("seat")}
                 </span>,
             ]}
             rows={rows}
