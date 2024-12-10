@@ -14,6 +14,7 @@ import { GlobalSettingsModule } from "./global-settings/global-settings.module";
 import { SettingsModule } from "./settings/settings.module";
 import { UserSettingsModule } from "./user-settings/user-settings.module";
 import { MultilingualTextModule } from "./multilingual-text/multilingual-text.module";
+import { FileModule } from "./file/file.module";
 
 @Module({
     imports: [
@@ -36,6 +37,7 @@ import { MultilingualTextModule } from "./multilingual-text/multilingual-text.mo
         SettingsModule,
         UserSettingsModule,
         MultilingualTextModule,
+        FileModule,
     ],
     controllers: [AppController],
     providers: [AppService],
