@@ -99,7 +99,7 @@ export default function ClientTable({
     );
 
     return (
-        <div>
+        <>
             <DeleteNumberModal
                 number={
                     (clientToDelete?.category.short_name ?? "") + (clientToDelete?.number ?? "")
@@ -128,6 +128,6 @@ export default function ClientTable({
                 }}
             />
             <Table columns={columns} rows={rows} />
-        </div>
+        </>
     );
 }

@@ -35,7 +35,7 @@ export default function LoginForm() {
 
     return (
         //TODO separate form to component
-        <div>
+        <>
             <form className="mx-auto max-w-sm" onSubmit={onSubmit}>
                 <div className="mb-5">
                     <label htmlFor="username" className="mb-2 block text-sm font-medium">
@@ -69,6 +69,6 @@ export default function LoginForm() {
                     {t("login")}
                 </Button>
             </form>
-        </div>
+        </>
     );
 }
