@@ -1,0 +1,45 @@
+{
+    "name": "queue-master-kiosk",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "main": "dist-electron/main.js",
+    "scripts": {
+        "dev": "npm-run-all --parallel dev:react dev:electron",
+        "dev:react": "vite",
+        "dev:electron": "yarn run transpile:electron && cross-env NODE_ENV=development electron .",
+        "build": "tsc -b && vite build",
+        "lint": "eslint .",
+        "preview": "vite preview",
+        "transpile:electron": "tsc -p src/electron/tsconfig.json",
+        "dist:mac": "yarn run transpile:electron && yarn run build && electron-builder --mac --arm64",
+        "dist:win": "yarn run transpile:electron && yarn run build && electron-builder --win --x64",
+        "dist:linux": "yarn run transpile:electron && yarn run build && electron-builder --linux --x64"
+    },
+    "dependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.17.0",
+        "@types/react": "^18.3.18",
+        "@types/react-dom": "^18.3.5",
+        "@vitejs/plugin-react": "^4.3.4",
+        "autoprefixer": "^10.4.20",
+        "cross-env": "^7.0.3",
+        "electron": "^33.3.1",
+        "electron-builder": "^25.1.8",
+        "eslint": "^9.17.0",
+        "eslint-plugin-react-hooks": "^5.0.0",
+        "eslint-plugin-react-refresh": "^0.4.16",
+        "globals": "^15.14.0",
+        "npm-run-all": "^4.1.5",
+        "postcss": "^8.4.49",
+        "prettier": "^3.4.2",
+        "prettier-plugin-tailwindcss": "^0.6.9",
+        "tailwindcss": "^3.4.17",
+        "typescript": "~5.6.2",
+        "typescript-eslint": "^8.18.2",
+        "vite": "^6.0.5"
+    }
+}

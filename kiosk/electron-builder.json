@@ -1,0 +1,25 @@
+{
+    "appId": "com.m-ramus.queue-system-kiosk",
+    "files": [
+        "dist-electron",
+        "dist-react"
+    ],
+    "extraResources": [
+        "dist-electron/preload.cjs",
+        "src/assets/**"
+    ],
+    "icon": "./logo.png",
+    "mac": {
+        "target": "dmg"
+    },
+    "linux": {
+        "target": "AppImage",
+        "category": "Utility"
+    },
+    "win": {
+        "target": [
+            "portable",
+            "msi"
+        ]
+    }
+}
