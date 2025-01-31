@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useState } from "react";
 
 import "./App.css";
 
@@ -7,7 +7,7 @@ function App() {
 
     return (
         <>
-            <h1 className="border border-blue-100">Vite + React</h1>
+            <h1 className="border-blue-100 border">Vite + React</h1>
             <div className="card">
                 <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
                 <p>
