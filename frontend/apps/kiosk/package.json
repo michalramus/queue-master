@@ -18,7 +18,9 @@
     },
     "dependencies": {
         "react": "^18.3.1",
-        "react-dom": "^18.3.1"
+        "react-dom": "^18.3.1",
+        "shared-components": "1.0.0",
+        "shared-utils": "1.0.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.17.0",
@@ -27,7 +29,7 @@
         "@vitejs/plugin-react": "^4.3.4",
         "autoprefixer": "^10.4.20",
         "cross-env": "^7.0.3",
-        "electron": "^33.3.1",
+        "electron": "33.3.1",
         "electron-builder": "^25.1.8",
         "eslint": "^9.17.0",
         "eslint-plugin-react-hooks": "^5.0.0",
@@ -41,5 +43,11 @@
         "typescript": "~5.6.2",
         "typescript-eslint": "^8.18.2",
         "vite": "^6.0.5"
+    },
+    "lint-staged": {
+        "**/*.{ts,tsx}": [
+            "eslint --cache --fix --max-warnings=0",
+            "prettier --write"
+        ]
     }
 }
