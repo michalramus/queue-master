@@ -3,13 +3,10 @@
 import React, { ReactNode, useState } from "react";
 import { ClientInterface, removeClient, setClientAsInService } from "@/utils/api/CSR/clients";
 import { useMutation } from "@tanstack/react-query";
-import Table from "@/components/Table";
-import Button from "@/components/Buttons/Button";
-import AcceptIcon from "../../components/svg/AcceptIcon";
-import RejectIcon from "@/components/svg/RejectIcon";
 import DeleteNumberModal from "./DeleteNumberModal";
 import ChooseNumberModal from "./ChooseNumberModal";
 import { useLocale, useTranslations } from "next-intl";
+import { AcceptIcon, Button, RejectIcon, Table } from "shared-components";
 
 /**
  * Table with clients waiting for service

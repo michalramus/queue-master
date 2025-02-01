@@ -3,8 +3,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/utils/api/CSR/auth";
 import { useState } from "react";
-import Button from "@/components/Buttons/Button";
 import { useTranslations } from "next-intl";
+import { Button } from "shared-components";
 
 export default function LoginForm() {
     const t = useTranslations();

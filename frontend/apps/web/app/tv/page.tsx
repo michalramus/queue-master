@@ -5,8 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
-import SmallHeader from "@/components/SmallHeader";
-import Card from "@/components/Card";
+import { SmallHeader, Card } from "shared-components";
 import { wsEvents } from "@/utils/wsEvents";
 import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 

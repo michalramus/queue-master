@@ -1,7 +1,7 @@
 "use client";
+import plFlag from "flag-icons/flags/4x3/pl.svg";
+import gbFlag from "flag-icons/flags/4x3/gb.svg";
 
-import plFlag from "/node_modules/flag-icons/flags/4x3/pl.svg";
-import gbFlag from "/node_modules/flag-icons/flags/4x3/gb.svg";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";

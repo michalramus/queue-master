@@ -1,12 +1,11 @@
 "use client";
 
-import Button from "@/components/Buttons/Button";
-import Card from "@/components/Card";
 import { getInfo, registerDevice } from "@/utils/api/CSR/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { Button, Card } from "shared-components";
 
 export default function RegisterDeviceForm() {
     const t = useTranslations();

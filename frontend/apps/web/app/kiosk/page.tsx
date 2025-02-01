@@ -1,10 +1,9 @@
-import Header from "../../components/Header";
 import { getCategoriesSSR } from "@/utils/api/SSR/categories";
 import CategoriesForm from "./CategoriesForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import SmallHeader from "@/components/SmallHeader";
 import Image from "next/image";
 import { getLogoAvailabilitySSR } from "@/utils/api/SSR/file";
+import { Header, SmallHeader } from "shared-components";
 
 export default async function KioskPage() {
     const categories = await getCategoriesSSR();

@@ -3,9 +3,9 @@
 import { CategoryInterface, getCategories } from "@/utils/api/CSR/categories";
 import { useQuery } from "@tanstack/react-query";
 import NumberGetterButton from "./NumberGetterButton";
-import MarkdownToHtml from "@/components/utils/MarkdownToHtml";
 import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 import { useTranslations } from "next-intl";
+import { MarkdownToHtml } from "shared-components";
 
 export default function CategoriesForm({
     prefetchCategories,

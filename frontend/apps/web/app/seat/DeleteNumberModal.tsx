@@ -1,6 +1,5 @@
-import Button from "@/components/Buttons/Button";
-import Modal from "@/components/Modal";
 import { useTranslations } from "next-intl";
+import { Button, Modal } from "shared-components";
 
 export default function DeleteNumberModal({
     number,

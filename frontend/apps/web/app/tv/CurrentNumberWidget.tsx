@@ -1,5 +1,5 @@
-import Table from "@/components/Table";
 import { useTranslations } from "next-intl";
+import { Table } from "shared-components";
 
 interface CurrentNumberWidgetProps {
     category_short_name: string;

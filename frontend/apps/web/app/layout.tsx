@@ -5,7 +5,7 @@ import ReactQueryProvider from "@/utils/providers/ReactQueryProvider";
 import { getGlobalSettingsSSR } from "@/utils/api/SSR/settings";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import RefreshOnGlobalSettingsChanged from "@/components/utils/RefreshOnGlobalSettingsChanged";
+import RefreshOnGlobalSettingsChanged from "@/components/RefreshOnGlobalSettingsChanged";
 import { GlobalSettingsProvider } from "@/utils/providers/GlobalSettingsProvider";
 
 const inter = Inter({ subsets: ["latin"] });

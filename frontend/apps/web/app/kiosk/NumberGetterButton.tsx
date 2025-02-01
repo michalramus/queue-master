@@ -1,8 +1,8 @@
 import * as clientsApi from "@/utils/api/CSR/clients";
 import { CategoryInterface } from "@/utils/api/CSR/categories";
 import { useMutation } from "@tanstack/react-query";
-import Button from "@/components/Buttons/Button";
 import { useLocale } from "next-intl";
+import { Button } from "shared-components";
 
 export default function NumberGetterButton({ category }: { category: CategoryInterface }) {
     const locale = useLocale();
