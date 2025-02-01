@@ -17,19 +17,19 @@
         "dist:linux": "yarn run transpile:electron && yarn run build && electron-builder --linux --x64"
     },
     "dependencies": {
-        "react": "^18.3.1",
-        "react-dom": "^18.3.1",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
         "shared-components": "1.0.0",
         "shared-utils": "1.0.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.17.0",
-        "@types/react": "^18.3.18",
-        "@types/react-dom": "^18.3.5",
+        "@types/react": "^19.0.8",
+        "@types/react-dom": "^19.0.3",
         "@vitejs/plugin-react": "^4.3.4",
         "autoprefixer": "^10.4.20",
         "cross-env": "^7.0.3",
-        "electron": "33.3.1",
+        "electron": "34.0.2",
         "electron-builder": "^25.1.8",
         "eslint": "^9.17.0",
         "eslint-plugin-react-hooks": "^5.0.0",
@@ -40,7 +40,7 @@
         "prettier": "^3.4.2",
         "prettier-plugin-tailwindcss": "^0.6.9",
         "tailwindcss": "^3.4.17",
-        "typescript": "~5.6.2",
+        "typescript": "~5.7.3",
         "typescript-eslint": "^8.18.2",
         "vite": "^6.0.5"
     },
