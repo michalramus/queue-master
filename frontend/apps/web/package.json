@@ -1,5 +1,5 @@
 {
-    "name": "queue-master-frontend",
+    "name": "queue-master-frontend-web",
     "version": "0.1.0",
     "private": true,
     "scripts": {
