@@ -1,9 +1,9 @@
 import { getClientsSSR } from "@/utils/api/SSR/clients";
 import QueuePanel from "./QueuePanel";
-import SmallHeader from "@/components/SmallHeader";
 import { getInfoSSR } from "@/utils/api/SSR/auth";
 import UserPanel from "./UserPanel";
 import { getUserSettingsSSR } from "@/utils/api/SSR/settings";
+import { SmallHeader } from "shared-components";
 
 export default async function SeatPage() {
     const clients = await getClientsSSR();

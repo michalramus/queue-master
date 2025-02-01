@@ -1,13 +1,12 @@
-import Button from "@/components/Buttons/Button";
 import {
     ClientInterface,
     callAgainForClient,
     removeClient,
     setClientAsInService,
 } from "../../utils/api/CSR/clients";
-import Card from "@/components/Card";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Button, Card } from "shared-components";
 
 export default function InServicePanel({
     clientNumber,

@@ -1,9 +1,8 @@
 "use client";
 import { logout } from "@/utils/api/CSR/auth";
-import Button from "../../components/Buttons/Button";
-import Card from "../../components/Card";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Button, Card } from "shared-components";
 
 export default function UserPanel({
     username,

@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import { Header } from "shared-components";
 import RegisterDeviceForm from "./RegisterDeviceForm";
 
 export default function RegisterDevice() {
