@@ -60,7 +60,7 @@ export default function InServicePanel({
                         onClick={finishClientHandler}
                         color="red"
                         disabled={clientNumber ? false : true}
-                        className="h-28 w-1/3 !text-2xl"
+                        className="h-28 w-1/3 text-2xl!"
                     >
                         {t("finish")}
                     </Button>
@@ -69,7 +69,7 @@ export default function InServicePanel({
                         onClick={callAgainHandler}
                         color="blue"
                         disabled={clientNumber ? false : true}
-                        className="h-28 w-1/3 !text-2xl"
+                        className="h-28 w-1/3 text-2xl!"
                     >
                         {t("call_again")}
                     </Button>
@@ -77,7 +77,7 @@ export default function InServicePanel({
                         onClick={nextClientHandler}
                         color="green"
                         disabled={nextClientNumber && !lockNextClientButton ? false : true}
-                        className="h-28 w-1/3 !text-2xl"
+                        className="h-28 w-1/3 text-2xl!"
                     >
                         {t("next")}
                     </Button>

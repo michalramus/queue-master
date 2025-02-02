@@ -1,0 +1,36 @@
+@plugin "@tailwindcss/typography";
+
+@layer utilities {
+    :root {
+        /* Interface colors */
+        --color-background: hsl(120, 60%, 99%);
+
+       
+    }
+}
+
+@theme {
+
+    --color-primary-1: hsl(139.8, 68.2%, 48%); /* L:48% */
+    --color-primary-2: hsl(140, 82.4%, 37.8%); /* L:38% */
+
+    --color-secondary-1: hsl(120, 100%, 93.1%); /* L:85% */
+    --color-secondary-2: hsl(139.8, 63%, 73.5%); /* L:73.5% */
+
+    --color-accent-1: hsl(136.8, 100%, 61.6%); /* L:53% */
+
+    --color-green-1: #63cb6b;
+    --color-green-2: #21ba2d;
+
+    --color-blue-1: #689ff0;
+    --color-blue-2: #2071e9;
+
+    --color-red-1: #e6705d;
+    --color-red-2: #e04c34;
+
+    --color-gray-1: #b1b2b5;
+    --color-gray-2: #949494;
+
+    --color-text-1: #050315;
+    --color-text-2: #4b5563;
+}
