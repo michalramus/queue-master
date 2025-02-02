@@ -9,7 +9,7 @@ export default function Card({
 }) {
     return (
         <div
-            className={`bg-secondary-1 block rounded-lg p-6 ${shadow ? "shadow-sm" : ""} ${className}`}
+            className={`bg-secondary-1 block rounded-lg p-6 ${shadow ? "shadow-xs" : ""} ${className}`}
         >
             {children}
         </div>
