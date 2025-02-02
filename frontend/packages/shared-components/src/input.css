@@ -1,0 +1,4 @@
+/*File used only to configure tailwind intellisense and use shared-components-config.css*/
+@import "tailwindcss";
+
+@import "shared-components-config.css";
