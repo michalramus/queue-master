@@ -19,7 +19,7 @@ export default function UserPanel({
         router.replace("/login");
     }
     return (
-        <Card className="flex flex-nowrap items-center !py-0">
+        <Card className="flex flex-nowrap items-center py-0!">
             <p className="mr-2">
                 {t("user")}: {username}
             </p>

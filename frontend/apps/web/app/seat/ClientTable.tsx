@@ -56,7 +56,7 @@ export default function ClientTable({
             <span key={index} className="text-2xl font-bold">
                 {client.category?.short_name + client.number}
             </span>,
-            <span key={index} className="text-lg text-text-2">
+            <span key={index} className="text-text-2 text-lg">
                 {client.category.name[locale] || client.category.short_name}
             </span>,
             <span key={index} className="text-base">
@@ -68,7 +68,7 @@ export default function ClientTable({
                     })}
                 </span>
             </span>,
-            <span key={index} className="flex flex-grow flex-wrap-reverse justify-center">
+            <span key={index} className="flex grow flex-wrap-reverse justify-center">
                 <Button
                     onClick={() => {
                         setClientToDelete(client);
