@@ -1,3 +1,5 @@
+/* !! File should be imported into tailwind config in every app that uses shared-components library  */
+
 @plugin "@tailwindcss/typography";
 
 @layer utilities {

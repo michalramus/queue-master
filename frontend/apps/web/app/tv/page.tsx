@@ -114,13 +114,13 @@ export default function TVPage() {
 
     return (
         <main>
-            <div className="fixed bottom-0 right-0 m-7">
+            <div className="fixed right-0 bottom-0 m-7">
                 <SmallHeader />
             </div>
             <div className="flex h-screen flex-row flex-nowrap p-24">
                 <ClientNumbersHistory clientNumbers={previousClients} />
 
-                <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center bg-opacity-75">
+                <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
                     <CurrentNumberWidget
                         category_short_name={currentClient?.category?.short_name ?? ""}
                         number={currentClient?.number ?? ""}
