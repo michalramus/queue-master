@@ -3,6 +3,7 @@ import { logout } from "@/utils/api/CSR/auth";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button, Card } from "shared-components";
+import { axiosInstance } from "@/utils/api/CSR/axiosInstances/axiosInstance";
 
 export default function UserPanel({
     username,
@@ -15,7 +16,7 @@ export default function UserPanel({
     const t = useTranslations();
 
     function logoutHandler() {
-        logout();
+        logout(axiosInstance);
         router.replace("/login");
     }
     return (

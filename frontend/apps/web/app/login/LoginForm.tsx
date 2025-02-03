@@ -5,23 +5,36 @@ import { login } from "@/utils/api/CSR/auth";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "shared-components";
+import { axiosInstance } from "@/utils/api/CSR/axiosInstances/axiosInstance";
 
 export default function LoginForm() {
     const t = useTranslations();
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const [isError, setIsError] = useState(false);
+    const [isIncorrectLoginData, setIsIncorrectLoginData] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isServerError, setIsServerError] = useState(false);
 
     async function onSubmit(event: any) {
         event.preventDefault();
+        setIsIncorrectLoginData(false);
+        setIsServerError(false);
         setIsLoading(true);
 
-        const res = await login(event.target.username.value, event.target.password.value);
-        if (res.status != 201) {
+        const res = await login(
+            event.target.username.value,
+            event.target.password.value,
+            axiosInstance,
+        );
+        if (res.status == 401) {
             setIsLoading(false);
-            setIsError(true);
+            setIsIncorrectLoginData(true);
+            setIsServerError(false);
+        } else if (res.status != 201) {
+            setIsLoading(false);
+            setIsIncorrectLoginData(false);
+            setIsServerError(true);
         } else {
             const redirect = searchParams.get("redirect");
 
@@ -36,7 +49,7 @@ export default function LoginForm() {
     return (
         //TODO separate form to component
         <>
-            <form className="mx-auto max-w-sm" onSubmit={onSubmit}>
+            <form className="mx-auto w-md" onSubmit={onSubmit}>
                 <div className="mb-5">
                     <label htmlFor="username" className="mb-2 block text-sm font-medium">
                         {t("username")}
@@ -44,7 +57,7 @@ export default function LoginForm() {
                     <input
                         type="text"
                         id="username"
-                        className="block w-full rounded-lg border border-secondary-2 bg-secondary-1 p-2.5 text-sm focus:border-accent-1 focus:ring-accent-1"
+                        className="border-secondary-2 bg-secondary-1 focus:border-accent-1 focus:ring-accent-1 block w-full rounded-lg border p-2.5 text-sm"
                         required
                     />
                 </div>
@@ -55,17 +68,27 @@ export default function LoginForm() {
                     <input
                         type="password"
                         id="password"
-                        className="block w-full rounded-lg border border-secondary-2 bg-secondary-1 p-2.5 text-sm focus:border-accent-1 focus:ring-accent-1"
+                        className="border-secondary-2 bg-secondary-1 focus:border-accent-1 focus:ring-accent-1 block w-full rounded-lg border p-2.5 text-sm"
                         required
                     />
                 </div>
-                {isLoading && <p className="mb-5 text-center">{t("loading")}</p>}
-                {isError && (
-                    <p className="mb-5 text-center text-red-2">
-                        {t("incorrect_login_or_password")}
-                    </p>
-                )}
-                <Button type="submit" color="primary" className="mx-0" onClick={() => {}}>
+
+                <p className="mb-5 h-1.5 text-center">
+                    {isLoading && t("loading")}
+                    {isIncorrectLoginData && (
+                        <span className="text-red-2">{t("incorrect_login_or_password")}</span>
+                    )}
+                    {isServerError && (
+                        <span className="text-red-2">{t("server_error_occurred")}</span>
+                    )}
+                </p>
+
+                <Button
+                    type="submit"
+                    color="primary"
+                    className="float-right mx-0"
+                    onClick={() => {}}
+                >
                     {t("login")}
                 </Button>
             </form>

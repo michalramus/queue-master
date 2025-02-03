@@ -12,6 +12,7 @@
     "error_occurred": "An error occurred. Check the console for more information.",
     "finish": "Finish",
     "incorrect_login_or_password": "Incorrect login or password",
+    "server_error_occurred": "Server error occurred. Try to refresh site.",
     "loading": "Loading...",
     "login": "Login",
     "logout": "Logout",
