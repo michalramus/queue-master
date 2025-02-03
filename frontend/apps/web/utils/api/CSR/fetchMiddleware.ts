@@ -1,5 +1,6 @@
 "use client";
 import { refreshJWTToken } from "./auth";
+import { axiosInstance } from "./axiosInstances/axiosInstance";
 
 /**
  * If error 401 received, function tries to refresh access token
@@ -10,7 +11,7 @@ export async function fetchMiddleware(fetch: () => Promise<Response>): Promise<R
     const res = await fetch();
 
     if (res.status == 401) {
-        await refreshJWTToken();
+        await refreshJWTToken(axiosInstance);
         return await fetch();
     }
     return res;

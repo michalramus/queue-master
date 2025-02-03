@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Button, Card } from "shared-components";
+import { axiosInstance } from "@/utils/api/CSR/axiosInstances/axiosInstance";
 
 export default function RegisterDeviceForm() {
     const t = useTranslations();
@@ -19,7 +20,7 @@ export default function RegisterDeviceForm() {
     });
 
     async function registerDeviceHandler() {
-        await registerDevice();
+        await registerDevice(axiosInstance);
         queryClient.invalidateQueries({ queryKey: ["info"] });
     }
 

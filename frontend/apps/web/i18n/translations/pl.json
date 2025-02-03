@@ -12,6 +12,7 @@
     "error_occurred": "Wystąpił błąd. Sprawdź konsolę w celu uzyskania dodatkowych informacji.",
     "finish": "Zakończ",
     "incorrect_login_or_password": "Nieprawidłowy login lub hasło",
+    "server_error_occurred": "Wystąpił błąd serwera. Spróbuj odświeżyć stronę.",
     "loading": "Ładowanie...",
     "login": "Zaloguj się",
     "logout": "Wyloguj się",
