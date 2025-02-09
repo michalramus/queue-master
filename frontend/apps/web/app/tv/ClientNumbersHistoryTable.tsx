@@ -1,7 +1,7 @@
-import { ClientInterface } from "../../utils/api/CSR/clients";
 import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Table } from "shared-components";
+import { ClientInterface } from "shared-utils";
 
 export default function ClientNumbersHistory({
     clientNumbers,

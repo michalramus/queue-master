@@ -1,17 +1,18 @@
-import { getClientsSSR } from "@/utils/api/SSR/clients";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import QueuePanel from "./QueuePanel";
-import { getInfoSSR } from "@/utils/api/SSR/auth";
+
 import UserPanel from "./UserPanel";
-import { getUserSettingsSSR } from "@/utils/api/SSR/settings";
+
 import { SmallHeader } from "shared-components";
+import { getClients, getInfo, getUserSettings } from "shared-utils";
 
 export default async function SeatPage() {
-    const clients = await getClientsSSR();
-    const user = await (await getInfoSSR()).json();
-    const userSettings = await getUserSettingsSSR();
+    const clients = await getClients(axiosAuthInstance);
+    const user = (await getInfo(axiosAuthInstance)).data;
+    const userSettings = await getUserSettings(axiosAuthInstance);
 
     return (
-        <main className="min-h-screen px-8 pb-24 pt-10 lg:px-10">
+        <main className="min-h-screen px-8 pt-10 pb-24 lg:px-10">
             <div className="flex flex-wrap justify-center sm:justify-between">
                 <SmallHeader />
                 <UserPanel

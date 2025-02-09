@@ -1,12 +1,12 @@
 "use client";
-
-import { getInfo, registerDevice } from "@/utils/api/CSR/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Button, Card } from "shared-components";
-import { axiosInstance } from "@/utils/api/CSR/axiosInstances/axiosInstance";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
+import { getInfo, registerDevice } from "shared-utils";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 export default function RegisterDeviceForm() {
     const t = useTranslations();
@@ -16,11 +16,11 @@ export default function RegisterDeviceForm() {
 
     const { data: info, isLoading: isLoadingInfo } = useQuery({
         queryKey: ["info"],
-        queryFn: getInfo,
+        queryFn: () => getInfo(axiosAuthInstance),
     });
 
     async function registerDeviceHandler() {
-        await registerDevice(axiosInstance);
+        await registerDevice(axiosPureInstance);
         queryClient.invalidateQueries({ queryKey: ["info"] });
     }
 

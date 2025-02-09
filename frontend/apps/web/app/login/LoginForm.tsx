@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { login } from "@/utils/api/CSR/auth";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "shared-components";
-import { axiosInstance } from "@/utils/api/CSR/axiosInstances/axiosInstance";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
+import { login } from "shared-utils";
 
 export default function LoginForm() {
     const t = useTranslations();
@@ -25,7 +25,7 @@ export default function LoginForm() {
         const res = await login(
             event.target.username.value,
             event.target.password.value,
-            axiosInstance,
+            axiosPureInstance,
         );
         if (res.status == 401) {
             setIsLoading(false);

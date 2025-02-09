@@ -1,12 +1,13 @@
 "use client";
 
 import React, { ReactNode, useState } from "react";
-import { ClientInterface, removeClient, setClientAsInService } from "@/utils/api/CSR/clients";
 import { useMutation } from "@tanstack/react-query";
 import DeleteNumberModal from "./DeleteNumberModal";
 import ChooseNumberModal from "./ChooseNumberModal";
 import { useLocale, useTranslations } from "next-intl";
 import { AcceptIcon, Button, RejectIcon, Table } from "shared-components";
+import { ClientInterface, removeClient, setClientAsInService } from "shared-utils";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 /**
  * Table with clients waiting for service
@@ -35,12 +36,14 @@ export default function ClientTable({
 
     // set client as in service
     const clientInService = useMutation({
-        mutationFn: (clientNumber: ClientInterface) => setClientAsInService(clientNumber, seat),
+        mutationFn: (clientNumber: ClientInterface) =>
+            setClientAsInService(clientNumber, seat, axiosAuthInstance),
     });
 
     // remove client
     const deleteClient = useMutation({
-        mutationFn: (clientNumber: ClientInterface) => removeClient(clientNumber),
+        mutationFn: (clientNumber: ClientInterface) =>
+            removeClient(clientNumber, axiosAuthInstance),
     });
     //----------------------------------------
 

@@ -3,7 +3,7 @@ import { AxiosAuthInstance, AxiosPureInstance } from "shared-utils";
 const apiPath = "/auth";
 
 export async function login(username: string, password: string, axiosInstance: AxiosPureInstance) {
-    const response = await axiosInstance.inst
+    const response = await axiosInstance.pure
         .post(
             apiPath + "/login",
             { username, password },
@@ -17,7 +17,7 @@ export async function login(username: string, password: string, axiosInstance: A
 }
 
 export async function registerDevice(axiosInstance: AxiosPureInstance) {
-    const response = await axiosInstance.inst
+    const response = await axiosInstance.pure
         .post(apiPath + "/register-device", {})
         .catch((error) => {
             return error.response;
@@ -27,6 +27,10 @@ export async function registerDevice(axiosInstance: AxiosPureInstance) {
 }
 
 /**
+ * Use this function to refresh JWT token
+ *
+ * Under the hood, function uses fetch instead of axios, because axios can't handle multiple set-cookie headers
+ * https://stackoverflow.com/questions/56237815/axios-returns-only-last-set-cookie-if-there-are-multiple
  *
  * @param axiosInstance
  * @param cookie Cookie string which "Cookie" header will be set to
@@ -36,22 +40,22 @@ export async function refreshJWTToken(
     axiosInstance: AxiosPureInstance,
     cookie: null | string = null,
 ) {
-    const headers: { [key: string]: string } = {};
+    const headers: any = {};
     if (cookie) {
         headers["Cookie"] = cookie;
     }
 
-    const response = await axiosInstance.inst
-        .post(apiPath + "/refresh", {}, { headers })
-        .catch((error) => {
-            return error.response;
-        });
+    const response = await fetch(axiosInstance.pure.defaults.baseURL + apiPath + "/refresh", {
+        method: "POST",
+        credentials: "include",
+        headers: headers,
+    });
 
     return response;
 }
 
 export async function logout(axiosInstance: AxiosPureInstance) {
-    const response = await axiosInstance.inst.post(apiPath + "/logout", {}).catch((error) => {
+    const response = await axiosInstance.pure.post(apiPath + "/logout", {}).catch((error) => {
         return error.response;
     });
 
@@ -59,10 +63,12 @@ export async function logout(axiosInstance: AxiosPureInstance) {
 }
 
 /**
- * @returns Info about logged in user or device !!!Convert it to JSON manually!!!
+ * @returns Info about logged in user or device
  */
-export async function getInfo(axiosAuthInstance: AxiosAuthInstance) {
-    const response = await axiosAuthInstance.inst.get(apiPath + "/get-info").catch((error) => {
+export async function getInfo(
+    axiosAuthInstance: AxiosAuthInstance,
+): Promise<{ data: any; status: number }> {
+    const response = await axiosAuthInstance.auth.get(apiPath + "/get-info").catch((error) => {
         return error.response;
     });
 

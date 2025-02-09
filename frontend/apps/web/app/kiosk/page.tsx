@@ -1,13 +1,14 @@
-import { getCategoriesSSR } from "@/utils/api/SSR/categories";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import CategoriesForm from "./CategoriesForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Image from "next/image";
-import { getLogoAvailabilitySSR } from "@/utils/api/SSR/file";
 import { Header, SmallHeader } from "shared-components";
+import { getCategories, getLogoAvailability } from "shared-utils";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 export default async function KioskPage() {
-    const categories = await getCategoriesSSR();
-    const logoAvailabilities = await getLogoAvailabilitySSR();
+    const categories = await getCategories(axiosAuthInstance);
+    const logoAvailabilities = await getLogoAvailability(axiosPureInstance);
 
     const mainLogoId = 1;
     const secondaryLogoId = 2;
@@ -44,7 +45,7 @@ export default async function KioskPage() {
 
             <CategoriesForm prefetchCategories={categories} />
 
-            <div className="fixed bottom-0 right-0 m-7">
+            <div className="fixed right-0 bottom-0 m-7">
                 <SmallHeader />
             </div>
         </main>

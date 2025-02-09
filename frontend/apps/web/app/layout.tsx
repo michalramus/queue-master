@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/utils/providers/ReactQueryProvider";
-import { getGlobalSettingsSSR } from "@/utils/api/SSR/settings";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import RefreshOnGlobalSettingsChanged from "@/components/RefreshOnGlobalSettingsChanged";
 import { GlobalSettingsProvider } from "@/utils/providers/GlobalSettingsProvider";
+import { getGlobalSettings } from "shared-utils";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const globalSettings = await getGlobalSettingsSSR();
+    const globalSettings = await getGlobalSettings(axiosPureInstance);
 
     const locale = await getLocale();
     const messages = await getMessages();

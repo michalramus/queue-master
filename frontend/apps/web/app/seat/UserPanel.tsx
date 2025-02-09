@@ -1,9 +1,9 @@
 "use client";
-import { logout } from "@/utils/api/CSR/auth";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button, Card } from "shared-components";
-import { axiosInstance } from "@/utils/api/CSR/axiosInstances/axiosInstance";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
+import { logout } from "shared-utils";
 
 export default function UserPanel({
     username,
@@ -16,16 +16,23 @@ export default function UserPanel({
     const t = useTranslations();
 
     function logoutHandler() {
-        logout(axiosInstance);
+        logout(axiosPureInstance);
         router.replace("/login");
     }
     return (
+        //TODO Add buttons onClick functionality
         <Card className="flex flex-nowrap items-center py-0!">
             <p className="mr-2">
                 {t("user")}: {username}
             </p>
-            {adminButton && <Button color="blue">{t("admin_dashboard")}</Button>}
-            <Button color="primary">{t("settings")}</Button>
+            {adminButton && (
+                <Button onClick={() => {}} color="blue">
+                    {t("admin_dashboard")}
+                </Button>
+            )}
+            <Button onClick={() => {}} color="primary">
+                {t("settings")}
+            </Button>
             <Button
                 color="red"
                 onClick={() => {

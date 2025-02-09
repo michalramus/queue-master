@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
-import { wsEvents } from "@/utils/wsEvents";
+import { wsEvents } from "shared-utils";
 
 /**
  * Add a listener to the globalSettingsChange websocket event and refresh the page when it happens

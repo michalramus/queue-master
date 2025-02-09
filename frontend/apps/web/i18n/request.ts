@@ -1,6 +1,7 @@
-import { getGlobalSettingsSSR } from "@/utils/api/SSR/settings";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { getRequestConfig } from "next-intl/server";
 import { cookies } from "next/headers";
+import { getGlobalSettings } from "shared-utils";
 
 const locales = ["en", "pl"];
 const defaultLocale = locales[0];
@@ -18,7 +19,7 @@ export default getRequestConfig(async () => {
 
     // set locale from globalSettings
     if (locale == null) {
-        const globalSettings = await getGlobalSettingsSSR();
+        const globalSettings = await getGlobalSettings(axiosPureInstance);
         if (locales.includes(globalSettings.locale as any)) {
             locale = globalSettings.locale;
         }

@@ -1,13 +1,13 @@
 "use client";
 
 import ClientTable from "./ClientTable";
-import { ClientInterface, getClients } from "@/utils/api/CSR/clients";
+
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
-import { UserSettingsInterface } from "../../utils/api/CSR/settings";
-import { wsEvents } from "@/utils/wsEvents";
+import { ClientInterface, getClients, UserSettingsInterface, wsEvents } from "shared-utils";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 export default function QueuePanel({
     clients,
@@ -26,14 +26,16 @@ export default function QueuePanel({
     const { data: waitingClients } = useQuery({
         queryKey: ["waitingClients"],
         queryFn: () =>
-            getClients().then((res) => res.filter((client) => client.status === "Waiting")),
+            getClients(axiosAuthInstance).then((res) =>
+                res.filter((client) => client.status === "Waiting"),
+            ),
         initialData: clients.filter((client) => client.status === "Waiting"),
     });
 
     const { data: inServiceClients } = useQuery({
         queryKey: ["inServiceClients"],
         queryFn: () =>
-            getClients().then((res) =>
+            getClients(axiosAuthInstance).then((res) =>
                 res.filter((client) => client.status === "InService" && client.seat === seat),
             ), //should be only one client in service per seat
         initialData: clients.filter(
