@@ -1,12 +1,13 @@
-import {
-    ClientInterface,
-    callAgainForClient,
-    removeClient,
-    setClientAsInService,
-} from "../../utils/api/CSR/clients";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Card } from "shared-components";
+import {
+    callAgainForClient,
+    ClientInterface,
+    removeClient,
+    setClientAsInService,
+} from "shared-utils";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 export default function InServicePanel({
     clientNumber,
@@ -23,14 +24,14 @@ export default function InServicePanel({
     //Handlers
     function finishClientHandler() {
         if (clientNumber) {
-            removeClient(clientNumber);
+            removeClient(clientNumber, axiosAuthInstance);
         }
     }
 
     async function nextClientHandler() {
         setLockNextClientButton(true);
         if (nextClientNumber) {
-            setClientAsInService(nextClientNumber, seat);
+            setClientAsInService(nextClientNumber, seat, axiosAuthInstance);
         }
         setTimeout(() => {
             setLockNextClientButton(false);
@@ -39,7 +40,7 @@ export default function InServicePanel({
 
     function callAgainHandler() {
         if (clientNumber) {
-            callAgainForClient(clientNumber);
+            callAgainForClient(clientNumber, axiosAuthInstance);
         }
     }
 

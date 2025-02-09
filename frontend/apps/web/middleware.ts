@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getInfoSSR } from "./utils/api/SSR/auth";
+import { axiosAuthInstance } from "./utils/axiosInstances/axiosAuthInstance";
+import { getInfo } from "shared-utils";
 
 interface Page {
     matcher: string;
@@ -28,7 +29,7 @@ const pages: Page[] = [
 export async function middleware(request: NextRequest) {
     for (let page of pages) {
         if (request.nextUrl.pathname.startsWith(page.matcher)) {
-            const info = await getInfoSSR();
+            const info = await getInfo(axiosAuthInstance);
             if (info.status == 401) {
                 return NextResponse.redirect(
                     new URL(page.error401Redirect + "?redirect=" + page.matcher, request.url),
@@ -41,7 +42,7 @@ export async function middleware(request: NextRequest) {
                 );
             }
 
-            if (page.roles.indexOf((await info.json()).role) < 0) {
+            if (page.roles.indexOf(info.data.role) < 0) {
                 return NextResponse.redirect(
                     new URL(page.error403Redirect + "?redirect=" + page.matcher, request.url),
                 );

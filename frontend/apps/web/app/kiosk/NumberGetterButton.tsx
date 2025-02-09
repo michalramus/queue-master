@@ -1,14 +1,15 @@
-import * as clientsApi from "@/utils/api/CSR/clients";
-import { CategoryInterface } from "@/utils/api/CSR/categories";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { useMutation } from "@tanstack/react-query";
 import { useLocale } from "next-intl";
 import { Button } from "shared-components";
+import { addClient, CategoryInterface } from "shared-utils";
 
 export default function NumberGetterButton({ category }: { category: CategoryInterface }) {
     const locale = useLocale();
     // Create new client
     const mutation = useMutation({
-        mutationFn: ({ categoryId }: { categoryId: number }) => clientsApi.addClient(categoryId),
+        mutationFn: ({ categoryId }: { categoryId: number }) =>
+            addClient(categoryId, axiosAuthInstance),
         onSuccess: (data) => {
             if (data != null) {
                 alert((data.category?.short_name ? data.category.short_name : "") + data.number);

@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, ReactNode, JSX } from "react";
-import { GlobalSettingsInterface } from "../api/CSR/settings";
+import { GlobalSettingsInterface } from "shared-utils";
 
 // Initializing context with the type (undefined at first)
 const GlobalSettingsContext = createContext<GlobalSettingsInterface | undefined>(undefined);

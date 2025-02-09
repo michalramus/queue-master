@@ -1,17 +1,18 @@
 import axios from "axios";
 import { getCookie } from "cookies-next";
-import { AxiosAuthInstance } from "shared-utils";
-import { refreshJWTToken } from "../auth";
-import { axiosInstance } from "./axiosInstance";
+import { AxiosAuthInstance, refreshJWTToken } from "shared-utils";
+import { axiosPureInstance } from "./axiosPureInstance";
 
 export const axiosAuthInstance: AxiosAuthInstance = {
-    inst: axios.create({
+    auth: axios.create({
         baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
         withCredentials: true,
     }),
 };
 
-axiosAuthInstance.inst.interceptors.request.use(
+let JWTRefreshTokenPromise: Promise<Response> | null = null;
+
+axiosAuthInstance.auth.interceptors.request.use(
     async function (config) {
         //before request is sent
         const tokenInvalidationTimeOffset = 5 * 60 * 1000; //5 minutes | when token has less than X minutes left, it will be considered invalid
@@ -71,13 +72,22 @@ axiosAuthInstance.inst.interceptors.request.use(
             refreshTokenExpirationDate.getTime() - new Date().getTime() >
                 tokenInvalidationTimeOffset
         ) {
-            if (serverSideCookies) {
-                config.headers["Cookie"] = (
-                    await refreshJWTToken(axiosInstance, serverSideCookies)
-                ).headers["set-cookie"].toString();
-            } else {
-                await refreshJWTToken(axiosInstance);
+            if (!JWTRefreshTokenPromise) {
+                if (serverSideCookies) {
+                    JWTRefreshTokenPromise = refreshJWTToken(axiosPureInstance, serverSideCookies);
+                } else {
+                    JWTRefreshTokenPromise = refreshJWTToken(axiosPureInstance);
+                }
             }
+
+            const refreshJWTTokenResponse = await JWTRefreshTokenPromise;
+
+            if (serverSideCookies) {
+                config.headers["Cookie"] = refreshJWTTokenResponse.headers
+                    .getSetCookie()
+                    .toString();
+            }
+            JWTRefreshTokenPromise = null;
             return config;
         }
 

@@ -1,13 +1,12 @@
 "use client";
 
-import { ClientInterface } from "../../utils/api/CSR/clients";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import { SmallHeader, Card } from "shared-components";
-import { wsEvents } from "@/utils/wsEvents";
 import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
+import { ClientInterface, wsEvents } from "shared-utils";
 
 export default function TVPage() {
     const globalSettings = useGlobalSettings();

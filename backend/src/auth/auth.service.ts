@@ -21,7 +21,7 @@ export class AuthService {
 
     private logger = new Logger(AuthService.name);
 
-    readonly accessTokenExpirationTime = "15m";
+    readonly accessTokenExpirationTime = "1d";
     readonly refreshTokenExpirationTime = "90d";
 
     /**
@@ -74,10 +74,15 @@ export class AuthService {
         response.cookie("jwt", accessToken, { httpOnly: true });
         response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
 
-        response.cookie("jwt_expiration_date", new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString());
+        response.cookie(
+            "jwt_expiration_date",
+            new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString(),
+            {},
+        );
         response.cookie(
             "jwt_refresh_expiration_date",
             new Date(Date.now() + ms(this.refreshTokenExpirationTime)).toUTCString(),
+            {},
         );
 
         return "Successful login";
@@ -106,10 +111,15 @@ export class AuthService {
         response.cookie("jwt", accessToken, { httpOnly: true });
         response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
 
-        response.cookie("jwt_expiration_date", new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString());
+        response.cookie(
+            "jwt_expiration_date",
+            new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString(),
+            {},
+        );
         response.cookie(
             "jwt_refresh_expiration_date",
             new Date(Date.now() + ms(this.refreshTokenExpirationTime)).toUTCString(),
+            {},
         );
 
         return "Successful token refresh";
@@ -118,8 +128,8 @@ export class AuthService {
     async logout(entity: Entity, response: Response) {
         response.clearCookie("jwt", { httpOnly: true });
         response.clearCookie("jwt_refresh", { httpOnly: true });
-        response.clearCookie("jwt_expiration_date");
-        response.clearCookie("jwt_refresh_expiration_date");
+        response.clearCookie("jwt_expiration_date", {});
+        response.clearCookie("jwt_refresh_expiration_date", {});
 
         return "Logged out successfully";
     }
