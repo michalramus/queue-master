@@ -7,6 +7,8 @@ import { LoginUserDto } from "./dto/login-user.dto";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ms = require("ms"); //import syntax not working properly with this package
 
 @Injectable()
 export class AuthService {
@@ -19,7 +21,7 @@ export class AuthService {
 
     private logger = new Logger(AuthService.name);
 
-    readonly accessTokenExpirationTime = "1d";
+    readonly accessTokenExpirationTime = "15m";
     readonly refreshTokenExpirationTime = "90d";
 
     /**
@@ -72,6 +74,12 @@ export class AuthService {
         response.cookie("jwt", accessToken, { httpOnly: true });
         response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
 
+        response.cookie("jwt_expiration_date", new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString());
+        response.cookie(
+            "jwt_refresh_expiration_date",
+            new Date(Date.now() + ms(this.refreshTokenExpirationTime)).toUTCString(),
+        );
+
         return "Successful login";
     }
 
@@ -98,12 +106,20 @@ export class AuthService {
         response.cookie("jwt", accessToken, { httpOnly: true });
         response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
 
+        response.cookie("jwt_expiration_date", new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString());
+        response.cookie(
+            "jwt_refresh_expiration_date",
+            new Date(Date.now() + ms(this.refreshTokenExpirationTime)).toUTCString(),
+        );
+
         return "Successful token refresh";
     }
 
     async logout(entity: Entity, response: Response) {
         response.clearCookie("jwt", { httpOnly: true });
         response.clearCookie("jwt_refresh", { httpOnly: true });
+        response.clearCookie("jwt_expiration_date");
+        response.clearCookie("jwt_refresh_expiration_date");
 
         return "Logged out successfully";
     }
