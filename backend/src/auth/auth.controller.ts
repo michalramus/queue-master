@@ -13,8 +13,10 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post("register-device")
-    async registerDevice(@Request() req, @Res({ passthrough: true }) res: Response) {
-        return this.authService.registerDevice(req.headers, req.ip, res);
+    @Roles(["Admin", "User"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    async registerDevice(@Request() req) {
+        return this.authService.registerDevice(Entity.convertFromReq(req));
     }
 
     @Post("login")
@@ -27,6 +29,7 @@ export class AuthController {
     }
 
     @Post("refresh")
+    @Roles(["Admin", "User"])
     @UseGuards(JwtRefreshTokenAuthGuard, RolesGuard)
     async refresh(@Request() req, @Res({ passthrough: true }) res: Response) {
         return this.authService.refresh(Entity.convertFromReq(req), req.ip, res);

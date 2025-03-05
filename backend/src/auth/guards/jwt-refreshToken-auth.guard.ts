@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException, Logger } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
+import { refreshTokenExtractor } from "../strategies/jwtRefreshToken.strategy";
 
 @Injectable()
 export class JwtRefreshTokenAuthGuard extends AuthGuard("jwtRefreshToken") {
@@ -10,7 +11,7 @@ export class JwtRefreshTokenAuthGuard extends AuthGuard("jwtRefreshToken") {
         const { method, ip, url } = request;
 
         if (err || !user) {
-            this.logger.warn(`${info} | ${method} ${url} ${ip}`, `Token: ${request.headers.authorization}`);
+            this.logger.warn(`${info} | ${method} ${url} ${ip}`, `Token: ${refreshTokenExtractor(request)}`);
             throw new UnauthorizedException(info);
         }
         return user;
