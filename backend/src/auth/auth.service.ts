@@ -7,6 +7,8 @@ import { LoginUserDto } from "./dto/login-user.dto";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ms = require("ms"); //import syntax not working properly with this package
 
 @Injectable()
 export class AuthService {
@@ -27,25 +29,18 @@ export class AuthService {
      * @param headers
      * @returns
      */
-    async registerDevice(headers: { "user-agent": string }, ip: string, response: Response) {
-        const device = await this.devicesService.create(headers["user-agent"]);
+    async registerDevice(entity: Entity) {
+        const device = await this.devicesService.create();
 
-        this.logger.log(`Registered new device ${ip} ${JSON.stringify(device)}`);
-
+        this.logger.log(`[${entity.name}] Registered new device ${JSON.stringify(device)}`);
         const payload = new Entity(device.id, "Device", `Device ${device.id}`).getJwtPayload();
-        const accessToken = await this.jwtService.signAsync(payload, {
-            expiresIn: this.accessTokenExpirationTime,
+
+        //Refresh token never expires
+        const jwtToken = await this.jwtService.signAsync(payload, {
             secret: process.env.JWT_SECRET_KEY,
         });
-        //Refresh token never expires
-        const refreshToken = await this.jwtService.signAsync(payload, {
-            secret: process.env.JWT_REFRESH_TOKEN_KEY,
-        });
 
-        response.cookie("jwt", accessToken, { httpOnly: true });
-        response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
-
-        return "Device registered successfully ";
+        return { message: "Device registered successfully ", jwt_token: jwtToken };
     }
 
     async login(loginUserDto: LoginUserDto, ip: string, response: Response) {
@@ -69,8 +64,19 @@ export class AuthService {
             secret: process.env.JWT_REFRESH_TOKEN_KEY,
         });
 
-        response.cookie("jwt", accessToken, { httpOnly: true });
-        response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
+        response.cookie("jwt", accessToken, { httpOnly: true, sameSite: "lax" });
+        response.cookie("jwt_refresh", refreshToken, { httpOnly: true, sameSite: "lax" });
+
+        response.cookie(
+            "jwt_expiration_date",
+            new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString(),
+            { sameSite: "lax" },
+        );
+        response.cookie(
+            "jwt_refresh_expiration_date",
+            new Date(Date.now() + ms(this.refreshTokenExpirationTime)).toUTCString(),
+            { sameSite: "lax" },
+        );
 
         return "Successful login";
     }
@@ -95,15 +101,28 @@ export class AuthService {
             secret: process.env.JWT_REFRESH_TOKEN_KEY,
         });
 
-        response.cookie("jwt", accessToken, { httpOnly: true });
-        response.cookie("jwt_refresh", refreshToken, { httpOnly: true });
+        response.cookie("jwt", accessToken, { httpOnly: true, sameSite: "lax" });
+        response.cookie(
+            "jwt_expiration_date",
+            new Date(Date.now() + ms(this.accessTokenExpirationTime)).toUTCString(),
+            { sameSite: "lax" },
+        );
+
+        response.cookie("jwt_refresh", refreshToken, { httpOnly: true, sameSite: "lax" });
+        response.cookie(
+            "jwt_refresh_expiration_date",
+            new Date(Date.now() + ms(this.refreshTokenExpirationTime)).toUTCString(),
+            { sameSite: "lax" },
+        );
 
         return "Successful token refresh";
     }
 
     async logout(entity: Entity, response: Response) {
-        response.clearCookie("jwt", { httpOnly: true });
-        response.clearCookie("jwt_refresh", { httpOnly: true });
+        response.clearCookie("jwt", { httpOnly: true, sameSite: "lax" });
+        response.clearCookie("jwt_refresh", { httpOnly: true, sameSite: "lax" });
+        response.clearCookie("jwt_expiration_date", { sameSite: "lax" });
+        response.clearCookie("jwt_refresh_expiration_date", { sameSite: "lax" });
 
         return "Logged out successfully";
     }

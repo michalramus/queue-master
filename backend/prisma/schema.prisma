@@ -81,7 +81,6 @@ enum Role {
 
 model Device {
     id         Int     @id @default(autoincrement())
-    user_agent String
     accepted   Boolean @default(false)
 }
 
