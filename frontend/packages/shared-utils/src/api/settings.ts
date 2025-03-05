@@ -38,11 +38,9 @@ export async function getUserSettings(
     axiosAuthInstance: AxiosAuthInstance,
     userId?: number,
 ): Promise<UserSettingsInterface> {
-    const response = await axiosAuthInstance.auth
-        .get(apiPathUserSettings + (userId ? `/${userId}` : ""))
-        .catch((error) => {
-            return error.response;
-        });
+    const response = await axiosAuthInstance.auth.get(
+        apiPathUserSettings + (userId ? `/${userId}` : ""),
+    );
 
     return response.data;
 }
@@ -58,11 +56,10 @@ export async function setUserSettings(
     axiosAuthInstance: AxiosAuthInstance,
     userId?: number,
 ): Promise<UserSettingsInterface> {
-    const response = await axiosAuthInstance.auth
-        .patch(apiPathUserSettings + (userId ? `/${userId}` : ""), userSettings)
-        .catch((error) => {
-            return error.response;
-        });
+    const response = await axiosAuthInstance.auth.patch(
+        apiPathUserSettings + (userId ? `/${userId}` : ""),
+        userSettings,
+    );
 
     return response.data;
 }
@@ -70,9 +67,7 @@ export async function setUserSettings(
 export async function getGlobalSettings(
     axiosPureInstance: AxiosPureInstance,
 ): Promise<GlobalSettingsInterface> {
-    const response = await axiosPureInstance.pure.get(apiPathGlobalSettings).catch((error) => {
-        return error.response;
-    });
+    const response = await axiosPureInstance.pure.get(apiPathGlobalSettings);
 
     return response.data;
 }
@@ -86,11 +81,7 @@ export async function setGlobalSettings(
     globalSettings: GlobalSettingsInterface,
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<GlobalSettingsInterface> {
-    const response = await axiosAuthInstance.auth
-        .patch(apiPathGlobalSettings, globalSettings)
-        .catch((error) => {
-            return error.response;
-        });
+    const response = await axiosAuthInstance.auth.patch(apiPathGlobalSettings, globalSettings);
 
     return response.data;
 }

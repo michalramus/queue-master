@@ -17,11 +17,7 @@ export class DevicesService {
      * @param userAgent
      * @returns
      */
-    async create(userAgent: string): Promise<Device | null> {
-        return this.databaseService.device.create({
-            data: {
-                user_agent: userAgent,
-            },
-        });
+    async create(): Promise<Device | null> {
+        return this.databaseService.device.create({ data: { accepted: true } });
     }
 }

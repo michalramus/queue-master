@@ -22,27 +22,34 @@ export default function LoginForm() {
         setIsServerError(false);
         setIsLoading(true);
 
-        const res = await login(
-            event.target.username.value,
-            event.target.password.value,
-            axiosPureInstance,
-        );
-        if (res.status == 401) {
-            setIsLoading(false);
-            setIsIncorrectLoginData(true);
-            setIsServerError(false);
-        } else if (res.status != 201) {
+        try {
+            const res = await login(
+                event.target.username.value,
+                event.target.password.value,
+                axiosPureInstance,
+            );
+
+            if (res.status == 401) {
+                setIsLoading(false);
+                setIsIncorrectLoginData(true);
+                setIsServerError(false);
+            } else if (res.status != 201) {
+                setIsLoading(false);
+                setIsIncorrectLoginData(false);
+                setIsServerError(true);
+            } else {
+                const redirect = searchParams.get("redirect");
+
+                if (redirect) {
+                    router.push(redirect);
+                } else {
+                    router.push("/");
+                }
+            }
+        } catch (error) {
             setIsLoading(false);
             setIsIncorrectLoginData(false);
             setIsServerError(true);
-        } else {
-            const redirect = searchParams.get("redirect");
-
-            if (redirect) {
-                router.push(redirect);
-            } else {
-                router.push("/");
-            }
         }
     }
 

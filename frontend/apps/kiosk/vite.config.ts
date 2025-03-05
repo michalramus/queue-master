@@ -5,11 +5,22 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
     plugins: [react()],
     base: "./",
+    optimizeDeps: {
+        esbuildOptions: {
+            target: "esnext",
+        },
+    },
     build: {
         outDir: "dist-react",
+        target: "esnext",
     },
     server: {
         port: 5123,
         strictPort: true,
+    },
+    resolve: {
+        alias: {
+            "@": "/src/ui",
+        },
     },
 });

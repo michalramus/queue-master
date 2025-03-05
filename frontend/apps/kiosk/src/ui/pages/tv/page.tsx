@@ -1,15 +1,15 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import { SmallHeader, Card } from "shared-components";
-import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 import { ClientInterface, wsEvents } from "shared-utils";
+import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
+import useAppConfig from "@/utils/providers/AppConfigProvider";
 
 export default function TVPage() {
     const globalSettings = useGlobalSettings();
+    const appConfig = useAppConfig();
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
     const currentClientRef = useRef<ClientInterface | null>(null);
 
@@ -23,7 +23,7 @@ export default function TVPage() {
 
     //Socket.io
     useEffect(() => {
-        const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL ?? "");
+        const socket = io(appConfig.backendUrl);
 
         function onClientToShow(client: ClientInterface) {
             setNewClientsQueue((e) => [...e, client]);
@@ -35,7 +35,7 @@ export default function TVPage() {
             socket.off(wsEvents.ClientInService, onClientToShow);
             socket.off(wsEvents.ClientCallAgain, onClientToShow);
         };
-    }, []);
+    }, [appConfig.backendUrl]);
 
     //Update Refs
     useEffect(() => {
@@ -72,7 +72,7 @@ export default function TVPage() {
 
             //Play audio
             const number = new Audio(
-                process.env.NEXT_PUBLIC_BACKEND_URL +
+                appConfig.backendUrl +
                     "/audio-samples/" +
                     globalSettings.locale +
                     "/" +
@@ -80,7 +80,7 @@ export default function TVPage() {
                     client.number,
             );
             const seat = new Audio(
-                process.env.NEXT_PUBLIC_BACKEND_URL +
+                appConfig.backendUrl +
                     "/audio-samples/" +
                     globalSettings.locale +
                     "/SEAT" +
@@ -99,13 +99,7 @@ export default function TVPage() {
         }
 
         isShowNewClientsRunning.current = false;
-    }, [
-        currentClientRef,
-        newClientsQueue,
-        previousClientsRef,
-        isShowNewClientsRunning,
-        globalSettings.locale,
-    ]);
+    }, [newClientsQueue, appConfig.backendUrl, globalSettings.locale]);
 
     useEffect(() => {
         showNewClients();

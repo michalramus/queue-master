@@ -3,25 +3,17 @@ import { AxiosAuthInstance, AxiosPureInstance } from "shared-utils";
 const apiPath = "/auth";
 
 export async function login(username: string, password: string, axiosInstance: AxiosPureInstance) {
-    const response = await axiosInstance.pure
-        .post(
-            apiPath + "/login",
-            { username, password },
-            { headers: { "Content-Type": "application/json" } },
-        )
-        .catch((error) => {
-            return error.response;
-        });
+    const response = await axiosInstance.pure.post(
+        apiPath + "/login",
+        { username, password },
+        { headers: { "Content-Type": "application/json" } },
+    );
 
     return response;
 }
 
 export async function registerDevice(axiosInstance: AxiosPureInstance) {
-    const response = await axiosInstance.pure
-        .post(apiPath + "/register-device", {})
-        .catch((error) => {
-            return error.response;
-        });
+    const response = await axiosInstance.pure.post(apiPath + "/register-device", {});
 
     return response;
 }
@@ -39,10 +31,14 @@ export async function registerDevice(axiosInstance: AxiosPureInstance) {
 export async function refreshJWTToken(
     axiosInstance: AxiosPureInstance,
     cookie: null | string = null,
+    authorization: null | string = null,
 ) {
     const headers: any = {};
     if (cookie) {
         headers["Cookie"] = cookie;
+    }
+    if (authorization) {
+        headers["Authorization"] = authorization;
     }
 
     const response = await fetch(axiosInstance.pure.defaults.baseURL + apiPath + "/refresh", {
@@ -55,9 +51,7 @@ export async function refreshJWTToken(
 }
 
 export async function logout(axiosInstance: AxiosPureInstance) {
-    const response = await axiosInstance.pure.post(apiPath + "/logout", {}).catch((error) => {
-        return error.response;
-    });
+    const response = await axiosInstance.pure.post(apiPath + "/logout", {});
 
     return response;
 }
@@ -68,9 +62,7 @@ export async function logout(axiosInstance: AxiosPureInstance) {
 export async function getInfo(
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<{ data: any; status: number }> {
-    const response = await axiosAuthInstance.auth.get(apiPath + "/get-info").catch((error) => {
-        return error.response;
-    });
+    const response = await axiosAuthInstance.auth.get(apiPath + "/get-info");
 
     return response;
 }

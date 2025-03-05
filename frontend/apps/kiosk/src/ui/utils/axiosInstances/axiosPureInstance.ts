@@ -1,14 +1,15 @@
 import axios from "axios";
 import { AxiosPureInstance } from "shared-utils";
 
+const appConfig = await window.electronAPI.getAppConfig();
+
 export const axiosPureInstance: AxiosPureInstance = {
     pure: axios.create({
-        baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+        baseURL: appConfig.backendUrl,
         withCredentials: true,
     }),
 };
 
-//Request part
 axiosPureInstance.pure.interceptors.request.use(
     function (config) {
         // Do something before request is sent

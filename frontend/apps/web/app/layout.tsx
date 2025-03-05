@@ -6,7 +6,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import RefreshOnGlobalSettingsChanged from "@/components/RefreshOnGlobalSettingsChanged";
 import { GlobalSettingsProvider } from "@/utils/providers/GlobalSettingsProvider";
-import { getGlobalSettings } from "shared-utils";
+import { getGlobalSettings, GlobalSettingsInterface } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,7 +21,19 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const globalSettings = await getGlobalSettings(axiosPureInstance);
+    let globalSettings: GlobalSettingsInterface;
+
+    try {
+        globalSettings = await getGlobalSettings(axiosPureInstance);
+    } catch (error) {
+        return (
+            <html>
+                <body>
+                    <div>Failed to load global settings. Check server connection</div>
+                </body>
+            </html>
+        );
+    }
 
     const locale = await getLocale();
     const messages = await getMessages();
