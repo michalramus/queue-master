@@ -1,28 +1,32 @@
 import axios from "axios";
-import { AxiosPureInstance } from "shared-utils";
+import { AxiosAuthInstance } from "shared-utils";
 
-export const axiosPureInstance: AxiosPureInstance = {
-    pure: axios.create({
-        baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+const appConfig = await window.electronAPI.getAppConfig();
+
+export const axiosAuthInstance: AxiosAuthInstance = {
+    auth: axios.create({
+        baseURL: appConfig.backendUrl,
         withCredentials: true,
+        headers: {
+            Authorization: `Bearer ${appConfig.JWTToken}`,
+        },
     }),
 };
 
 //Request part
-axiosPureInstance.pure.interceptors.request.use(
-    function (config) {
-        // Do something before request is sent
+axiosAuthInstance.auth.interceptors.request.use(
+    async function (config) {
         return config;
     },
     function (error) {
-        // Do something with request error
+        //request error
         console.log(error.toJSON());
         return Promise.reject(error);
     },
 );
 
 //Response part
-axiosPureInstance.pure.interceptors.response.use(
+axiosAuthInstance.auth.interceptors.response.use(
     function (response) {
         // Do something with response data
         return response;

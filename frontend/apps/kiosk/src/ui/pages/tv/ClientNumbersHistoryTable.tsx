@@ -1,14 +1,14 @@
 import { ReactNode } from "react";
-import { useTranslations } from "next-intl";
 import { Table } from "shared-components";
 import { ClientInterface } from "shared-utils";
+import { useTranslation } from "react-i18next";
 
 export default function ClientNumbersHistory({
     clientNumbers,
 }: {
     clientNumbers: ClientInterface[];
 }) {
-    const t = useTranslations();
+    const { t } = useTranslation();
 
     const rows: (string | number | ReactNode | null)[][] = [];
     clientNumbers.map((clientNumber) =>

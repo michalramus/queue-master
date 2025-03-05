@@ -16,35 +16,22 @@ const pages: Page[] = [
         error401Redirect: "/login",
         error403Redirect: "/login",
     },
-
-    {
-        matcher: "/kiosk",
-        roles: ["Device", "User", "Admin"],
-        error401Redirect: "/register-device",
-        error403Redirect: "/register-device",
-    },
 ];
 
-//TODO Add 404
 export async function middleware(request: NextRequest) {
     for (let page of pages) {
         if (request.nextUrl.pathname.startsWith(page.matcher)) {
-            const info = await getInfo(axiosAuthInstance);
-            if (info.status == 401) {
+            try {
+                const info = await getInfo(axiosAuthInstance);
+
+                if (page.roles.indexOf(info.data.role) < 0) {
+                    return NextResponse.redirect(
+                        new URL(page.error403Redirect + "?redirect=" + page.matcher, request.url),
+                    );
+                }
+            } catch (error) {
                 return NextResponse.redirect(
                     new URL(page.error401Redirect + "?redirect=" + page.matcher, request.url),
-                );
-            }
-
-            if (info.status == 403) {
-                return NextResponse.redirect(
-                    new URL(page.error403Redirect + "?redirect=" + page.matcher, request.url),
-                );
-            }
-
-            if (page.roles.indexOf(info.data.role) < 0) {
-                return NextResponse.redirect(
-                    new URL(page.error403Redirect + "?redirect=" + page.matcher, request.url),
                 );
             }
         }

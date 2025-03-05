@@ -11,9 +11,7 @@ const apiPath = "/categories";
 export async function getCategories(
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<CategoryInterface[]> {
-    const response = await axiosAuthInstance.auth.get(apiPath).catch((error) => {
-        return error.response;
-    });
+    const response = await axiosAuthInstance.auth.get(apiPath);
 
     return response.data;
 }

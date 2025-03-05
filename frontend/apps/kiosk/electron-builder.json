@@ -1,7 +1,29 @@
 {
     "appId": "com.m-ramus.queue-system-kiosk",
-    "files": ["dist-electron", "dist-react"],
-    "extraResources": ["dist-electron/preload.cjs", "src/assets/**"],
+    "files": [
+        "dist-electron",
+        "dist-react"
+    ],
+    "extraResources": [
+        {
+            "from": "./dist-electron/preload.cjs",
+            "to": "./dist-electron/preload.cjs"
+        },
+        {
+            "from": "./src/ui/assets/",
+            "to": "./assets",
+            "filter": [
+                "**/*"
+            ]
+        },
+        {
+            "from": "../../i18n/",
+            "to": "./i18n",
+            "filter": [
+                "**/*"
+            ]
+        }
+    ],
     "icon": "./logo.png",
     "mac": {
         "target": "dmg"
@@ -11,6 +33,9 @@
         "category": "Utility"
     },
     "win": {
-        "target": ["portable", "msi"]
+        "target": [
+            "portable",
+            "msi"
+        ]
     }
 }

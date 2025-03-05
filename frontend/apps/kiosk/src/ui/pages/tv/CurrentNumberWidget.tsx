@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
 import { Table } from "shared-components";
+import { useTranslation } from "react-i18next";
 
 interface CurrentNumberWidgetProps {
     category_short_name: string;
@@ -14,7 +14,7 @@ export default function CurrentNumberWidget({
     seat,
     className,
 }: CurrentNumberWidgetProps) {
-    const t = useTranslations();
+    const { t } = useTranslation();
 
     return (
         <div className={`${className}`}>
