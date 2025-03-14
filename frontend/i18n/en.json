@@ -19,6 +19,7 @@
     "next": "Next",
     "number": "Number",
     "password": "Password",
+    "printing": "Printing...",
     "refresh_this_site": "Refresh this site",
     "register_device_instruction_after_registration": "Accept device inside the admin panel and refresh this site.",
     "register_device_instruction_before_registration": "After registering new device, it is necessary to accept it in the admin panel.",
