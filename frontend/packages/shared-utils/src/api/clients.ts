@@ -16,7 +16,7 @@ const apiPath = "/clients";
 export async function addClient(
     categoryId: number,
     axiosAuthInstance: AxiosAuthInstance,
-): Promise<ClientInterface | null> {
+): Promise<ClientInterface> {
     const response = await axiosAuthInstance.auth.post(apiPath, { categoryId: categoryId });
 
     return response.data;
