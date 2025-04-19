@@ -24,6 +24,7 @@ async function onExecutePrintTicket(
         number: client.number,
         template: printingTicketTemplate || "",
     })}'`; //Added ' at the beginning and end of the string to avoid issues with spaces in the parameters
+    //TODO check if not remove '
 
     if (config.printingScriptAddPythonPrefix) {
         printJob = spawnSync("python3", [config.printingScript, callParameters]);
@@ -42,6 +43,38 @@ async function onExecutePrintTicket(
     }
 
     console.log(`Printing script ended with ${printJob.status}`);
+}
+
+async function handleInvokeAudioSynthesizer(
+    _event: IpcMainInvokeEvent,
+    client: ClientInterface,
+): Promise<void> {
+    console.log("Invoking audio synthesizer");
+    if (!config.audioSynthesizerScript) {
+        console.log("No audio synthesizer script configured");
+        return;
+    }
+    let audioSynthesizer;
+    const callParameters = `${JSON.stringify({
+        categoryShortName: client.category.short_name,
+        number: client.number,
+        seat: client.seat,
+    })}`;
+    if (config.audioSynthesizerScriptAddPythonPrefix) {
+        audioSynthesizer = spawnSync("python3", [config.audioSynthesizerScript, callParameters]);
+    } else {
+        audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);
+    }
+    if (process.env.NODE_ENV == "development") {
+        if (audioSynthesizer.stdout) {
+            console.log(audioSynthesizer.stdout.toString());
+        }
+
+        if (audioSynthesizer.stderr) {
+            console.error(audioSynthesizer.stderr.toString());
+        }
+    }
+    console.log(`Audio synthesizer script ended with ${audioSynthesizer.status}`);
 }
 
 async function handleGetTranslation(
@@ -106,6 +139,8 @@ app.on("ready", async () => {
     await fetchConfig();
 
     ipcMain.on("executePrintTicket", onExecutePrintTicket);
+
+    ipcMain.handle("invokeAudioSynthesizer", handleInvokeAudioSynthesizer);
 
     ipcMain.handle("getTranslation", handleGetTranslation);
     ipcMain.handle("getAppConfig", handleGetAppConfig);
