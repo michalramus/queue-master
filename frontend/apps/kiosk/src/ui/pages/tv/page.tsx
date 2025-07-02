@@ -4,11 +4,9 @@ import { io } from "socket.io-client";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import { SmallHeader, Card } from "shared-components";
 import { ClientInterface, wsEvents } from "shared-utils";
-import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 import useAppConfig from "@/utils/providers/AppConfigProvider";
 
 export default function TVPage() {
-    const globalSettings = useGlobalSettings();
     const appConfig = useAppConfig();
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
     const currentClientRef = useRef<ClientInterface | null>(null);
@@ -71,35 +69,13 @@ export default function TVPage() {
             }
 
             //Play audio
-            const number = new Audio(
-                appConfig.backendUrl +
-                    "/audio-samples/" +
-                    globalSettings.locale +
-                    "/" +
-                    client.category?.short_name +
-                    client.number,
-            );
-            const seat = new Audio(
-                appConfig.backendUrl +
-                    "/audio-samples/" +
-                    globalSettings.locale +
-                    "/SEAT" +
-                    client.seat,
-            );
-            number.play();
-            await new Promise((resolve) => {
-                number.onended = resolve;
-            });
-            seat.play();
-            await new Promise((resolve) => {
-                seat.onended = resolve;
-            });
+            await window.electronAPI.invokeAudioSynthesizer(client);
 
             setNewClientsQueue((e) => e.slice(1));
         }
 
         isShowNewClientsRunning.current = false;
-    }, [newClientsQueue, appConfig.backendUrl, globalSettings.locale]);
+    }, [newClientsQueue]);
 
     useEffect(() => {
         showNewClients();
