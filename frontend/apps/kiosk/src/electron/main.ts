@@ -1,9 +1,48 @@
+import { spawnSync } from "child_process";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import path from "path";
+import { ClientInterface } from "shared-utils";
 
 let config: AppConfigInterface;
 
 //IPC --------------------------------
+
+async function onExecutePrintTicket(
+    _event: IpcMainInvokeEvent,
+    client: ClientInterface,
+    printingTicketTemplate: string,
+): Promise<void> {
+    console.log("Printing ticket");
+    if (!config.printingScript) {
+        console.log("No printing script configured");
+        return;
+    }
+
+    let printJob;
+    const callParameters = `'${JSON.stringify({
+        categoryShortName: client.category.short_name,
+        number: client.number,
+        template: printingTicketTemplate || "",
+    })}'`; //Added ' at the beginning and end of the string to avoid issues with spaces in the parameters
+
+    if (config.printingScriptAddPythonPrefix) {
+        printJob = spawnSync("python3", [config.printingScript, callParameters]);
+    } else {
+        printJob = spawnSync(config.printingScript, [callParameters]);
+    }
+
+    if (process.env.NODE_ENV == "development") {
+        if (printJob.stdout) {
+            console.log(printJob.stdout.toString());
+        }
+
+        if (printJob.stderr) {
+            console.error(printJob.stderr.toString());
+        }
+    }
+
+    console.log(`Printing script ended with ${printJob.status}`);
+}
 
 async function handleGetTranslation(
     _event: IpcMainInvokeEvent,
@@ -65,6 +104,8 @@ async function fetchConfig() {
 
 app.on("ready", async () => {
     await fetchConfig();
+
+    ipcMain.on("executePrintTicket", onExecutePrintTicket);
 
     ipcMain.handle("getTranslation", handleGetTranslation);
     ipcMain.handle("getAppConfig", handleGetAppConfig);
