@@ -1,12 +1,16 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { HttpException, Injectable, Logger } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
 import { Entity } from "../auth/types/entity.class";
 import { userSettingsList } from "./user-settings.list";
 import { SettingSupportedTypes } from "src/settings/setting.class";
+import { UsersService } from "../users/users.service";
 
 @Injectable()
 export class UserSettingsService {
-    constructor(private readonly databaseService: DatabaseService) {}
+    constructor(
+        private readonly databaseService: DatabaseService,
+        private readonly usersService: UsersService,
+    ) {}
     logger = new Logger(UserSettingsService.name);
 
     findSettings(entity: Entity): Promise<string> {
@@ -20,6 +24,9 @@ export class UserSettingsService {
      */
     async findUserSettings(id: number): Promise<string> {
         //find all settings in database and complete with default values
+        if (this.usersService.findOneById(id) === null) {
+            throw new HttpException(`User with id ${id} not found`, 404);
+        }
 
         const rawSettings = await this.databaseService.user_Setting.findMany({
             where: {
@@ -61,6 +68,11 @@ export class UserSettingsService {
         this.logger.log(
             `[${entity.name} id:${entity.id}] Updating settings: ${JSON.stringify(settings)} for user ${id}`,
         );
+
+        if (this.usersService.findOneById(id) === null) {
+            this.logger.warn(`User with id ${id} not found. Cannot update settings.`);
+            throw new HttpException(`User with id ${id} not found`, 404);
+        }
 
         //find setting in globalSettings, convert to string and save to database
         for (const [key, setting] of Object.entries(settings)) {
