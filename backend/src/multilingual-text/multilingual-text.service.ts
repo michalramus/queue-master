@@ -6,6 +6,12 @@ import { MultilingualTextCategories } from "./types/multilingualTextCategories.e
 export class MultilingualTextService {
     constructor(private readonly databaseService: DatabaseService) {}
 
+    /**
+     *
+     * @param moduleName
+     * @param key
+     * @returns JSON in format { lang: translatedText }
+     */
     async getMultilingualText(
         moduleName: MultilingualTextCategories,
         key: string,

@@ -5,7 +5,6 @@ import { DatabaseService } from "src/database/database.service";
 import { WebsocketsService } from "../websockets/websockets.service";
 import { Entity } from "src/auth/types/entity.class";
 import { Client } from "./types/client.interface";
-import { userSettingsList } from "src/user-settings/user-settings.list";
 import { wsEvents } from "src/websockets/wsEvents.enum";
 import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
 import { MultilingualTextCategories } from "src/multilingual-text/types/multilingualTextCategories.enum";
@@ -21,7 +20,7 @@ export class ClientsService {
 
     private maxClientsCounter = 999;
     private minClientsCounterToReset = 50; // if clients with number lower than this exist, counter cannot be reset
-    private timeBetweenCounterResets = 1000 * 60 * 60 * 24; // in seconds - 24 hours
+    private timeBetweenCounterResets = 1000 * 60 * 60 * 10; // in seconds - 8 hours
 
     async create(createClientDto: CreateClientDto, entity: Entity): Promise<Client> {
         // Check if category exists
@@ -87,6 +86,7 @@ export class ClientsService {
             },
         });
 
+        //TODO not fetch every category translation for every client. Fetch first all categories and then map them
         const clients = dbClients.map(async (client) => await this.addCategoryNameFieldToClient(client));
         this.logger.debug(`Fetched ${dbClients.length} clients`);
         return Promise.all(clients);
@@ -181,31 +181,17 @@ export class ClientsService {
         const now = new Date();
         const resetTime = new Date(now.getTime() - this.timeBetweenCounterResets);
         if (category.last_counter_reset > resetTime) {
-            this.logger.debug(`Avoiding reset: Counter for category ${categoryId} was reset less than 24 hours ago`);
+            this.logger.debug(
+                `Avoiding reset: Counter for category ${categoryId} was reset less than ${this.timeBetweenCounterResets / (1000 * 60 * 60)} hours ago`,
+            );
             return;
         }
 
-        this.logger.log(`Resetting counter for category ${categoryId}`);
-        //usuń numerki, które są w stanie "InService", a zadne konto nie ma przypisanego stanowiska, od którego te numerki są przypisane
-
-        const clientsInService = await this.databaseService.client.findMany({
-            where: { category_id: categoryId, status: "InService" },
-            select: { seat: true },
+        //Delete clients older than resetTime
+        const deletedClients = await this.databaseService.client.deleteMany({
+            where: { creation_date: { lt: resetTime } },
         });
-
-        //Get all assigned seats
-        const seatsStr = await this.databaseService.user_Setting.findMany({
-            where: { key: userSettingsList["seat"].key },
-            select: { value: true },
-        });
-        const seats = seatsStr.map((seat) => userSettingsList["seat"].convertSettingFromString(seat.value));
-
-        //Delete clients in service with seat not in seats
-        for (const clientInService of clientsInService) {
-            if (clientInService.seat && !seats.includes(clientInService.seat)) {
-                this.databaseService.client.deleteMany({ where: { seat: clientInService.seat } });
-            }
-        }
+        this.logger.log(`Deleted ${deletedClients.count} clients older than ${resetTime} for category ${categoryId}`);
 
         //Check if there are clients with number lower than
         const clientsLowerThan = await this.databaseService.client.findMany({

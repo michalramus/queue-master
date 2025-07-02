@@ -23,6 +23,9 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
 
     kiosk_markdown: new Setting<string>("kiosk_markdown", ""), //markdown text shown on kiosk page
     locale: new Setting<EnumSettingValue>("locale", new EnumSettingValue("en", ["en", "pl"])),
+
+    //TODO: Add default template
+    printingTicketTemplate: new Setting<string>("printingTicketTemplate", ``), //Template used for printing tickets
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;
