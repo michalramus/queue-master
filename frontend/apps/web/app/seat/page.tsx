@@ -24,3 +24,5 @@ export default async function SeatPage() {
         </main>
     );
 }
+
+export const dynamic = "force-dynamic";
