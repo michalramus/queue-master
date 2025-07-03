@@ -29,7 +29,7 @@
         "target": "dmg"
     },
     "linux": {
-        "target": "AppImage",
+        "target": "deb",
         "category": "Utility"
     },
     "win": {
