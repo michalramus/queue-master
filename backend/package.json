@@ -100,5 +100,6 @@
       "eslint --cache --fix --max-warnings=0",
       "prettier --write"
     ]
-  }
+  },
+  "packageManager": "yarn@4.9.2"
 }

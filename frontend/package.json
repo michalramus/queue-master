@@ -12,5 +12,6 @@
   "scripts": {
     "prepare": "cd .. && husky frontend/.husky",
     "lint-staged": "yarn workspaces foreach run lint-staged"
-  }
+  },
+  "packageManager": "yarn@4.9.2"
 }
