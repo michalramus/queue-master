@@ -102,19 +102,22 @@ async function handleGetAppConfig(): Promise<AppConfigInterface> {
 
 // -----------------------------------
 function createWindow() {
+    const isDevelopment = process.env.NODE_ENV == "development";
     const mainWindow = new BrowserWindow({
+        autoHideMenuBar: true,
         width: 800,
         height: 600,
+        fullscreen: !isDevelopment, // Enable fullscreen in production
         webPreferences: {
             preload: path.join(
                 app.getAppPath(),
-                process.env.NODE_ENV == "development" ? "." : "..",
+                isDevelopment ? "." : "..",
                 "/dist-electron/preload.cjs",
             ),
         },
     });
 
-    if (process.env.NODE_ENV == "development") {
+    if (isDevelopment) {
         mainWindow.loadURL("http://localhost:5123");
     } else {
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"));
