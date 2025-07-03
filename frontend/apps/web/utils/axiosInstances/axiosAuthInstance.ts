@@ -39,16 +39,19 @@ axiosAuthInstance.auth.interceptors.request.use(
         } else {
             // server side
             const { cookies } = await import("next/headers");
-            serverSideCookies = (await cookies()).toString();
+            const cookieStore = await cookies();
+            serverSideCookies = cookieStore.toString();
 
-            const jwt_expiration_date_cookie = await getCookie("jwt_expiration_date", { cookies });
+            const jwt_expiration_date_cookie = await getCookie("jwt_expiration_date", {
+                cookies: () => Promise.resolve(cookieStore),
+            });
             if (jwt_expiration_date_cookie) {
                 accessTokenExpirationDate = new Date(jwt_expiration_date_cookie);
             }
 
             const refresh_token_expiration_date_cookie = await getCookie(
                 "jwt_refresh_expiration_date",
-                { cookies },
+                { cookies: () => Promise.resolve(cookieStore) },
             );
             if (refresh_token_expiration_date_cookie) {
                 refreshTokenExpirationDate = new Date(refresh_token_expiration_date_cookie);

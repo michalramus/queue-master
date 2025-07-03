@@ -2,6 +2,11 @@
     "name": "queue-master-kiosk",
     "private": true,
     "version": "0.0.0",
+    "author": {
+        "name": "Michal Ramus",
+        "email": "ramus.michal21@gmail.com"
+    },
+    "homepage": "https://github.com/michalramus/queue-master",
     "type": "module",
     "main": "dist-electron/main.js",
     "scripts": {
@@ -17,6 +22,8 @@
         "dist:linux": "yarn run transpile:electron && yarn run build && electron-builder --linux --x64"
     },
     "dependencies": {
+        "@tailwindcss/typography": "^0.5.16",
+        "@tanstack/react-query": "^5.67.3",
         "axios": "^1.8.3",
         "i18next": "^24.2.3",
         "prettier-plugin-tailwindcss": "^0.6.11",
@@ -25,6 +32,7 @@
         "react-i18next": "^15.4.1",
         "shared-components": "1.0.0",
         "shared-utils": "1.0.0",
+        "socket.io-client": "^4.8.1",
         "tailwindcss": "^4.0.14"
     },
     "devDependencies": {
@@ -34,8 +42,8 @@
         "@types/react-dom": "^19.0.4",
         "@vitejs/plugin-react": "^4.3.4",
         "cross-env": "^7.0.3",
-        "electron": "35.0.1",
-        "electron-builder": "^25.1.8",
+        "electron": "37.1.0",
+        "electron-builder": "26.0.12",
         "eslint": "^9.22.0",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-refresh": "^0.4.19",
