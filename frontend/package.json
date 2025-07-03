@@ -11,7 +11,9 @@
   },
   "scripts": {
     "prepare": "cd .. && husky frontend/.husky",
-    "lint-staged": "yarn workspaces foreach run lint-staged"
+    "lint-staged": "yarn workspaces foreach run lint-staged",
+    "start:web": "yarn --cwd apps/web start",
+    "build:web": "yarn --cwd apps/web build"
   },
   "packageManager": "yarn@4.9.2"
 }
