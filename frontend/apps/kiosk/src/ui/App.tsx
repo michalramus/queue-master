@@ -10,29 +10,18 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
 
 export default function App() {
-    const {
-        data: globalSettings,
-        isLoading: globalSettingsLoading,
-        isError: globalSettingsError,
-    } = useQuery({
+    const { data: globalSettings, isError: globalSettingsError } = useQuery({
         queryKey: ["App_globalSettings"],
         queryFn: () => getGlobalSettings(axiosPureInstance),
+        retry: true,
     });
 
-    const {
-        data: appConfig,
-        isLoading: appConfigLoading,
-        isError: appConfigError,
-    } = useQuery({
+    const { data: appConfig, isError: appConfigError } = useQuery({
         queryKey: ["App_appConfig"],
         queryFn: () => window.electronAPI.getAppConfig(),
     });
 
     //TODO move errors rendering to a separate component
-
-    if (globalSettingsLoading || appConfigLoading) {
-        return <div>Loading...</div>;
-    }
 
     if (appConfig?.configError) {
         return <div>Invalid config or config path</div>;
