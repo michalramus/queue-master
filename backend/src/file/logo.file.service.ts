@@ -4,9 +4,12 @@ import * as fs from "fs/promises";
 import * as fsSync from "fs";
 import * as path from "path";
 import { Entity } from "src/auth/types/entity.class";
+import { WebsocketsService } from "src/websockets/websockets.service";
 
 @Injectable()
 export class LogoFileService {
+    constructor(private readonly websocketsService: WebsocketsService) {}
+
     readonly uploadsPath = process.env.UPLOADS_PATH || "./uploads";
     readonly logoFolder = "logo";
     readonly logoIDs = [1, 2];
@@ -69,6 +72,7 @@ export class LogoFileService {
         await fs.mkdir(path.resolve(this.uploadsPath, this.logoFolder), { recursive: true });
         await fs.writeFile(path.resolve(this.uploadsPath, this.logoFolder, `logo${id}.svg`), file.buffer);
 
+        this.websocketsService.reloadFrontend();
         this.logger.log(`[${entity.name}] Uploaded new logo with id ${id}`);
         return { message: "Logo uploaded successfully" };
     }
@@ -89,6 +93,7 @@ export class LogoFileService {
         }
 
         await fs.unlink(filePath);
+        this.websocketsService.reloadFrontend();
         this.logger.log(`[${entity.name}] Deleted logo with id ${id}`);
         return { message: "Logo deleted successfully" };
     }

@@ -4,7 +4,7 @@ import "./globals.css";
 import ReactQueryProvider from "@/utils/providers/ReactQueryProvider";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import RefreshOnGlobalSettingsChanged from "@/components/RefreshOnGlobalSettingsChanged";
+import RefreshOnWsEvents from "@/components/RefreshOnWsEvents";
 import { GlobalSettingsProvider } from "@/utils/providers/GlobalSettingsProvider";
 import { getGlobalSettings, GlobalSettingsInterface } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
@@ -60,7 +60,7 @@ export default async function RootLayout({
                                 ${globalSettings.color_text_1 ? `--color-text-1: ${globalSettings.color_text_1} !important;` : ""}
                                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2} !important;` : ""}
                                 }`}</style>
-                <RefreshOnGlobalSettingsChanged />
+                <RefreshOnWsEvents />
                 <NextIntlClientProvider messages={messages}>
                     <GlobalSettingsProvider globalSettings={globalSettings}>
                         <ReactQueryProvider>
