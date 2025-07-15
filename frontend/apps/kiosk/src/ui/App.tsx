@@ -1,4 +1,4 @@
-import RefreshOnGlobalSettingsChanged from "./components/RefreshOnGlobalSettingsChanged";
+import RefreshOnWsEvents from "./components/RefreshOnWsEvents";
 import KioskPage from "./pages/kiosk/page";
 import { AppConfigProvider } from "./utils/providers/AppConfigProvider";
 import { GlobalSettingsProvider } from "./utils/providers/GlobalSettingsProvider";
@@ -60,7 +60,7 @@ export default function App() {
                                 }`}</style>
 
             <AppConfigProvider appConfig={appConfig}>
-                <RefreshOnGlobalSettingsChanged />
+                <RefreshOnWsEvents />
                 <GlobalSettingsProvider globalSettings={globalSettings}>
                     {appConfig.mode === "tv" && <TVPage />}
                     {appConfig.mode === "kiosk" && <KioskPage />}

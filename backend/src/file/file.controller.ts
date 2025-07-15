@@ -28,9 +28,9 @@ export class FileController {
     constructor(private readonly logoService: LogoFileService) {}
 
     @Get("logo")
-    @ApiBody({
-        description: "Get IDs of logos which can be fetched",
-    })
+    // @ApiBody({
+    //     description: "Get IDs of logos which can be fetched",
+    // })
     async getLogoAvailabilityInfo() {
         return this.logoService.getLogoAvailabilityInfo();
     }
