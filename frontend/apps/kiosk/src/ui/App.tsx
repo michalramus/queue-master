@@ -8,6 +8,8 @@ import TVPage from "@/pages/tv/page";
 import { getGlobalSettings } from "shared-utils";
 import { useQuery } from "@tanstack/react-query";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
+import { useEffect } from "react";
+import i18n from "./i18n";
 
 export default function App() {
     const { data: globalSettings, isError: globalSettingsError } = useQuery({
@@ -20,6 +22,12 @@ export default function App() {
         queryKey: ["App_appConfig"],
         queryFn: () => window.electronAPI.getAppConfig(),
     });
+
+    useEffect(() => {
+        if (globalSettings?.locale) {
+            i18n.changeLanguage(globalSettings.locale);
+        }
+    }, [globalSettings?.locale]);
 
     //TODO move errors rendering to a separate component
 
@@ -35,12 +43,13 @@ export default function App() {
         return <div>Invalid mode</div>;
     }
 
-    //TODO config and auth and default language
+    //TODO config and auth
 
     return (
         <>
             {/* Setup global colors */}
             <style>{`:root {
+            
                                 ${globalSettings.color_background ? `--color-background: ${globalSettings.color_background} !important;` : ""}
                                 ${globalSettings.color_primary_1 ? `--color-primary-1: ${globalSettings.color_primary_1} !important;` : ""}
                                 ${globalSettings.color_primary_2 ? `--color-primary-2: ${globalSettings.color_primary_2} !important;` : ""}
