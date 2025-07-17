@@ -9,7 +9,12 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 async function bootstrap() {
     ConfigModule.forRoot();
 
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+        logger:
+            process.env.NODE_ENV === "development"
+                ? ["verbose", "debug", "log", "warn", "error"]
+                : ["error", "warn", "log"],
+    });
     app.useGlobalInterceptors(new LoggingInterceptor());
     app.use(cookieParser());
 
