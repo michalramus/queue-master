@@ -18,18 +18,13 @@ async function onExecutePrintTicket(
         return;
     }
 
-    let printJob;
     const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
         template: printingTicketTemplate || "",
     })}`;
 
-    if (config.printingScriptAddPythonPrefix) {
-        printJob = spawnSync("python3", [config.printingScript, callParameters]);
-    } else {
-        printJob = spawnSync(config.printingScript, [callParameters]);
-    }
+    const printJob = spawnSync(config.printingScript, [callParameters]);
 
     if (process.env.NODE_ENV == "development") {
         if (printJob.stdout) {
@@ -53,17 +48,15 @@ async function handleInvokeAudioSynthesizer(
         console.log("No audio synthesizer script configured");
         return;
     }
-    let audioSynthesizer;
+
     const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
         seat: client.seat,
     })}`;
-    if (config.audioSynthesizerScriptAddPythonPrefix) {
-        audioSynthesizer = spawnSync("python3", [config.audioSynthesizerScript, callParameters]);
-    } else {
-        audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);
-    }
+
+    const audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);
+
     if (process.env.NODE_ENV == "development") {
         if (audioSynthesizer.stdout) {
             console.log(audioSynthesizer.stdout.toString());

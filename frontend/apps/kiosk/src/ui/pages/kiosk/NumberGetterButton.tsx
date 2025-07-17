@@ -14,7 +14,7 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
     const appConfig = useAppConfig();
     const locale = i18n.language;
 
-    const printingTime = appConfig.printingScriptDelay || 5000;
+    const printingTime = appConfig.printingDialogueShowTime || 5000;
 
     const [loadingPage, setLoadingPage] = useState(false);
     const [lastTicketString, setLastTicketString] = useState(""); //category.shortname+number
