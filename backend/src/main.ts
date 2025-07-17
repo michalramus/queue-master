@@ -20,7 +20,7 @@ async function bootstrap() {
 
     app.enableCors(corsOptions);
 
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV === "development") {
         const config = new DocumentBuilder().setTitle("Queue Master API Documentation").setVersion("1.0").build();
         const document = SwaggerModule.createDocument(app, config);
         SwaggerModule.setup("api", app, document);
