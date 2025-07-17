@@ -19,12 +19,11 @@ async function onExecutePrintTicket(
     }
 
     let printJob;
-    const callParameters = `'${JSON.stringify({
+    const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
         template: printingTicketTemplate || "",
-    })}'`; //Added ' at the beginning and end of the string to avoid issues with spaces in the parameters
-    //TODO check if not remove '
+    })}`;
 
     if (config.printingScriptAddPythonPrefix) {
         printJob = spawnSync("python3", [config.printingScript, callParameters]);
