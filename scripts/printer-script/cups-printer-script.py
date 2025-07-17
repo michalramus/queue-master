@@ -7,6 +7,7 @@ import json
 import cups
 import datetime
 from tempfile import gettempdir
+import time
 
 printerName = "printerName"  # Printer name provided by cups - check ReadMe
 printerOptions = {
@@ -72,6 +73,9 @@ def main():
 
     if not disablePrint:
         printPDF()
+
+        time.sleep(5) #Wait to ensure the print job is processed
+        os.remove(ticketPDFPath)
     else:
         print("PDF path: ", ticketPDFPath)
 
