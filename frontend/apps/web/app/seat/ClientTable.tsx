@@ -66,9 +66,7 @@ export default function ClientTable({
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}
                 <br />
                 <span className="text-text-2">
-                    {new Date(client.creation_date).toLocaleDateString("en-EN", {
-                        hour12: false,
-                    })}
+                    {new Date(client.creation_date).toISOString().split("T")[0]}
                 </span>
             </span>,
             <span key={index} className="flex grow flex-wrap-reverse justify-center">
