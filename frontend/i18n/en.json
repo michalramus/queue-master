@@ -11,6 +11,7 @@
     "do_you_want_to_delete_ticket": "Do you really want to <underline>delete</underline> ticket",
     "error_occurred": "An error occurred. Check the console for more information.",
     "finish": "Finish",
+    "get_a_ticket": "Get a ticket",
     "incorrect_login_or_password": "Incorrect login or password",
     "server_error_occurred": "Server error occurred. Try to refresh site.",
     "loading": "Loading...",
