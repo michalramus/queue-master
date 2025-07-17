@@ -29,7 +29,10 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
 
                 setLoadingPage(true);
                 setLastTicketString(data.category.short_name + data.number.toString());
-                window.electronAPI.executePrintTicket(data, globalSettings.printingTicketTemplate);
+                window.electronAPI.executePrintTicket(
+                    data,
+                    globalSettings.printing_ticket_template,
+                );
                 await new Promise((resolve) => setTimeout(resolve, printingTime));
                 setLoadingPage(false);
             }

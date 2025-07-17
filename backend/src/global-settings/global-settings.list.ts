@@ -2,6 +2,7 @@ import { HexColorSettingValue } from "src/settings/types/hexColorSettingValue.cl
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
 import { EnumSettingValue } from "src/settings/types/enumSettingValue.class";
 
+//Remember to keep name of setting and 'key' argument the same
 export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes> } = {
     //colors
     color_background: new Setting<HexColorSettingValue>("color_background", new HexColorSettingValue("#fbfefb")),
@@ -25,7 +26,7 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
     locale: new Setting<EnumSettingValue>("locale", new EnumSettingValue("en", ["en", "pl"])),
 
     //TODO: Add default template
-    printingTicketTemplate: new Setting<string>("printingTicketTemplate", ``), //Template used for printing tickets
+    printing_ticket_template: new Setting<string>("printing_ticket_template", ``), //Template used for printing tickets
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;

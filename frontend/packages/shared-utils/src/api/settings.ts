@@ -25,7 +25,7 @@ export interface GlobalSettingsInterface {
     locale: string;
     kiosk_markdown: string;
 
-    printingTicketTemplate: string;
+    printing_ticket_template: string;
 }
 
 const apiPathGlobalSettings = "/settings/global";
