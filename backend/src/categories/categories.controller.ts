@@ -6,7 +6,16 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 // import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { Roles } from "../auth/roles.decorator";
 import { Category } from "./types/category.interface";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    // ApiBearerAuth,
+    ApiUnauthorizedResponse,
+    ApiForbiddenResponse,
+} from "@nestjs/swagger";
 
+@ApiTags("categories")
 @Controller("categories")
 export class CategoriesController {
     constructor(private readonly categoriesService: CategoriesService) {}
@@ -19,6 +28,11 @@ export class CategoriesController {
     @Get()
     @Roles(["Device", "User", "Admin"])
     @UseGuards(new JwtAuthGuard(), RolesGuard)
+    @ApiOperation({ summary: "Get all available categories" })
+    @ApiResponse({ status: 200, description: "List of all categories", type: Array })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
     findAll(): Promise<Category[]> {
         return this.categoriesService.findAll();
     }

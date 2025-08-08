@@ -78,7 +78,7 @@ export class AuthService {
             { sameSite: "lax" },
         );
 
-        return "Successful login";
+        return "Successful login"; //TODO return token
     }
 
     async refresh(entity: Entity, ip: string, response: Response) {

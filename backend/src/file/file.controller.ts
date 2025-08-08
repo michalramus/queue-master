@@ -18,24 +18,37 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { LogoFileService } from "./logo.file.service";
 import { Entity } from "src/auth/types/entity.class";
-import { ApiBody, ApiConsumes } from "@nestjs/swagger";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiParam,
+    ApiBody,
+    ApiConsumes,
+    // ApiBearerAuth,
+    ApiUnauthorizedResponse,
+    ApiForbiddenResponse,
+} from "@nestjs/swagger";
 
 //max sizes
 const maxLogoSize = 1024 * 1024;
 
+@ApiTags("file")
 @Controller("file")
 export class FileController {
     constructor(private readonly logoService: LogoFileService) {}
 
     @Get("logo")
-    // @ApiBody({
-    //     description: "Get IDs of logos which can be fetched",
-    // })
+    @ApiOperation({ summary: "Get available logo information" })
+    @ApiResponse({ status: 200, description: "IDs of available logos" })
     async getLogoAvailabilityInfo() {
         return this.logoService.getLogoAvailabilityInfo();
     }
 
     @Get("logo/:id")
+    @ApiOperation({ summary: "Download logo file by ID" })
+    @ApiParam({ name: "id", description: "Logo ID", type: "number" })
+    @ApiResponse({ status: 200, description: "Logo file", schema: { type: "string", format: "binary" } })
     async getLogo(@Param("id", new ParseIntPipe()) id: number): Promise<StreamableFile> {
         return this.logoService.getLogo(id);
     }
@@ -44,6 +57,8 @@ export class FileController {
     @UseInterceptors(FileInterceptor("file", { storage: memoryStorage(), limits: { fileSize: maxLogoSize } }))
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Upload logo file" })
+    @ApiParam({ name: "id", description: "Logo ID", type: "number" })
     @ApiConsumes("multipart/form-data")
     @ApiBody({
         description: "Upload logo file",
@@ -59,6 +74,10 @@ export class FileController {
             },
         },
     })
+    @ApiResponse({ status: 201, description: "Logo uploaded successfully" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    // @ApiBearerAuth("JWT-auth")
     async uploadLogo(
         @UploadedFile()
         file: Express.Multer.File,
@@ -71,6 +90,12 @@ export class FileController {
     @Delete("logo/:id")
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Delete logo file" })
+    @ApiParam({ name: "id", description: "Logo ID", type: "number" })
+    @ApiResponse({ status: 200, description: "Logo deleted successfully" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    // @ApiBearerAuth("JWT-auth")
     async deleteLogo(@Param("id", new ParseIntPipe()) id: number, @Req() req: any): Promise<{ message: string }> {
         return this.logoService.deleteLogo(id, Entity.convertFromReq(req));
     }
