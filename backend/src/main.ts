@@ -26,7 +26,37 @@ async function bootstrap() {
     app.enableCors(corsOptions);
 
     if (process.env.NODE_ENV === "development") {
-        const config = new DocumentBuilder().setTitle("Queue Master API Documentation").setVersion("1.0").build();
+        const config = new DocumentBuilder()
+            .setTitle("Queue Master API")
+            .setDescription(
+                `
+API documentation for Queue Master - A queue management system
+
+To authenticate, invoke the /auth/login endpoint to obtain a JWT token. 
+Token is automatically saved in cookies, so you don't have to do anything more.
+            `,
+            )
+            .setVersion("1.0")
+            .addTag("auth", "Authentication endpoints - Start here to get your access token")
+            .addTag("clients", "Client management endpoints - Manage queue clients")
+            .addTag("categories", "Category management endpoints - Manage service categories")
+            .addTag("devices", "Device management endpoints - Manage display devices")
+            .addTag("users", "User management endpoints - Manage system users")
+            .addTag("settings", "Settings management endpoints - Configure system settings")
+            .addTag("file", "File management endpoints - Handle file uploads/downloads")
+            //TODO
+            // .addBearerAuth(
+            //     {
+            //         type: "http",
+            //         scheme: "bearer",
+            //         bearerFormat: "JWT",
+            //         name: "JWT",
+            //         description: "Enter JWT token obtained from /auth/login endpoint",
+            //         in: "header",
+            //     },
+            //     "JWT-auth",
+            // )
+            .build();
         const document = SwaggerModule.createDocument(app, config);
         SwaggerModule.setup("api", app, document);
     }

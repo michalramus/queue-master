@@ -4,7 +4,17 @@ import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiParam,
+    ApiBody,
+    ApiUnauthorizedResponse,
+    ApiForbiddenResponse,
+} from "@nestjs/swagger";
 
+@ApiTags("settings")
 @Controller("settings/user")
 export class UserSettingsController {
     constructor(private readonly userSettingsService: UserSettingsService) {}
@@ -16,6 +26,11 @@ export class UserSettingsController {
     @Get()
     @Roles(["Admin", "User"])
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Get settings for currently logged in user" })
+    @ApiResponse({ status: 200, description: "User settings retrieved successfully" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
     findSettings(@Request() req) {
         return this.userSettingsService.findSettings(Entity.convertFromReq(req));
     }
@@ -27,6 +42,12 @@ export class UserSettingsController {
     @Get(":id")
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Get settings for a specific user (Admin only)" })
+    @ApiParam({ name: "id", description: "User ID", type: "number" })
+    @ApiResponse({ status: 200, description: "User settings retrieved successfully" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    // @ApiBearerAuth("JWT-auth")
     findUserSettings(@Param("id", ParseIntPipe) id: number) {
         return this.userSettingsService.findUserSettings(id);
     }
@@ -34,6 +55,20 @@ export class UserSettingsController {
     @Patch()
     @Roles(["Admin", "User"])
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Update settings for currently logged in user" })
+    @ApiBody({
+        description: "Settings to update",
+        schema: {
+            type: "object",
+            additionalProperties: {
+                oneOf: [{ type: "string" }, { type: "number" }],
+            },
+        },
+    })
+    @ApiResponse({ status: 200, description: "Settings updated successfully" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
     updateSettings(@Body() settings: { [key: string]: string | number }, @Request() req) {
         return this.userSettingsService.updateSettings(settings, Entity.convertFromReq(req));
     }
@@ -41,6 +76,21 @@ export class UserSettingsController {
     @Patch(":id")
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Update settings for a specific user (Admin only)" })
+    @ApiParam({ name: "id", description: "User ID", type: "number" })
+    @ApiBody({
+        description: "Settings to update",
+        schema: {
+            type: "object",
+            additionalProperties: {
+                oneOf: [{ type: "string" }, { type: "number" }],
+            },
+        },
+    })
+    @ApiResponse({ status: 200, description: "Settings updated successfully" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    // @ApiBearerAuth("JWT-auth")
     updateUserSettings(
         @Param("id", ParseIntPipe) id: number,
         @Body() settings: { [key: string]: string | number },
