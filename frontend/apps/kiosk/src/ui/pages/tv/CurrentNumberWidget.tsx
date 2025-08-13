@@ -35,7 +35,7 @@ export default function CurrentNumberWidget({
                     ],
                 ]}
                 theadClassName="text-text-1 text-5xl"
-                tbodyClassName="text-text-1 border-0! text-7xl font-medium"
+                tbodyClassName="text-text-1 border-0! text-7xl font-semibold"
                 className="mb-20"
             />
             <Table
@@ -46,7 +46,7 @@ export default function CurrentNumberWidget({
                 ]}
                 rows={[[seat != "" ? seat : <br />]]}
                 theadClassName="text-text-1 text-5xl"
-                tbodyClassName="text-text-1 border-0! text-7xl font-medium"
+                tbodyClassName="text-text-1 border-0! text-7xl font-semibold"
             />
         </div>
     );
