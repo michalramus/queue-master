@@ -16,25 +16,49 @@ export default function Button({
     let colorClass = "";
     switch (color) {
         case "blue":
-            colorClass = "bg-blue-1 hover:bg-blue-2";
+            if (disabled) {
+                colorClass = "bg-blue-2";
+            } else {
+                colorClass = "bg-blue-1 hover:bg-blue-2";
+            }
             break;
         case "green":
-            colorClass = "bg-green-1 hover:bg-green-2";
+            if (disabled) {
+                colorClass = "bg-green-2";
+            } else {
+                colorClass = "bg-green-1 hover:bg-green-2";
+            }
 
             break;
         case "red":
-            colorClass = "bg-red-1 hover:bg-red-2";
+            if (disabled) {
+                colorClass = "bg-red-2";
+            } else {
+                colorClass = "bg-red-1 hover:bg-red-2";
+            }
             break;
         case "gray":
-            colorClass = "bg-gray-1 hover:bg-gray-2";
+            if (disabled) {
+                colorClass = "bg-gray-2";
+            } else {
+                colorClass = "bg-gray-1 hover:bg-gray-2";
+            }
             break;
 
         case "primary":
-            colorClass = "bg-primary-1 hover:bg-primary-2";
+            if (disabled) {
+                colorClass = "bg-primary-2";
+            } else {
+                colorClass = "bg-primary-1 hover:bg-primary-2";
+            }
 
             break;
         case "secondary":
-            colorClass = "bg-secondary-1 hover:bg-secondary-2";
+            if (disabled) {
+                colorClass = "bg-secondary-2";
+            } else {
+                colorClass = "bg-secondary-1 hover:bg-secondary-2";
+            }
             break;
     }
 
