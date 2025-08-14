@@ -62,7 +62,12 @@ export class ClientsService {
             },
         });
 
-        const client = await this.addCategoryNameFieldToClient(dbClient);
+        const queueLength =
+            (await this.databaseService.client.count({
+                where: { status: "Waiting", category_id: createClientDto.categoryId },
+            })) - 1;
+
+        const client = await this.addCategoryNameFieldToClient({ queue_length: queueLength, ...dbClient });
 
         this.websocketsService.emit(wsEvents.ClientWaiting, client);
         this.logger.log(
@@ -226,6 +231,7 @@ export class ClientsService {
         status: "Waiting" | "InService";
         seat: number | null;
         creation_date: Date;
+        queue_length?: number;
         category: { id: number; multilingual_text_key: string; short_name: string };
     }): Promise<Client> {
         const clientWithCategoryName = {

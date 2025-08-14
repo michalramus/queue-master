@@ -8,4 +8,5 @@ export interface Client {
     status: "Waiting" | "InService";
     seat: number | null;
     creation_date: Date;
+    queue_length?: number;
 }
