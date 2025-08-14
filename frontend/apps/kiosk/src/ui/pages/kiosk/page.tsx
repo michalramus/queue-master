@@ -5,8 +5,11 @@ import { Header, SmallHeader } from "shared-components";
 import { getCategories, getLogoAvailability } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { useQuery } from "@tanstack/react-query";
+import useAppConfig from "@/utils/providers/AppConfigProvider";
 
 export default function KioskPage() {
+    const appConfig = useAppConfig();
+
     const { data: logoAvailabilities, isLoading: logoAvailabilitiesLoading } = useQuery({
         queryKey: ["KioskPage_logoAvailabilities"],
         queryFn: () => getLogoAvailability(axiosPureInstance),
@@ -41,23 +44,23 @@ export default function KioskPage() {
     return (
         <main className="flex min-h-screen flex-col items-center px-10">
             <div className="flex w-full items-center justify-between">
-                <div className="relative h-48">
-                    {logoAvailabilities!.includes(secondaryLogoId) && (
+                <div className="relative flex h-48 w-4/12 items-center justify-start pt-4">
+                    {logoAvailabilities?.includes(secondaryLogoId) && (
                         <img
-                            src={`http://localhost:3001/file/logo/${secondaryLogoId}`}
+                            src={`${appConfig.backendUrl}/file/logo/${secondaryLogoId}`}
                             alt="External Logo"
-                            className="max-h-48"
+                            className="max-h-48 w-auto object-contain"
                         />
                     )}
                 </div>
                 <LanguageSwitcher />
             </div>
-            {logoAvailabilities!.includes(mainLogoId) && (
-                <div className="relative mb-2 h-64 w-full">
+            {logoAvailabilities?.includes(mainLogoId) && (
+                <div className="relative mb-2 flex h-64 w-6/12 items-center justify-center">
                     <img
-                        src={`http://localhost:3001/file/logo/${mainLogoId}`}
+                        src={`${appConfig.backendUrl}/file/logo/${mainLogoId}`}
                         alt="External Logo"
-                        className="mx-auto block max-h-64"
+                        className="max-h-64"
                     />
                 </div>
             )}
