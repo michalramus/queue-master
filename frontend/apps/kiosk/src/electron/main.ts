@@ -21,6 +21,7 @@ async function onExecutePrintTicket(
     const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
+        queueLength: client.queue_length || "",
         template: printingTicketTemplate || "",
     })}`;
 

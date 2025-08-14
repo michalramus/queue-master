@@ -67,6 +67,7 @@ def main():
         .replace("&number", str(inputs["number"]))
         .replace("&date", str(datetime.datetime.now().strftime("%Y-%m-%d")))
         .replace("&time", str(datetime.datetime.now().strftime("%H:%M:%S")))
+        .replace("&queueLength", str(inputs["queueLength"]))
     )
 
     generatePDF(HTML)
