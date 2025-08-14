@@ -5,6 +5,7 @@ import * as fsSync from "fs";
 import * as path from "path";
 import { Entity } from "src/auth/types/entity.class";
 import { WebsocketsService } from "src/websockets/websockets.service";
+import { LogoID } from "./types/logoID.enum";
 
 @Injectable()
 export class LogoFileService {
@@ -12,31 +13,25 @@ export class LogoFileService {
 
     readonly uploadsPath = process.env.UPLOADS_PATH || "./uploads";
     readonly logoFolder = "logo";
-    readonly logoIDs = [1, 2];
 
     private logger = new Logger(LogoFileService.name);
 
-    async getLogoAvailabilityInfo(): Promise<{ availableLogos: number[] }> {
-        const availableLogos: number[] = [];
+    async getLogoAvailabilityInfo(): Promise<{ availableLogos: LogoID[] }> {
+        const availableLogos: LogoID[] = [];
 
-        this.logoIDs.map((id) => {
-            const filePath = path.resolve(this.uploadsPath, this.logoFolder, `logo${id}.svg`);
+        for (const id in LogoID) {
+            const filePath = path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`);
 
             if (fsSync.existsSync(filePath)) {
-                availableLogos.push(id);
+                availableLogos.push(LogoID[id as keyof typeof LogoID]);
             }
-        });
+        }
 
         return { availableLogos: availableLogos };
     }
 
-    async getLogo(id: number): Promise<StreamableFile> {
-        if (!this.logoIDs.includes(id)) {
-            this.logger.warn("Cannot fetch logo because of invalid id");
-            throw new BadRequestException("Invalid id");
-        }
-
-        const filePath = path.resolve(this.uploadsPath, this.logoFolder, `logo${id}.svg`);
+    async getLogo(id: LogoID): Promise<StreamableFile> {
+        const filePath = path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`);
 
         if (!fsSync.existsSync(filePath)) {
             this.logger.warn("Cannot fetch logo because it doesn't exist");
@@ -48,16 +43,11 @@ export class LogoFileService {
 
         return new StreamableFile(file, {
             type: "image/svg+xml",
-            disposition: `attachment; filename=logo${id}.svg`,
+            disposition: `attachment; filename=${id}.svg`,
         });
     }
 
-    async uploadLogo(file: Express.Multer.File, id: number, entity: Entity): Promise<{ message: string }> {
-        if (!this.logoIDs.includes(id)) {
-            this.logger.warn("Cannot upload new logo because of invalid id");
-            throw new BadRequestException("Invalid id");
-        }
-
+    async uploadLogo(file: Express.Multer.File, id: LogoID, entity: Entity): Promise<{ message: string }> {
         if (!file) {
             this.logger.warn("Cannot upload new logo because no file uploaded");
             throw new BadRequestException("No file uploaded");
@@ -68,22 +58,17 @@ export class LogoFileService {
             throw new BadRequestException("Invalid file type - SVG only");
         }
 
-        this.logger.debug(`Saving ${path.resolve(this.uploadsPath, this.logoFolder, `logo${id}.svg`)}`);
+        this.logger.debug(`Saving ${path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`)}`);
         await fs.mkdir(path.resolve(this.uploadsPath, this.logoFolder), { recursive: true });
-        await fs.writeFile(path.resolve(this.uploadsPath, this.logoFolder, `logo${id}.svg`), file.buffer);
+        await fs.writeFile(path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`), file.buffer);
 
         this.websocketsService.reloadFrontend();
         this.logger.log(`[${entity.name}] Uploaded new logo with id ${id}`);
         return { message: "Logo uploaded successfully" };
     }
 
-    async deleteLogo(id: number, entity: Entity): Promise<{ message: string }> {
-        if (!this.logoIDs.includes(id)) {
-            this.logger.warn("Cannot delete logo because of invalid id");
-            throw new BadRequestException("Invalid id");
-        }
-
-        const filePath = path.resolve(this.uploadsPath, this.logoFolder, `logo${id}.svg`);
+    async deleteLogo(id: LogoID, entity: Entity): Promise<{ message: string }> {
+        const filePath = path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`);
         this.logger.debug(`Trying to delete ${filePath}`);
 
         // Check if file exists

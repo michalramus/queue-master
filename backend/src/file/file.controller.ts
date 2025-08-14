@@ -7,9 +7,9 @@ import {
     UseInterceptors,
     UploadedFile,
     Param,
-    ParseIntPipe,
     Req,
     StreamableFile,
+    ParseEnumPipe,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
@@ -29,6 +29,7 @@ import {
     ApiUnauthorizedResponse,
     ApiForbiddenResponse,
 } from "@nestjs/swagger";
+import { LogoID } from "./types/logoID.enum";
 
 //max sizes
 const maxLogoSize = 1024 * 1024;
@@ -41,15 +42,17 @@ export class FileController {
     @Get("logo")
     @ApiOperation({ summary: "Get available logo information" })
     @ApiResponse({ status: 200, description: "IDs of available logos" })
-    async getLogoAvailabilityInfo() {
+    async getLogoAvailabilityInfo(): Promise<{
+        availableLogos: LogoID[];
+    }> {
         return this.logoService.getLogoAvailabilityInfo();
     }
 
     @Get("logo/:id")
     @ApiOperation({ summary: "Download logo file by ID" })
-    @ApiParam({ name: "id", description: "Logo ID", type: "number" })
+    @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
     @ApiResponse({ status: 200, description: "Logo file", schema: { type: "string", format: "binary" } })
-    async getLogo(@Param("id", new ParseIntPipe()) id: number): Promise<StreamableFile> {
+    async getLogo(@Param("id", new ParseEnumPipe(LogoID)) id: LogoID): Promise<StreamableFile> {
         return this.logoService.getLogo(id);
     }
 
@@ -58,11 +61,10 @@ export class FileController {
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Upload logo file" })
-    @ApiParam({ name: "id", description: "Logo ID", type: "number" })
+    @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
     @ApiConsumes("multipart/form-data")
     @ApiBody({
         description: "Upload logo file",
-        type: "multipart/form-data",
         required: true,
         schema: {
             type: "object",
@@ -81,7 +83,7 @@ export class FileController {
     async uploadLogo(
         @UploadedFile()
         file: Express.Multer.File,
-        @Param("id", new ParseIntPipe()) id: number,
+        @Param("id", new ParseEnumPipe(LogoID)) id: LogoID,
         @Req() req: any,
     ): Promise<{ message: string }> {
         return this.logoService.uploadLogo(file, id, Entity.convertFromReq(req));
@@ -91,12 +93,15 @@ export class FileController {
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Delete logo file" })
-    @ApiParam({ name: "id", description: "Logo ID", type: "number" })
+    @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
     @ApiResponse({ status: 200, description: "Logo deleted successfully" })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
     // @ApiBearerAuth("JWT-auth")
-    async deleteLogo(@Param("id", new ParseIntPipe()) id: number, @Req() req: any): Promise<{ message: string }> {
+    async deleteLogo(
+        @Param("id", new ParseEnumPipe(LogoID)) id: LogoID,
+        @Req() req: any,
+    ): Promise<{ message: string }> {
         return this.logoService.deleteLogo(id, Entity.convertFromReq(req));
     }
 }
