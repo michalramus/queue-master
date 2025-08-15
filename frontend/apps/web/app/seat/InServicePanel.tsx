@@ -23,7 +23,7 @@ export default function InServicePanel({
     const [isCurrentTicketTextAnimating, setIsCurrentTicketTextAnimating] = useState(false);
     const [currentTicketText, setCurrentTicketText] = useState("");
     const t = useTranslations();
-    const lockNextClientButtonDelay = 500;
+    const lockNextClientButtonDelay = 700;
     const currentTicketTransitionTime = 200;
     const callAgainButtonAnimationTime = 1000;
 
