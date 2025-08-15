@@ -27,9 +27,17 @@ export class UserSettingsController {
     @Roles(["Admin", "User"])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Get settings for currently logged in user" })
-    @ApiResponse({ status: 200, description: "User settings retrieved successfully" })
+    @ApiResponse({
+        status: 200,
+        description: "User settings retrieved",
+        schema: {
+            type: "object",
+            description: "JSON string containing user settings",
+            example: '{"desk": "1", "notifications": true}',
+        },
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     findSettings(@Request() req) {
         return this.userSettingsService.findSettings(Entity.convertFromReq(req));
@@ -44,7 +52,15 @@ export class UserSettingsController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Get settings for a specific user (Admin only)" })
     @ApiParam({ name: "id", description: "User ID", type: "number" })
-    @ApiResponse({ status: 200, description: "User settings retrieved successfully" })
+    @ApiResponse({
+        status: 200,
+        description: "User settings retrieved",
+        schema: {
+            type: "object",
+            description: "JSON string containing user settings",
+            example: '{"desk": "1", "notifications": true}',
+        },
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
     // @ApiBearerAuth("JWT-auth")
@@ -57,7 +73,7 @@ export class UserSettingsController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Update settings for currently logged in user" })
     @ApiBody({
-        description: "Settings to update",
+        description: "Only settings to update",
         schema: {
             type: "object",
             additionalProperties: {
@@ -65,9 +81,17 @@ export class UserSettingsController {
             },
         },
     })
-    @ApiResponse({ status: 200, description: "Settings updated successfully" })
+    @ApiResponse({
+        status: 200,
+        description: "Settings updated",
+        schema: {
+            type: "object",
+            description: "JSON string containing all user settings(including updated)",
+            example: '{"desk": "1", "notifications": true}',
+        },
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     updateSettings(@Body() settings: { [key: string]: string | number }, @Request() req) {
         return this.userSettingsService.updateSettings(settings, Entity.convertFromReq(req));
@@ -79,7 +103,7 @@ export class UserSettingsController {
     @ApiOperation({ summary: "Update settings for a specific user (Admin only)" })
     @ApiParam({ name: "id", description: "User ID", type: "number" })
     @ApiBody({
-        description: "Settings to update",
+        description: "Only settings to update ",
         schema: {
             type: "object",
             additionalProperties: {
@@ -87,7 +111,15 @@ export class UserSettingsController {
             },
         },
     })
-    @ApiResponse({ status: 200, description: "Settings updated successfully" })
+    @ApiResponse({
+        status: 200,
+        description: "Settings updated",
+        schema: {
+            type: "object",
+            description: "JSON string containing all user settings(including updated)",
+            example: '{"desk": "1", "notifications": true}',
+        },
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
     // @ApiBearerAuth("JWT-auth")

@@ -18,6 +18,7 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { LogoFileService } from "./logo.file.service";
 import { Entity } from "src/auth/types/entity.class";
+import { LogoAvailabilityResponseDto } from "./types/logoAvailabilityResponse.dto";
 import {
     ApiTags,
     ApiOperation,
@@ -30,6 +31,7 @@ import {
     ApiForbiddenResponse,
 } from "@nestjs/swagger";
 import { LogoID } from "./types/logoID.enum";
+import { MessageResponseDto } from "src/types/messageResponse.dto";
 
 //max sizes
 const maxLogoSize = 1024 * 1024;
@@ -40,18 +42,27 @@ export class FileController {
     constructor(private readonly logoService: LogoFileService) {}
 
     @Get("logo")
-    @ApiOperation({ summary: "Get available logo information" })
-    @ApiResponse({ status: 200, description: "IDs of available logos" })
-    async getLogoAvailabilityInfo(): Promise<{
-        availableLogos: LogoID[];
-    }> {
+    @ApiOperation({ summary: "Get logo availability information" })
+    @ApiResponse({ status: 200, description: "Available logo IDs", type: LogoAvailabilityResponseDto })
+    async getLogoAvailabilityInfo(): Promise<LogoAvailabilityResponseDto> {
         return this.logoService.getLogoAvailabilityInfo();
     }
 
     @Get("logo/:id")
     @ApiOperation({ summary: "Download logo file by ID" })
     @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
-    @ApiResponse({ status: 200, description: "Logo file", schema: { type: "string", format: "binary" } })
+    @ApiResponse({
+        status: 200,
+        description: "Logo file",
+        content: {
+            "image/*": {
+                schema: {
+                    type: "string",
+                    format: "binary",
+                },
+            },
+        },
+    })
     async getLogo(@Param("id", new ParseEnumPipe(LogoID)) id: LogoID): Promise<StreamableFile> {
         return this.logoService.getLogo(id);
     }
@@ -76,16 +87,16 @@ export class FileController {
             },
         },
     })
-    @ApiResponse({ status: 201, description: "Logo uploaded successfully" })
+    @ApiResponse({ status: 201, description: "Logo uploaded successfully", type: MessageResponseDto })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    @ApiForbiddenResponse({ description: "Admin role required" })
     // @ApiBearerAuth("JWT-auth")
     async uploadLogo(
         @UploadedFile()
         file: Express.Multer.File,
         @Param("id", new ParseEnumPipe(LogoID)) id: LogoID,
         @Req() req: any,
-    ): Promise<{ message: string }> {
+    ): Promise<MessageResponseDto> {
         return this.logoService.uploadLogo(file, id, Entity.convertFromReq(req));
     }
 
@@ -94,14 +105,11 @@ export class FileController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Delete logo file" })
     @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
-    @ApiResponse({ status: 200, description: "Logo deleted successfully" })
+    @ApiResponse({ status: 200, description: "Logo deleted", type: MessageResponseDto })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    @ApiForbiddenResponse({ description: "Admin role required" })
     // @ApiBearerAuth("JWT-auth")
-    async deleteLogo(
-        @Param("id", new ParseEnumPipe(LogoID)) id: LogoID,
-        @Req() req: any,
-    ): Promise<{ message: string }> {
+    async deleteLogo(@Param("id", new ParseEnumPipe(LogoID)) id: LogoID, @Req() req: any): Promise<MessageResponseDto> {
         return this.logoService.deleteLogo(id, Entity.convertFromReq(req));
     }
 }

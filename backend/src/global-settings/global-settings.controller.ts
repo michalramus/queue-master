@@ -21,7 +21,15 @@ export class GlobalSettingsController {
 
     @Get()
     @ApiOperation({ summary: "Get all global settings" })
-    @ApiResponse({ status: 200, description: "Global settings retrieved successfully" })
+    @ApiResponse({
+        status: 200,
+        description: "All global settings retrieved",
+        schema: {
+            type: "object",
+            description: "JSON object containing all global settings",
+            example: '{"color_background": "#fbfefb", "locale": en}',
+        },
+    })
     findAll() {
         return this.globalSettingsService.findAll();
     }
@@ -31,7 +39,7 @@ export class GlobalSettingsController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Update global settings" })
     @ApiBody({
-        description: "Settings to update",
+        description: "Settings to update (specify only these settings, you want to update)",
         schema: {
             type: "object",
             additionalProperties: {
@@ -39,7 +47,15 @@ export class GlobalSettingsController {
             },
         },
     })
-    @ApiResponse({ status: 200, description: "Settings updated successfully" })
+    @ApiResponse({
+        status: 200,
+        description: "Settings updated",
+        schema: {
+            type: "string",
+            description: "JSON object containing all global settings(including updated)",
+            example: '{"color_background": "#fbfefb", "locale": en}',
+        },
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
     // @ApiBearerAuth("JWT-auth")

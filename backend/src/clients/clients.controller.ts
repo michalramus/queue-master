@@ -40,9 +40,13 @@ export class ClientsController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Create a new client in queue" })
     @ApiBody({ type: CreateClientDto })
-    @ApiResponse({ status: 201, description: "Client created successfully", type: "object" })
+    @ApiResponse({
+        status: 201,
+        description: "Client created",
+        type: Client,
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     create(@Body(ValidationPipe) createClientDto: CreateClientDto, @Request() req): Promise<Client> {
         return this.clientsService.create(createClientDto, Entity.convertFromReq(req));
@@ -52,9 +56,13 @@ export class ClientsController {
     @Roles(["Device", "User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Get all clients in queue" })
-    @ApiResponse({ status: 200, description: "List of all clients", type: Array })
+    @ApiResponse({
+        status: 200,
+        description: "List of all clients",
+        type: [Client],
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     findAll(): Promise<Client[]> {
         return this.clientsService.findAll();
@@ -66,9 +74,13 @@ export class ClientsController {
     @ApiOperation({ summary: "Update client information" })
     @ApiParam({ name: "id", description: "Client ID", type: "number" })
     @ApiBody({ type: UpdateClientDto })
-    @ApiResponse({ status: 200, description: "Client updated successfully", type: "object" })
+    @ApiResponse({
+        status: 200,
+        description: "Client updated",
+        type: Client,
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     update(
         @Param("id", ParseIntPipe) id: number,
@@ -83,9 +95,13 @@ export class ClientsController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Call client again (re-queue)" })
     @ApiParam({ name: "id", description: "Client ID", type: "number" })
-    @ApiResponse({ status: 200, description: "Client called again successfully", type: "object" })
+    @ApiResponse({
+        status: 200,
+        description: "Client called again",
+        type: Client,
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     findOne(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<Client> {
         return this.clientsService.callAgain(id, Entity.convertFromReq(req));
@@ -96,9 +112,13 @@ export class ClientsController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Remove client from queue" })
     @ApiParam({ name: "id", description: "Client ID", type: "number" })
-    @ApiResponse({ status: 200, description: "Client removed successfully", type: "object" })
+    @ApiResponse({
+        status: 200,
+        description: "Client removed",
+        type: Client,
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<Client> {
         return this.clientsService.remove(id, Entity.convertFromReq(req));

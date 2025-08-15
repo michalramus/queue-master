@@ -29,9 +29,9 @@ export class CategoriesController {
     @Roles(["Device", "User", "Admin"])
     @UseGuards(new JwtAuthGuard(), RolesGuard)
     @ApiOperation({ summary: "Get all available categories" })
-    @ApiResponse({ status: 200, description: "List of all categories", type: Array })
+    @ApiResponse({ status: 200, description: "List of all categories", type: [Category] })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    @ApiForbiddenResponse({ description: "Forbidden - insufficient permissions" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
     findAll(): Promise<Category[]> {
         return this.categoriesService.findAll();
