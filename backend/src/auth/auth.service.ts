@@ -3,12 +3,13 @@ import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { DevicesService } from "../devices/devices.service";
-import { LoginUserDto } from "./dto/login-user.dto";
+import { LoginUserDto } from "./types/loginUser.dto";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
+import { InfoResponseDto } from "./types/infoResponse.dto";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const ms = require("ms"); //import syntax not working properly with this package
+const ms = require("ms"); //'import' syntax not working properly with this package. Using 'require' instead
 
 @Injectable()
 export class AuthService {
@@ -78,7 +79,7 @@ export class AuthService {
             { sameSite: "lax" },
         );
 
-        return "Successful login"; //TODO return token
+        return { message: "Successful login" }; //TODO return token
     }
 
     async refresh(entity: Entity, ip: string, response: Response) {
@@ -115,7 +116,7 @@ export class AuthService {
             { sameSite: "lax" },
         );
 
-        return "Successful token refresh";
+        return { message: "Successful token refresh" };
     }
 
     async logout(entity: Entity, response: Response) {
@@ -124,16 +125,16 @@ export class AuthService {
         response.clearCookie("jwt_expiration_date", { sameSite: "lax" });
         response.clearCookie("jwt_refresh_expiration_date", { sameSite: "lax" });
 
-        return "Logged out successfully";
+        return { message: "Logged out successfully" };
     }
 
     async getInfo(entity: Entity) {
         if (entity.type == "Device") {
             const device = await this.databaseService.device.findUnique({ where: { id: entity.id } });
-            return { id: device.id, role: "Device" };
+            return { id: device.id, role: "Device" } as InfoResponseDto;
         } else if (entity.type == "User") {
             const user = await this.databaseService.user.findUnique({ where: { id: entity.id } });
-            return { id: user.id, username: user.username, role: user.role };
+            return { id: user.id, username: user.username, role: user.role } as InfoResponseDto;
         }
 
         return;
