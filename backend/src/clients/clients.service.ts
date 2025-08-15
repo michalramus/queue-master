@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { ClientResponseDto, CreateClientDto, UpdateClientDto } from "./dto/client.dto";
+import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
 import { WebsocketsService } from "../websockets/websockets.service";
 import { Entity } from "src/auth/types/entity.class";
@@ -20,7 +20,7 @@ export class ClientsService {
     private minClientsCounterToReset = 50; // if clients with number lower than this exist, counter cannot be reset
     private timeBetweenCounterResets = 1000 * 60 * 60 * 10; // in seconds - 8 hours
 
-    async create(createClientDto: CreateClientDto, entity: Entity): Promise<ClientResponseDto> {
+    async create(createClientDto: ClientCreateDto, entity: Entity): Promise<ClientResponseDto> {
         // Check if category exists
         const category = await this.databaseService.category.findUnique({ where: { id: createClientDto.categoryId } });
         if (!category) {
@@ -101,7 +101,7 @@ export class ClientsService {
      * @param updateClientDto
      * @returns
      */
-    async update(id: number, updateClientDto: UpdateClientDto, entity: Entity): Promise<ClientResponseDto> {
+    async update(id: number, updateClientDto: ClientUpdateDto, entity: Entity): Promise<ClientResponseDto> {
         // Check if client exists
         const isClient = await this.databaseService.client.findUnique({ where: { id: id } });
         if (!isClient) {

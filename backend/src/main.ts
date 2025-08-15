@@ -58,7 +58,15 @@ Token is automatically saved in cookies, so you don't have to do anything more.
             // )
             .build();
         const document = SwaggerModule.createDocument(app, config);
-        SwaggerModule.setup("api", app, document);
+        SwaggerModule.setup("api", app, document, {
+            swaggerOptions: {
+                tagsSorter: "alpha",
+                operationsSorter: "alpha",
+                docExpansion: "none",
+                filter: true,
+                showRequestHeaders: false,
+            },
+        });
     }
 
     await app.listen(process.env.PORT);

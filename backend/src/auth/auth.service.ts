@@ -6,7 +6,7 @@ import { DevicesService } from "../devices/devices.service";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
-import { InfoResponseDto, LoginUserDto } from "./dto/auth.dto";
+import { AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const ms = require("ms"); //'import' syntax not working properly with this package. Using 'require' instead
 
@@ -43,7 +43,7 @@ export class AuthService {
         return { message: "Device registered successfully ", jwt_token: jwtToken };
     }
 
-    async login(loginUserDto: LoginUserDto, ip: string, response: Response) {
+    async login(loginUserDto: AuthLoginUserDto, ip: string, response: Response) {
         const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
 
         if (!user) {
@@ -130,10 +130,10 @@ export class AuthService {
     async getInfo(entity: Entity) {
         if (entity.type == "Device") {
             const device = await this.databaseService.device.findUnique({ where: { id: entity.id } });
-            return { id: device.id, role: "Device" } as InfoResponseDto;
+            return { id: device.id, role: "Device" } as AuthInfoResponseDto;
         } else if (entity.type == "User") {
             const user = await this.databaseService.user.findUnique({ where: { id: entity.id } });
-            return { id: user.id, username: user.username, role: user.role } as InfoResponseDto;
+            return { id: user.id, username: user.username, role: user.role } as AuthInfoResponseDto;
         }
 
         return;
