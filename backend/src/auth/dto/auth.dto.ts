@@ -15,7 +15,7 @@ export class DeviceRegistrationResponseDto {
     jwt_token: string;
 }
 
-export class InfoResponseDto {
+export class AuthInfoResponseDto {
     @ApiProperty({ description: "ID", example: 1 })
     id: number;
 
@@ -34,7 +34,7 @@ export class InfoResponseDto {
     username?: string;
 }
 
-export class LoginUserDto {
+export class AuthLoginUserDto {
     @ApiProperty({
         description: "Username for authentication",
     })

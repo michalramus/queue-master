@@ -1,7 +1,7 @@
 import { Controller, Post, UseGuards, Request, Body, ValidationPipe, Res, Get } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { JwtRefreshTokenAuthGuard } from "./guards/jwt-refreshToken-auth.guard";
-import { DeviceRegistrationResponseDto, InfoResponseDto, LoginUserDto } from "./dto/auth.dto";
+import { DeviceRegistrationResponseDto, AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
 import { Entity } from "./types/entity.class";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./roles.decorator";
@@ -43,7 +43,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
         `,
     })
     @ApiBody({
-        type: LoginUserDto,
+        type: AuthLoginUserDto,
     })
     @ApiResponse({
         status: 201,
@@ -54,7 +54,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
         description: "Invalid credentials - Check your username and password",
     })
     async login(
-        @Body(ValidationPipe) loginUserDto: LoginUserDto,
+        @Body(ValidationPipe) loginUserDto: AuthLoginUserDto,
         @Request() req,
         @Res({ passthrough: true }) res: Response,
     ): Promise<MessageResponseDto> {
@@ -94,12 +94,12 @@ Token is automatically saved in cookies, so you don't have to do anything more.
     @ApiResponse({
         status: 200,
         description: "User/device information retrieved",
-        type: InfoResponseDto,
+        type: AuthInfoResponseDto,
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    async getInfo(@Request() req): Promise<InfoResponseDto> {
+    async getInfo(@Request() req): Promise<AuthInfoResponseDto> {
         return this.authService.getInfo(Entity.convertFromReq(req));
     }
 }

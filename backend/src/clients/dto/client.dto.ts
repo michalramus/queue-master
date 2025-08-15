@@ -2,7 +2,7 @@ import { IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { CategoryResponseDto } from "src/categories/dto/category.dto";
 
-export class CreateClientDto {
+export class ClientCreateDto {
     @ApiProperty({
         description: "ID of the category for the client",
         example: 1,
@@ -13,7 +13,7 @@ export class CreateClientDto {
     categoryId: number;
 }
 
-export class UpdateClientDto {
+export class ClientUpdateDto {
     @ApiProperty({
         description: "Status of the client in queue",
         enum: ["Waiting", "InService"],
