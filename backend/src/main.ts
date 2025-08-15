@@ -40,7 +40,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
             .addTag("auth", "Authentication endpoints - Start here to get your access token")
             .addTag("clients", "Client management endpoints - Manage queue clients")
             .addTag("categories", "Category management endpoints - Manage service categories")
-            .addTag("devices", "Device management endpoints - Manage display devices")
+            .addTag("devices", "Device management endpoints - Register, manage and control display devices")
             .addTag("users", "User management endpoints - Manage system users")
             .addTag("settings", "Settings management endpoints - Configure system settings")
             .addTag("file", "File management endpoints - Handle file uploads/downloads")
