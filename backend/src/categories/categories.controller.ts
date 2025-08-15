@@ -5,7 +5,7 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 // import { CreateCategoryDto } from "./dto/create-category.dto";
 // import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { Roles } from "../auth/roles.decorator";
-import { Category } from "./types/category.interface";
+import { CategoryResponseDto } from "./dto/category.dto";
 import {
     ApiTags,
     ApiOperation,
@@ -29,11 +29,11 @@ export class CategoriesController {
     @Roles(["Device", "User", "Admin"])
     @UseGuards(new JwtAuthGuard(), RolesGuard)
     @ApiOperation({ summary: "Get all available categories" })
-    @ApiResponse({ status: 200, description: "List of all categories", type: [Category] })
+    @ApiResponse({ status: 200, description: "List of all categories", type: [CategoryResponseDto] })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    findAll(): Promise<Category[]> {
+    findAll(): Promise<CategoryResponseDto[]> {
         return this.categoriesService.findAll();
     }
 

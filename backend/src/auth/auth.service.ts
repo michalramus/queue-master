@@ -3,11 +3,10 @@ import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { DevicesService } from "../devices/devices.service";
-import { LoginUserDto } from "./types/loginUser.dto";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
-import { InfoResponseDto } from "./types/infoResponse.dto";
+import { InfoResponseDto, LoginUserDto } from "./dto/auth.dto";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const ms = require("ms"); //'import' syntax not working properly with this package. Using 'require' instead
 

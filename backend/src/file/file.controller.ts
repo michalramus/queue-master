@@ -18,7 +18,7 @@ import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { LogoFileService } from "./logo.file.service";
 import { Entity } from "src/auth/types/entity.class";
-import { LogoAvailabilityResponseDto } from "./types/logoAvailabilityResponse.dto";
+import { LogoAvailabilityResponseDto } from "./dto/logo.dto";
 import {
     ApiTags,
     ApiOperation,
@@ -31,7 +31,7 @@ import {
     ApiForbiddenResponse,
 } from "@nestjs/swagger";
 import { LogoID } from "./types/logoID.enum";
-import { MessageResponseDto } from "src/types/messageResponse.dto";
+import { MessageResponseDto } from "src/dto/messageResponse.dto";
 
 //max sizes
 const maxLogoSize = 1024 * 1024;
