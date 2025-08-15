@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable, Logger, UnauthorizedException } from "@
 import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import { DevicesService } from "../devices/devices.service";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
@@ -14,7 +13,6 @@ const ms = require("ms"); //'import' syntax not working properly with this packa
 export class AuthService {
     constructor(
         private readonly usersService: UsersService,
-        private readonly devicesService: DevicesService,
         private readonly jwtService: JwtService,
         private readonly databaseService: DatabaseService,
     ) {}
@@ -23,25 +21,6 @@ export class AuthService {
 
     readonly accessTokenExpirationTime = "1d";
     readonly refreshTokenExpirationTime = "90d";
-
-    /**
-     * Refresh token of device never expires
-     * @param headers
-     * @returns
-     */
-    async registerDevice(entity: Entity) {
-        const device = await this.devicesService.create();
-
-        this.logger.log(`[${entity.name}] Registered new device ${JSON.stringify(device)}`);
-        const payload = new Entity(device.id, "Device", `Device ${device.id}`).getJwtPayload();
-
-        //Refresh token never expires
-        const jwtToken = await this.jwtService.signAsync(payload, {
-            secret: process.env.JWT_SECRET_KEY,
-        });
-
-        return { message: "Device registered successfully ", jwt_token: jwtToken };
-    }
 
     async login(loginUserDto: AuthLoginUserDto, ip: string, response: Response) {
         const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
@@ -173,7 +152,9 @@ export class AuthService {
 
                 break;
             case "Device":
-                const device = await this.devicesService.findOne(entity.id);
+                const device = await this.databaseService.device.findUnique({
+                    where: { id: entity.id },
+                });
 
                 if (!device) {
                     this.logger.warn(
