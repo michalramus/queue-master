@@ -2,7 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 // import { CreateCategoryDto } from "./dto/create-category.dto";
 // import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { DatabaseService } from "../database/database.service";
-import { Category } from "./types/category.interface";
+import { CategoryResponseDto } from "./dto/category.dto";
 import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
 import { MultilingualTextCategories } from "src/multilingual-text/types/multilingualTextCategories.enum";
 
@@ -15,7 +15,7 @@ export class CategoriesService {
 
     private logger = new Logger(CategoriesService.name);
 
-    async findAll(): Promise<Category[]> {
+    async findAll(): Promise<CategoryResponseDto[]> {
         const categories = await this.databaseService.category.findMany({
             orderBy: [
                 {

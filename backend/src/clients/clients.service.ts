@@ -1,10 +1,8 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { CreateClientDto } from "./dto/create-client.dto";
-import { UpdateClientDto } from "./dto/update-client.dto";
+import { ClientResponseDto, CreateClientDto, UpdateClientDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
 import { WebsocketsService } from "../websockets/websockets.service";
 import { Entity } from "src/auth/types/entity.class";
-import { Client } from "./types/client.interface";
 import { wsEvents } from "src/websockets/wsEvents.enum";
 import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
 import { MultilingualTextCategories } from "src/multilingual-text/types/multilingualTextCategories.enum";
@@ -22,7 +20,7 @@ export class ClientsService {
     private minClientsCounterToReset = 50; // if clients with number lower than this exist, counter cannot be reset
     private timeBetweenCounterResets = 1000 * 60 * 60 * 10; // in seconds - 8 hours
 
-    async create(createClientDto: CreateClientDto, entity: Entity): Promise<Client> {
+    async create(createClientDto: CreateClientDto, entity: Entity): Promise<ClientResponseDto> {
         // Check if category exists
         const category = await this.databaseService.category.findUnique({ where: { id: createClientDto.categoryId } });
         if (!category) {
@@ -77,7 +75,7 @@ export class ClientsService {
         return client;
     }
 
-    async findAll(): Promise<Client[]> {
+    async findAll(): Promise<ClientResponseDto[]> {
         const dbClients = await this.databaseService.client.findMany({
             orderBy: [{ creation_date: "asc" }],
             select: {
@@ -103,7 +101,7 @@ export class ClientsService {
      * @param updateClientDto
      * @returns
      */
-    async update(id: number, updateClientDto: UpdateClientDto, entity: Entity): Promise<Client> {
+    async update(id: number, updateClientDto: UpdateClientDto, entity: Entity): Promise<ClientResponseDto> {
         // Check if client exists
         const isClient = await this.databaseService.client.findUnique({ where: { id: id } });
         if (!isClient) {
@@ -134,7 +132,7 @@ export class ClientsService {
         return client;
     }
 
-    async callAgain(id: number, entity: Entity): Promise<Client> {
+    async callAgain(id: number, entity: Entity): Promise<ClientResponseDto> {
         // Check if client exists
         const dbClient = await this.databaseService.client.findUnique({
             where: { id: id },
@@ -154,7 +152,7 @@ export class ClientsService {
         return client;
     }
 
-    async remove(id: number, entity: Entity): Promise<Client> {
+    async remove(id: number, entity: Entity): Promise<ClientResponseDto> {
         // Check if client exists
         const isClient = await this.databaseService.client.findUnique({ where: { id: id } });
         if (!isClient) {
@@ -233,7 +231,7 @@ export class ClientsService {
         creation_date: Date;
         queue_length?: number;
         category: { id: number; multilingual_text_key: string; short_name: string };
-    }): Promise<Client> {
+    }): Promise<ClientResponseDto> {
         const clientWithCategoryName = {
             ...client,
             category: {

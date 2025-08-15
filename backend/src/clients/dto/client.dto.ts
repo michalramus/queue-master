@@ -1,12 +1,38 @@
+import { IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { Category } from "src/categories/types/category.interface";
+import { CategoryResponseDto } from "src/categories/dto/category.dto";
 
-export enum ClientStatus {
-    Waiting = "Waiting",
-    InService = "InService",
+export class CreateClientDto {
+    @ApiProperty({
+        description: "ID of the category for the client",
+        example: 1,
+        type: "number",
+    })
+    @IsNumber()
+    @IsNotEmpty()
+    categoryId: number;
 }
 
-export class Client {
+export class UpdateClientDto {
+    @ApiProperty({
+        description: "Status of the client in queue",
+        enum: ["Waiting", "InService"],
+        example: "InService",
+    })
+    @IsString()
+    @IsNotEmpty()
+    status: "Waiting" | "InService";
+
+    @ApiProperty({
+        description: "Seat number assigned to the client",
+        example: 5,
+        type: "integer",
+    })
+    @IsInt()
+    seat: number;
+}
+
+export class ClientResponseDto {
     @ApiProperty({ description: "Client ID", example: 1 })
     id: number;
 
@@ -17,7 +43,7 @@ export class Client {
     category_id: number;
 
     @ApiProperty({ description: "Category information" })
-    category: Category; //name - multilingual text
+    category: CategoryResponseDto; //name - multilingual text
 
     @ApiProperty({
         description: "Client status",

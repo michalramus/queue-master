@@ -12,13 +12,11 @@ import {
     ParseIntPipe,
 } from "@nestjs/common";
 import { ClientsService } from "./clients.service";
-import { CreateClientDto } from "./dto/create-client.dto";
-import { UpdateClientDto } from "./dto/update-client.dto";
+import { ClientResponseDto, CreateClientDto, UpdateClientDto } from "./dto/client.dto";
 import { Roles } from "../auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
-import { Client } from "./types/client.interface";
 import {
     ApiTags,
     ApiOperation,
@@ -43,12 +41,12 @@ export class ClientsController {
     @ApiResponse({
         status: 201,
         description: "Client created",
-        type: Client,
+        type: ClientResponseDto,
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    create(@Body(ValidationPipe) createClientDto: CreateClientDto, @Request() req): Promise<Client> {
+    create(@Body(ValidationPipe) createClientDto: CreateClientDto, @Request() req): Promise<ClientResponseDto> {
         return this.clientsService.create(createClientDto, Entity.convertFromReq(req));
     }
 
@@ -59,12 +57,12 @@ export class ClientsController {
     @ApiResponse({
         status: 200,
         description: "List of all clients",
-        type: [Client],
+        type: [ClientResponseDto],
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    findAll(): Promise<Client[]> {
+    findAll(): Promise<ClientResponseDto[]> {
         return this.clientsService.findAll();
     }
 
@@ -77,7 +75,7 @@ export class ClientsController {
     @ApiResponse({
         status: 200,
         description: "Client updated",
-        type: Client,
+        type: ClientResponseDto,
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
@@ -86,7 +84,7 @@ export class ClientsController {
         @Param("id", ParseIntPipe) id: number,
         @Body(ValidationPipe) updateClientDto: UpdateClientDto,
         @Request() req,
-    ): Promise<Client> {
+    ): Promise<ClientResponseDto> {
         return this.clientsService.update(id, updateClientDto, Entity.convertFromReq(req));
     }
 
@@ -98,12 +96,12 @@ export class ClientsController {
     @ApiResponse({
         status: 200,
         description: "Client called again",
-        type: Client,
+        type: ClientResponseDto,
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    findOne(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<Client> {
+    findOne(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<ClientResponseDto> {
         return this.clientsService.callAgain(id, Entity.convertFromReq(req));
     }
 
@@ -115,12 +113,12 @@ export class ClientsController {
     @ApiResponse({
         status: 200,
         description: "Client removed",
-        type: Client,
+        type: ClientResponseDto,
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<Client> {
+    remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<ClientResponseDto> {
         return this.clientsService.remove(id, Entity.convertFromReq(req));
     }
 }

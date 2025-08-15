@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { LogoID } from "./logoID.enum";
+import { LogoID } from "../types/logoID.enum";
 
 export class LogoAvailabilityResponseDto {
     @ApiProperty({

@@ -1,8 +1,7 @@
 import { Controller, Post, UseGuards, Request, Body, ValidationPipe, Res, Get } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { JwtRefreshTokenAuthGuard } from "./guards/jwt-refreshToken-auth.guard";
-import { LoginUserDto } from "./types/loginUser.dto";
-import { DeviceRegistrationResponseDto } from "./types/auth-response.dto";
+import { DeviceRegistrationResponseDto, InfoResponseDto, LoginUserDto } from "./dto/auth.dto";
 import { Entity } from "./types/entity.class";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./roles.decorator";
@@ -17,8 +16,7 @@ import {
     ApiUnauthorizedResponse,
     ApiForbiddenResponse,
 } from "@nestjs/swagger";
-import { MessageResponseDto } from "src/types/messageResponse.dto";
-import { InfoResponseDto } from "./types/infoResponse.dto";
+import { MessageResponseDto } from "src/dto/messageResponse.dto";
 
 @ApiTags("auth")
 @Controller("auth")

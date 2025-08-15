@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
-import { Device } from "./types/device.interface";
+import { DeviceResponseDto } from "./dto/device.dto";
 
 @Injectable()
 export class DevicesService {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async findOne(deviceId: number): Promise<Device | null> {
+    async findOne(deviceId: number): Promise<DeviceResponseDto | null> {
         return this.databaseService.device.findUnique({
             where: { id: deviceId },
         });
@@ -17,7 +17,7 @@ export class DevicesService {
      * @param userAgent
      * @returns
      */
-    async create(): Promise<Device | null> {
+    async create(): Promise<DeviceResponseDto | null> {
         return this.databaseService.device.create({ data: { accepted: true } });
     }
 }
