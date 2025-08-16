@@ -51,10 +51,16 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
                 onClick={() => {
                     mutation.mutate({ categoryId: category.id });
                 }}
-                className="border-primary-1 m-3! w-9/12! rounded-3xl! border-2! p-6! text-3xl!"
+                className="border-primary-1 relative! m-3! flex! w-9/12! items-center! justify-center! rounded-3xl! border-2! p-6! text-3xl!"
                 color="secondary"
             >
-                {category.name[locale] || category.short_name}
+                {/* TODO: text-white class replace with custom class or left it to be ok */}
+                <div className="absolute top-1/2 left-6 -translate-y-1/2 transform">
+                    <span className="bg-primary-1 rounded-lg px-4 py-2 text-2xl font-bold text-white shadow-md">
+                        {category.short_name}
+                    </span>
+                </div>
+                <span className="text-center">{category.name[locale] || category.short_name}</span>
             </Button>
         </>
     );
