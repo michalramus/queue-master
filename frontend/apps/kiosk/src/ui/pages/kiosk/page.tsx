@@ -22,6 +22,7 @@ export default function KioskPage() {
     } = useQuery({
         queryKey: ["KioskPage_categories"],
         queryFn: () => getCategories(axiosAuthInstance),
+        select: (data) => data?.sort((a, b) => a.short_name.localeCompare(b.short_name)),
     });
 
     if (logoAvailabilitiesLoading || categoriesLoading) {
