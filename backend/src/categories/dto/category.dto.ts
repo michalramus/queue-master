@@ -1,6 +1,45 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Category_Short_Name } from "@prisma/client";
-import { IsNotEmpty, IsEnum, IsObject, IsOptional } from "class-validator";
+import { Category_Short_Name, LangCode } from "@prisma/client";
+import {
+    IsNotEmpty,
+    IsEnum,
+    IsObject,
+    IsOptional,
+    ValidatorConstraint,
+    ValidatorConstraintInterface,
+    Validate,
+} from "class-validator";
+
+@ValidatorConstraint({ name: "isValidMultilingualText", async: false })
+export class IsValidMultilingualText implements ValidatorConstraintInterface {
+    validate(value: any): boolean {
+        if (!value || typeof value !== "object") {
+            return false;
+        }
+
+        const providedLangs = Object.keys(value);
+
+        // Validate that all provided languages are valid LangCodes with non-empty strings
+        const validLangs = Object.values(LangCode);
+        for (const lang of providedLangs) {
+            if (!validLangs.includes(lang as LangCode)) {
+                return false;
+            }
+            if (!value[lang] || typeof value[lang] !== "string" || value[lang].trim().length === 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    defaultMessage(): string {
+        return (
+            "Name must contain valid language with non-empty text. Valid languages: " +
+            Object.values(LangCode).join(", ")
+        );
+    }
+}
 
 export class CategoryCreateDto {
     @ApiProperty({
@@ -17,7 +56,8 @@ export class CategoryCreateDto {
     })
     @IsObject()
     @IsNotEmpty()
-    name: { [lang: string]: string };
+    @Validate(IsValidMultilingualText)
+    name: { [lang in LangCode]?: string };
 }
 
 export class CategoryUpdateDto {
@@ -38,7 +78,8 @@ export class CategoryUpdateDto {
     })
     @IsObject()
     @IsOptional()
-    name?: { [lang: string]: string };
+    @Validate(IsValidMultilingualText)
+    name?: { [lang in LangCode]?: string };
 }
 
 export class CategoryResponseDto {
@@ -52,5 +93,5 @@ export class CategoryResponseDto {
         description: "Multilingual category name dictionary",
         example: { en: "Category A", pl: "Kategoria A" },
     })
-    name: { [lang: string]: string }; // MultilingualText
+    name: { [lang: string]: string }; //TODO: replace with LangCode
 }
