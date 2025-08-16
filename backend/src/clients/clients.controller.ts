@@ -1,16 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    ValidationPipe,
-    UseGuards,
-    Request,
-    ParseIntPipe,
-} from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from "@nestjs/common";
 import { ClientsService } from "./clients.service";
 import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { Roles } from "../auth/roles.decorator";
@@ -46,7 +34,7 @@ export class ClientsController {
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    create(@Body(ValidationPipe) createClientDto: ClientCreateDto, @Request() req): Promise<ClientResponseDto> {
+    create(@Body() createClientDto: ClientCreateDto, @Request() req): Promise<ClientResponseDto> {
         return this.clientsService.create(createClientDto, Entity.convertFromReq(req));
     }
 
@@ -82,7 +70,7 @@ export class ClientsController {
     // @ApiBearerAuth("JWT-auth")
     update(
         @Param("id", ParseIntPipe) id: number,
-        @Body(ValidationPipe) updateClientDto: ClientUpdateDto,
+        @Body() updateClientDto: ClientUpdateDto,
         @Request() req,
     ): Promise<ClientResponseDto> {
         return this.clientsService.update(id, updateClientDto, Entity.convertFromReq(req));
