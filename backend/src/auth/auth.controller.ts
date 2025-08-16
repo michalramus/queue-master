@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Request, Body, ValidationPipe, Res, Get } from "@nestjs/common";
+import { Controller, Post, UseGuards, Request, Body, Res, Get } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { JwtRefreshTokenAuthGuard } from "./guards/jwt-refreshToken-auth.guard";
 import { AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
@@ -42,7 +42,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
         description: "Invalid credentials - Check your username and password",
     })
     async login(
-        @Body(ValidationPipe) loginUserDto: AuthLoginUserDto,
+        @Body() loginUserDto: AuthLoginUserDto,
         @Request() req,
         @Res({ passthrough: true }) res: Response,
     ): Promise<MessageResponseDto> {

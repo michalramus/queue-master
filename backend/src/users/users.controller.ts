@@ -1,16 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Delete,
-    Patch,
-    Param,
-    Body,
-    UseGuards,
-    Request,
-    ParseIntPipe,
-    ValidationPipe,
-} from "@nestjs/common";
+import { Controller, Get, Post, Delete, Patch, Param, Body, UseGuards, Request, ParseIntPipe } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UserCreateDto, UserUpdateDto, UserPasswordUpdateDto, UserResponseDto } from "./dto/user.dto";
 import { Roles } from "../auth/roles.decorator";
@@ -46,7 +34,7 @@ export class UsersController {
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     @ApiConflictResponse({ description: "Username already exists" })
     // @ApiBearerAuth("JWT-auth")
-    async create(@Body(ValidationPipe) userCreateDto: UserCreateDto, @Request() req): Promise<UserResponseDto> {
+    async create(@Body() userCreateDto: UserCreateDto, @Request() req): Promise<UserResponseDto> {
         return this.usersService.create(userCreateDto, Entity.convertFromReq(req));
     }
 
@@ -84,7 +72,7 @@ export class UsersController {
     // @ApiBearerAuth("JWT-auth")
     async updateUser(
         @Param("id", ParseIntPipe) id: number,
-        @Body(ValidationPipe) userUpdateDto: UserUpdateDto,
+        @Body() userUpdateDto: UserUpdateDto,
         @Request() req,
     ): Promise<UserResponseDto> {
         return this.usersService.updateUser(id, userUpdateDto, Entity.convertFromReq(req));
@@ -107,7 +95,7 @@ export class UsersController {
     // @ApiBearerAuth("JWT-auth")
     async updatePassword(
         @Param("id", ParseIntPipe) id: number,
-        @Body(ValidationPipe) userPasswordUpdateDto: UserPasswordUpdateDto,
+        @Body() userPasswordUpdateDto: UserPasswordUpdateDto,
         @Request() req,
     ): Promise<MessageResponseDto> {
         return this.usersService.updatePassword(id, userPasswordUpdateDto, Entity.convertFromReq(req));

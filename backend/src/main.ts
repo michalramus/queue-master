@@ -5,6 +5,7 @@ import { LoggingInterceptor } from "./middleware/logging.interceptor";
 import * as cookieParser from "cookie-parser";
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
     ConfigModule.forRoot();
@@ -16,6 +17,13 @@ async function bootstrap() {
                 : ["error", "warn", "log"],
     });
     app.useGlobalInterceptors(new LoggingInterceptor());
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+        }),
+    );
     app.use(cookieParser());
 
     const corsOptions: CorsOptions = {

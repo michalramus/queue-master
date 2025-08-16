@@ -1,16 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Delete,
-    Patch,
-    Param,
-    Body,
-    UseGuards,
-    Request,
-    ParseIntPipe,
-    ValidationPipe,
-} from "@nestjs/common";
+import { Controller, Get, Post, Delete, Patch, Param, Body, UseGuards, Request, ParseIntPipe } from "@nestjs/common";
 import { DevicesService } from "./devices.service";
 import { DeviceResponseDto, DevicePatchDto } from "./dto/device.dto";
 import { Roles } from "../auth/roles.decorator";
@@ -78,7 +66,7 @@ export class DevicesController {
     // @ApiBearerAuth("JWT-auth")
     async updateDevice(
         @Param("id", ParseIntPipe) id: number,
-        @Body(ValidationPipe) devicePatchDto: DevicePatchDto,
+        @Body() devicePatchDto: DevicePatchDto,
         @Request() req,
     ): Promise<DeviceResponseDto> {
         return this.devicesService.updateDevice(id, devicePatchDto, Entity.convertFromReq(req));
