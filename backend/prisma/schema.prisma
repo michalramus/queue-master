@@ -71,10 +71,10 @@ model User {
     id       Int    @id @default(autoincrement())
     username String @unique
     password String
-    role     Role
+    role     UserRole
 }
 
-enum Role {
+enum UserRole {
     User
     Admin
 }
@@ -103,12 +103,12 @@ model Multilingual_Text {
     id    Int    @id @default(autoincrement())
     module_name String
     key   String
-    lang  Lang
+    lang  LangCode
     value String
     @@unique([key, lang, module_name])
 }
 
-enum Lang {
+enum LangCode {
     en
     pl
 }

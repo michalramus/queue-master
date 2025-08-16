@@ -6,6 +6,7 @@ import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
 import { AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
+import { DevicesService } from "src/devices/devices.service";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const ms = require("ms"); //'import' syntax not working properly with this package. Using 'require' instead
 
@@ -13,6 +14,7 @@ const ms = require("ms"); //'import' syntax not working properly with this packa
 export class AuthService {
     constructor(
         private readonly usersService: UsersService,
+        private readonly devicesService: DevicesService,
         private readonly jwtService: JwtService,
         private readonly databaseService: DatabaseService,
     ) {}
@@ -108,10 +110,10 @@ export class AuthService {
 
     async getInfo(entity: Entity) {
         if (entity.type == "Device") {
-            const device = await this.databaseService.device.findUnique({ where: { id: entity.id } });
+            const device = await this.devicesService.findOne(entity.id);
             return { id: device.id, role: "Device" } as AuthInfoResponseDto;
         } else if (entity.type == "User") {
-            const user = await this.databaseService.user.findUnique({ where: { id: entity.id } });
+            const user = await this.usersService.findOneById(entity.id);
             return { id: user.id, username: user.username, role: user.role } as AuthInfoResponseDto;
         }
 
@@ -152,9 +154,7 @@ export class AuthService {
 
                 break;
             case "Device":
-                const device = await this.databaseService.device.findUnique({
-                    where: { id: entity.id },
-                });
+                const device = await this.devicesService.findOne(entity.id);
 
                 if (!device) {
                     this.logger.warn(
