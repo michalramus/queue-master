@@ -5,7 +5,7 @@ import { WebsocketsService } from "../websockets/websockets.service";
 import { Entity } from "src/auth/types/entity.class";
 import { wsEvents } from "src/websockets/wsEvents.enum";
 import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
-import { MultilingualTextCategories } from "src/multilingual-text/types/multilingualTextCategories.enum";
+import { ModuleNameMultilingualText } from "src/multilingual-text/types/multilingualTextCategories.enum";
 
 @Injectable()
 export class ClientsService {
@@ -82,14 +82,13 @@ export class ClientsService {
                 id: true,
                 number: true,
                 category_id: true,
-                category: { select: { id: true, short_name: true, multilingual_text_key: true } },
+                category: { select: { id: true, short_name: true } },
                 status: true,
                 seat: true,
                 creation_date: true,
             },
         });
 
-        //TODO not fetch every category translation for every client. Fetch first all categories and then map them
         const clients = dbClients.map(async (client) => await this.addCategoryNameFieldToClient(client));
         this.logger.debug(`Fetched ${dbClients.length} clients`);
         return Promise.all(clients);
@@ -230,15 +229,15 @@ export class ClientsService {
         seat: number | null;
         creation_date: Date;
         queue_length?: number;
-        category: { id: number; multilingual_text_key: string; short_name: string };
+        category: { id: number; short_name: string };
     }): Promise<ClientResponseDto> {
         const clientWithCategoryName = {
             ...client,
             category: {
                 ...client.category,
                 name: await this.multilingualTextService.getMultilingualText(
-                    MultilingualTextCategories.categories,
-                    client.category.multilingual_text_key,
+                    ModuleNameMultilingualText.categories,
+                    client.category.id,
                 ),
             },
         };

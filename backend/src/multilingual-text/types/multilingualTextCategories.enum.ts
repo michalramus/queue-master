@@ -1,3 +1,3 @@
-export enum MultilingualTextCategories {
+export enum ModuleNameMultilingualText {
     categories = "categories",
 }
