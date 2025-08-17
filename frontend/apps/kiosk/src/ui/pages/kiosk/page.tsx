@@ -38,7 +38,6 @@ export default function KioskPage() {
         );
     }
 
-    //TODO Assign img sizes
     return (
         <main className="flex min-h-screen flex-col items-center px-10">
             <div className="flex w-full items-center justify-between">
