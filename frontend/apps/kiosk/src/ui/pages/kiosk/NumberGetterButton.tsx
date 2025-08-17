@@ -39,13 +39,28 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
         },
     });
 
-    //TODO More elegant printing screen
-
+    //TODO fix printing screen
     return (
         <>
             <Modal hidden={!loadingPage}>
-                <p className="mb-1.5 text-center text-4xl font-bold">{lastTicketString}</p>
-                <p className="text-center text-xl">{t("printing")}</p>
+                <div className="flex flex-col items-center justify-center p-8">
+                    <div className="border-primary-1 mb-6 h-16 w-16 animate-spin rounded-full border-b-2"></div>
+                    <p className="text-text-1 mb-4 text-center text-5xl font-bold">
+                        {lastTicketString}
+                    </p>
+                    <p className="text-text-2 text-center text-2xl">{t("printing")}</p>
+                    <div className="mt-4 flex space-x-1">
+                        <div className="bg-primary-1 h-2 w-2 animate-bounce rounded-full"></div>
+                        <div
+                            className="bg-primary-1 h-2 w-2 animate-bounce rounded-full"
+                            style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                            className="bg-primary-1 h-2 w-2 animate-bounce rounded-full"
+                            style={{ animationDelay: "0.2s" }}
+                        ></div>
+                    </div>
+                </div>
             </Modal>
             <Button
                 onClick={() => {
