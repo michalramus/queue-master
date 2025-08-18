@@ -19,7 +19,7 @@ export default function TVPage() {
     const [newClientsQueue, setNewClientsQueue] = useState<ClientInterface[]>([]);
     const isShowNewClientsRunning = useRef(false); //Protect from multiple calls at the same time - something like a mutex
 
-    const maxHistory = 8; // TODO: Move to settings
+    const maxHistory = 20; // max stored history of clients. Clients are automatically trimmed to match screen size in ClientNumbersHistoryTable component
 
     // Logo availability query
     const { data: logoAvailabilities } = useQuery({
