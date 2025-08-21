@@ -20,7 +20,7 @@ async function bootstrap() {
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true,
-            forbidNonWhitelisted: true,
+            forbidNonWhitelisted: false,
             transform: true,
         }),
     );
@@ -52,6 +52,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
             .addTag("users", "User management endpoints - Manage system users")
             .addTag("settings", "Settings management endpoints - Configure system settings")
             .addTag("file", "File management endpoints - Handle file uploads/downloads")
+            .addTag("opening-hours", "Opening hours management endpoints - Configure business operating hours")
             //TODO
             // .addBearerAuth(
             //     {
