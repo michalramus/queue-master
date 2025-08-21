@@ -1,6 +1,7 @@
 import { HexColorSettingValue } from "src/settings/types/hexColorSettingValue.class";
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
 import { EnumSettingValue } from "src/settings/types/enumSettingValue.class";
+import { BooleanSettingValue } from "src/settings/types/booleanSettingValue.class";
 
 //Remember to keep name of setting and 'key' argument the same
 export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes> } = {
@@ -35,6 +36,12 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
         </div>
         `,
     ), //Template used for printing tickets
+
+    enable_opening_hours: new Setting<BooleanSettingValue>("enable_opening_hours", new BooleanSettingValue(false)),
+    opening_hours_override: new Setting<EnumSettingValue>(
+        "opening_hours_override",
+        new EnumSettingValue("off", ["off", "override_to_open", "override_to_close"]),
+    ),
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;

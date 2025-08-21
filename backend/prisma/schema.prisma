@@ -31,11 +31,11 @@ enum Status {
 }
 
 model Category {
-    id                    Int                 @id @default(autoincrement())
-    short_name            Category_Short_Name @unique
-    counter               Int
-    last_counter_reset    DateTime
-    clients               Client[]
+    id                 Int                 @id @default(autoincrement())
+    short_name         Category_Short_Name @unique
+    counter            Int
+    last_counter_reset DateTime
+    clients            Client[]
 }
 
 enum Category_Short_Name {
@@ -108,6 +108,24 @@ model Multilingual_Text {
     value       String
 
     @@unique([key, lang, module_name])
+}
+
+model Opening_Hours {
+    id          Int       @id @default(autoincrement())
+    day_of_week DayOfWeek @unique
+    is_closed   Boolean   @default(false)
+    open_time   String? // HH:mm format, required when not closed
+    close_time  String? // HH:mm format, required when not closed
+}
+
+enum DayOfWeek {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
 }
 
 enum LangCode {
