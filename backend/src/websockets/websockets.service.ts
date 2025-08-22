@@ -12,4 +12,8 @@ export class WebsocketsService {
     emit(event: wsEvents, data: any) {
         this.server.emit(event, data);
     }
+
+    reloadFrontend() {
+        this.emit(wsEvents.ReloadFrontend, null);
+    }
 }

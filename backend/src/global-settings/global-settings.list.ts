@@ -1,7 +1,9 @@
 import { HexColorSettingValue } from "src/settings/types/hexColorSettingValue.class";
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
 import { EnumSettingValue } from "src/settings/types/enumSettingValue.class";
+import { BooleanSettingValue } from "src/settings/types/booleanSettingValue.class";
 
+//Remember to keep name of setting and 'key' argument the same
 export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes> } = {
     //colors
     color_background: new Setting<HexColorSettingValue>("color_background", new HexColorSettingValue("#fbfefb")),
@@ -24,8 +26,22 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
     kiosk_markdown: new Setting<string>("kiosk_markdown", ""), //markdown text shown on kiosk page
     locale: new Setting<EnumSettingValue>("locale", new EnumSettingValue("en", ["en", "pl"])),
 
-    //TODO: Add default template
-    printingTicketTemplate: new Setting<string>("printingTicketTemplate", ``), //Template used for printing tickets
+    printing_ticket_template: new Setting<string>(
+        "printing_ticket_template",
+        `
+        <div style="text-align:center;font-family:Helvetica"> 
+            <p style="font-size:12px;font-weight:bold;margin-bottom:1px">Your</br>Brand</p> 
+            <p style="font-size:28px;font-weight:bold">&categoryShortName&number</p> 
+            <p style="font-size:9px">&date&nbsp&nbsp&nbsp&time</p> 
+        </div>
+        `,
+    ), //Template used for printing tickets
+
+    enable_opening_hours: new Setting<BooleanSettingValue>("enable_opening_hours", new BooleanSettingValue(false)),
+    opening_hours_override: new Setting<EnumSettingValue>(
+        "opening_hours_override",
+        new EnumSettingValue("off", ["off", "override_to_open", "override_to_close"]),
+    ),
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;

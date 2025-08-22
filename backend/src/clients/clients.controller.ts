@@ -1,25 +1,22 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    ValidationPipe,
-    UseGuards,
-    Request,
-    ParseIntPipe,
-} from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ParseIntPipe } from "@nestjs/common";
 import { ClientsService } from "./clients.service";
-import { CreateClientDto } from "./dto/create-client.dto";
-import { UpdateClientDto } from "./dto/update-client.dto";
+import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { Roles } from "../auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
-import { Client } from "./types/client.interface";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiParam,
+    ApiBody,
+    // ApiBearerAuth,
+    ApiUnauthorizedResponse,
+    ApiForbiddenResponse,
+} from "@nestjs/swagger";
 
+@ApiTags("clients")
 @Controller("clients")
 export class ClientsController {
     constructor(private readonly clientsService: ClientsService) {}
@@ -27,39 +24,89 @@ export class ClientsController {
     @Post()
     @Roles(["Device", "User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    create(@Body(ValidationPipe) createClientDto: CreateClientDto, @Request() req): Promise<Client> {
+    @ApiOperation({ summary: "Create a new client in queue" })
+    @ApiBody({ type: ClientCreateDto })
+    @ApiResponse({
+        status: 201,
+        description: "Client created",
+        type: ClientResponseDto,
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
+    create(@Body() createClientDto: ClientCreateDto, @Request() req): Promise<ClientResponseDto> {
         return this.clientsService.create(createClientDto, Entity.convertFromReq(req));
     }
 
     @Get()
     @Roles(["Device", "User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    findAll(): Promise<Client[]> {
+    @ApiOperation({ summary: "Get all clients in queue" })
+    @ApiResponse({
+        status: 200,
+        description: "List of all clients",
+        type: [ClientResponseDto],
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
+    findAll(): Promise<ClientResponseDto[]> {
         return this.clientsService.findAll();
     }
 
     @Patch(":id")
     @Roles(["User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Update client information" })
+    @ApiParam({ name: "id", description: "Client ID", type: "number" })
+    @ApiBody({ type: ClientUpdateDto })
+    @ApiResponse({
+        status: 200,
+        description: "Client updated",
+        type: ClientResponseDto,
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
     update(
         @Param("id", ParseIntPipe) id: number,
-        @Body(ValidationPipe) updateClientDto: UpdateClientDto,
+        @Body() updateClientDto: ClientUpdateDto,
         @Request() req,
-    ): Promise<Client> {
+    ): Promise<ClientResponseDto> {
         return this.clientsService.update(id, updateClientDto, Entity.convertFromReq(req));
     }
 
     @Post(":id/call-again")
     @Roles(["User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    findOne(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<Client> {
+    @ApiOperation({ summary: "Call client again (re-queue)" })
+    @ApiParam({ name: "id", description: "Client ID", type: "number" })
+    @ApiResponse({
+        status: 200,
+        description: "Client called again",
+        type: ClientResponseDto,
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
+    findOne(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<ClientResponseDto> {
         return this.clientsService.callAgain(id, Entity.convertFromReq(req));
     }
 
     @Delete(":id")
     @Roles(["User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<Client> {
+    @ApiOperation({ summary: "Remove client from queue" })
+    @ApiParam({ name: "id", description: "Client ID", type: "number" })
+    @ApiResponse({
+        status: 200,
+        description: "Client removed",
+        type: ClientResponseDto,
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
+    remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<ClientResponseDto> {
         return this.clientsService.remove(id, Entity.convertFromReq(req));
     }
 }

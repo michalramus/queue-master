@@ -6,4 +6,6 @@ export enum wsEvents {
     ClientCallAgain = "ClientCallAgain",
 
     GlobalSettingsChanged = "GlobalSettingsChanged",
+
+    ReloadFrontend = "ReloadFrontend",
 }

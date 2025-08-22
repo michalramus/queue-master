@@ -11,7 +11,17 @@ export default function CategoriesForm({ categories }: { categories: CategoryInt
 
     return (
         <div className="mt-10 flex w-full flex-col items-center">
-            <p className="text-text-2 mb-5 text-4xl">{t("choose_category")}</p>
+            <p className="text-text-2 mb-5 text-4xl">
+                {(() => {
+                    if (categories.length > 1) {
+                        return t("choose_category");
+                    } else if (categories.length === 1) {
+                        return t("get_a_ticket");
+                    } else {
+                        return t("category_list_is_empty");
+                    }
+                })()}
+            </p>
             <MarkdownToHtml className="mb-5" markdown={globalSettings.kiosk_markdown} />
 
             {Array.isArray(categories) &&

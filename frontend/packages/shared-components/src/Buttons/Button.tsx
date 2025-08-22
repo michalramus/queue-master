@@ -16,25 +16,43 @@ export default function Button({
     let colorClass = "";
     switch (color) {
         case "blue":
-            colorClass = "bg-blue-1 hover:bg-blue-2";
+            colorClass = "bg-blue-1";
+            if (!disabled) {
+                colorClass += " hover:bg-blue-2";
+            }
+
             break;
         case "green":
-            colorClass = "bg-green-1 hover:bg-green-2";
+            colorClass = "bg-green-1";
+            if (!disabled) {
+                colorClass += " hover:bg-green-2";
+            }
 
             break;
         case "red":
-            colorClass = "bg-red-1 hover:bg-red-2";
+            colorClass = "bg-red-1";
+            if (!disabled) {
+                colorClass += " hover:bg-red-2";
+            }
             break;
         case "gray":
-            colorClass = "bg-gray-1 hover:bg-gray-2";
+            colorClass = "bg-gray-1";
+            if (!disabled) {
+                colorClass += " hover:bg-gray-2";
+            }
             break;
 
         case "primary":
-            colorClass = "bg-primary-1 hover:bg-primary-2";
-
+            colorClass = "bg-primary-1";
+            if (!disabled) {
+                colorClass += " hover:bg-primary-2";
+            }
             break;
         case "secondary":
-            colorClass = "bg-secondary-1 hover:bg-secondary-2";
+            colorClass = "bg-secondary-1";
+            if (!disabled) {
+                colorClass += " hover:bg-secondary-2";
+            }
             break;
     }
 
