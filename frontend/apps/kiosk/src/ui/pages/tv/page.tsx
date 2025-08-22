@@ -8,20 +8,20 @@ import {
     wsEvents,
     getLogoAvailability,
     LogoID,
-    getOpeningHours,
+    OpeningHoursDto,
 } from "shared-utils";
 import useAppConfig from "@/utils/providers/AppConfigProvider";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { useQuery } from "@tanstack/react-query";
-
-import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
-import { isKioskOpen } from "@/utils/isKioskOpen";
-import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 
-export default function TVPage() {
+interface TVPageProps {
+    kioskOpen: boolean;
+    openingHours: OpeningHoursDto[];
+}
+
+export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
     const appConfig = useAppConfig();
-    const globalSettings = useGlobalSettings();
 
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
     const currentClientRef = useRef<ClientInterface | null>(null);
@@ -39,33 +39,6 @@ export default function TVPage() {
         queryKey: ["TVPage_logoAvailabilities"],
         queryFn: () => getLogoAvailability(axiosPureInstance),
     });
-
-    const { data: openingHours } = useQuery({
-        queryKey: ["TVPage_OpeningHours"],
-        queryFn: () => getOpeningHours(axiosAuthInstance),
-    });
-
-    // Make kioskOpen reactive to time
-    const [kioskOpen, setKioskOpen] = useState(() =>
-        isKioskOpen(openingHours || [], globalSettings),
-    );
-    useEffect(() => {
-        setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
-        // Calculate ms until next full minute
-        const now = new Date();
-        const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-        let interval: ReturnType<typeof setInterval>;
-        const timeout = setTimeout(() => {
-            setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
-            interval = setInterval(() => {
-                setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
-            }, 60000);
-        }, msToNextMinute);
-        return () => {
-            clearTimeout(timeout);
-            if (interval) clearInterval(interval);
-        };
-    }, [openingHours, globalSettings]);
 
     //Socket.io
     useEffect(() => {
@@ -149,7 +122,7 @@ export default function TVPage() {
                 <SmallHeader />
             </div>
             <div className="flex h-screen flex-row flex-nowrap px-24 pt-20 pb-28">
-                {kioskOpen ? (
+                {kioskOpen || !appConfig.opening_hours_enable_banner ? (
                     <>
                         <ClientNumbersHistory clientNumbers={previousClients} />
                         <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">

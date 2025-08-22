@@ -40,6 +40,38 @@ async function onExecutePrintTicket(
     console.log(`Printing script ended with ${printJob.status}`);
 }
 
+async function onExecuteOpenKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
+    const openJob = spawnSync(config.opening_hours_open_script || "echo");
+
+    if (process.env.NODE_ENV == "development") {
+        if (openJob.stdout) {
+            console.log(openJob.stdout.toString());
+        }
+
+        if (openJob.stderr) {
+            console.error(openJob.stderr.toString());
+        }
+    }
+
+    console.log(`Opening hours script ended with ${openJob.status}`);
+}
+
+async function onExecuteCloseKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
+    const closeJob = spawnSync(config.opening_hours_close_script || "echo");
+
+    if (process.env.NODE_ENV == "development") {
+        if (closeJob.stdout) {
+            console.log(closeJob.stdout.toString());
+        }
+
+        if (closeJob.stderr) {
+            console.error(closeJob.stderr.toString());
+        }
+    }
+
+    console.log(`Closing hours script ended with ${closeJob.status}`);
+}
+
 async function handleInvokeAudioSynthesizer(
     _event: IpcMainInvokeEvent,
     client: ClientInterface,
@@ -135,6 +167,8 @@ app.on("ready", async () => {
     await fetchConfig();
 
     ipcMain.on("executePrintTicket", onExecutePrintTicket);
+    ipcMain.on("executeOpenKioskScript", onExecuteOpenKioskScript);
+    ipcMain.on("executeCloseKioskScript", onExecuteCloseKioskScript);
 
     ipcMain.handle("invokeAudioSynthesizer", handleInvokeAudioSynthesizer);
 

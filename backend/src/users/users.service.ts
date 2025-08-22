@@ -171,6 +171,14 @@ export class UsersService {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
+        // Prevent deleting the only admin
+        if (user.role === "Admin") {
+            const adminCount = await this.databaseService.user.count({ where: { role: "Admin" } });
+            if (adminCount <= 1) {
+                throw new ConflictException("Nie można usunąć jedynego administratora.");
+            }
+        }
+
         const deletedUser = await this.databaseService.user.delete({
             where: { id: userId },
             select: {
