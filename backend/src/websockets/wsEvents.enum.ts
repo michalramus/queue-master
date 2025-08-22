@@ -8,4 +8,6 @@ export enum wsEvents {
 
     //global settings module
     GlobalSettingsChanged = "GlobalSettingsChanged",
+
+    ReloadFrontend = "ReloadFrontend",
 }

@@ -21,6 +21,7 @@ model Client {
     status        Status
     seat          Int?
     creation_date DateTime @default(now())
+
     @@unique([number, category_id])
 }
 
@@ -30,12 +31,11 @@ enum Status {
 }
 
 model Category {
-    id                    Int                 @id @default(autoincrement())
-    short_name            Category_Short_Name @unique
-    multilingual_text_key String
-    counter               Int
-    last_counter_reset    DateTime
-    clients               Client[]
+    id                 Int                 @id @default(autoincrement())
+    short_name         Category_Short_Name @unique
+    counter            Int
+    last_counter_reset DateTime
+    clients            Client[]
 }
 
 enum Category_Short_Name {
@@ -68,20 +68,20 @@ enum Category_Short_Name {
 }
 
 model User {
-    id       Int    @id @default(autoincrement())
-    username String @unique
+    id       Int      @id @default(autoincrement())
+    username String   @unique
     password String
-    role     Role
+    role     UserRole
 }
 
-enum Role {
+enum UserRole {
     User
     Admin
 }
 
 model Device {
-    id         Int     @id @default(autoincrement())
-    accepted   Boolean @default(false)
+    id       Int     @id @default(autoincrement())
+    accepted Boolean @default(false)
 }
 
 model Global_Setting {
@@ -95,20 +95,40 @@ model User_Setting {
     user_id Int
     key     String //key of settings
     value   String
+
     @@unique([user_id, key])
 }
 
 //texts are grouped by module_name.key.lang
 model Multilingual_Text {
-    id    Int    @id @default(autoincrement())
+    id          Int      @id @default(autoincrement())
     module_name String
-    key   String
-    lang  Lang
-    value String
+    key         Int
+    lang        LangCode
+    value       String
+
     @@unique([key, lang, module_name])
 }
 
-enum Lang {
+model Opening_Hours {
+    id          Int       @id @default(autoincrement())
+    day_of_week DayOfWeek @unique
+    is_closed   Boolean   @default(false)
+    open_time   String? // HH:mm format, required when not closed
+    close_time  String? // HH:mm format, required when not closed
+}
+
+enum DayOfWeek {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+}
+
+enum LangCode {
     en
     pl
 }

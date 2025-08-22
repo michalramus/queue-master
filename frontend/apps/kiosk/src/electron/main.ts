@@ -18,19 +18,14 @@ async function onExecutePrintTicket(
         return;
     }
 
-    let printJob;
-    const callParameters = `'${JSON.stringify({
+    const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
+        queueLength: client.queue_length || "",
         template: printingTicketTemplate || "",
-    })}'`; //Added ' at the beginning and end of the string to avoid issues with spaces in the parameters
-    //TODO check if not remove '
+    })}`;
 
-    if (config.printingScriptAddPythonPrefix) {
-        printJob = spawnSync("python3", [config.printingScript, callParameters]);
-    } else {
-        printJob = spawnSync(config.printingScript, [callParameters]);
-    }
+    const printJob = spawnSync(config.printingScript, [callParameters]);
 
     if (process.env.NODE_ENV == "development") {
         if (printJob.stdout) {
@@ -45,6 +40,38 @@ async function onExecutePrintTicket(
     console.log(`Printing script ended with ${printJob.status}`);
 }
 
+async function onExecuteOpenKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
+    const openJob = spawnSync(config.opening_hours_open_script || "echo");
+
+    if (process.env.NODE_ENV == "development") {
+        if (openJob.stdout) {
+            console.log(openJob.stdout.toString());
+        }
+
+        if (openJob.stderr) {
+            console.error(openJob.stderr.toString());
+        }
+    }
+
+    console.log(`Opening hours script ended with ${openJob.status}`);
+}
+
+async function onExecuteCloseKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
+    const closeJob = spawnSync(config.opening_hours_close_script || "echo");
+
+    if (process.env.NODE_ENV == "development") {
+        if (closeJob.stdout) {
+            console.log(closeJob.stdout.toString());
+        }
+
+        if (closeJob.stderr) {
+            console.error(closeJob.stderr.toString());
+        }
+    }
+
+    console.log(`Closing hours script ended with ${closeJob.status}`);
+}
+
 async function handleInvokeAudioSynthesizer(
     _event: IpcMainInvokeEvent,
     client: ClientInterface,
@@ -54,17 +81,15 @@ async function handleInvokeAudioSynthesizer(
         console.log("No audio synthesizer script configured");
         return;
     }
-    let audioSynthesizer;
+
     const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
         seat: client.seat,
     })}`;
-    if (config.audioSynthesizerScriptAddPythonPrefix) {
-        audioSynthesizer = spawnSync("python3", [config.audioSynthesizerScript, callParameters]);
-    } else {
-        audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);
-    }
+
+    const audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);
+
     if (process.env.NODE_ENV == "development") {
         if (audioSynthesizer.stdout) {
             console.log(audioSynthesizer.stdout.toString());
@@ -102,19 +127,22 @@ async function handleGetAppConfig(): Promise<AppConfigInterface> {
 
 // -----------------------------------
 function createWindow() {
+    const isDevelopment = process.env.NODE_ENV == "development";
     const mainWindow = new BrowserWindow({
+        autoHideMenuBar: true,
         width: 800,
         height: 600,
+        fullscreen: !isDevelopment, // Enable fullscreen in production
         webPreferences: {
             preload: path.join(
                 app.getAppPath(),
-                process.env.NODE_ENV == "development" ? "." : "..",
+                isDevelopment ? "." : "..",
                 "/dist-electron/preload.cjs",
             ),
         },
     });
 
-    if (process.env.NODE_ENV == "development") {
+    if (isDevelopment) {
         mainWindow.loadURL("http://localhost:5123");
     } else {
         mainWindow.loadFile(path.join(app.getAppPath() + "/dist-react/index.html"));
@@ -139,6 +167,8 @@ app.on("ready", async () => {
     await fetchConfig();
 
     ipcMain.on("executePrintTicket", onExecutePrintTicket);
+    ipcMain.on("executeOpenKioskScript", onExecuteOpenKioskScript);
+    ipcMain.on("executeCloseKioskScript", onExecuteCloseKioskScript);
 
     ipcMain.handle("invokeAudioSynthesizer", handleInvokeAudioSynthesizer);
 

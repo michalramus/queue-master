@@ -1,43 +1,73 @@
-import { Controller, Post, UseGuards, Request, Body, ValidationPipe, Res, Get } from "@nestjs/common";
+import { Controller, Post, UseGuards, Request, Body, Res, Get } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { JwtRefreshTokenAuthGuard } from "./guards/jwt-refreshToken-auth.guard";
-import { LoginUserDto } from "./dto/login-user.dto";
+import { AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
 import { Entity } from "./types/entity.class";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./roles.decorator";
 import { Response } from "express";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBody,
+    // ApiBearerAuth,
+    ApiUnauthorizedResponse,
+    ApiForbiddenResponse,
+} from "@nestjs/swagger";
+import { MessageResponseDto } from "src/dto/messageResponse.dto";
 
+@ApiTags("auth")
 @Controller("auth")
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @Post("register-device")
-    @Roles(["Admin", "User"])
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    async registerDevice(@Request() req) {
-        return this.authService.registerDevice(Entity.convertFromReq(req));
-    }
-
     @Post("login")
+    @ApiOperation({
+        summary: "User login - Get your access token here",
+        description: `
+Token is automatically saved in cookies, so you don't have to do anything more.
+        `,
+    })
+    @ApiBody({
+        type: AuthLoginUserDto,
+    })
+    @ApiResponse({
+        status: 201,
+        description: "Login successful - Use the accessToken for authorization", //TODO: return access token
+        type: MessageResponseDto,
+    })
+    @ApiUnauthorizedResponse({
+        description: "Invalid credentials - Check your username and password",
+    })
     async login(
-        @Body(ValidationPipe) loginUserDto: LoginUserDto,
+        @Body() loginUserDto: AuthLoginUserDto,
         @Request() req,
         @Res({ passthrough: true }) res: Response,
-    ) {
+    ): Promise<MessageResponseDto> {
         return this.authService.login(loginUserDto, req.ip, res);
     }
 
     @Post("refresh")
     @Roles(["Admin", "User"])
     @UseGuards(JwtRefreshTokenAuthGuard, RolesGuard)
-    async refresh(@Request() req, @Res({ passthrough: true }) res: Response) {
+    @ApiOperation({ summary: "Refresh access token" })
+    @ApiResponse({ status: 200, description: "Token refreshed", type: MessageResponseDto })
+    @ApiUnauthorizedResponse({ description: "Invalid refresh token" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
+    async refresh(@Request() req, @Res({ passthrough: true }) res: Response): Promise<MessageResponseDto> {
         return this.authService.refresh(Entity.convertFromReq(req), req.ip, res);
     }
 
     @Post("logout")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    async logout(@Request() req, @Res({ passthrough: true }) res: Response) {
+    @ApiOperation({ summary: "User logout" })
+    @ApiResponse({ status: 200, description: "Logout successful", type: MessageResponseDto })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    // @ApiBearerAuth("JWT-auth")
+    async logout(@Request() req, @Res({ passthrough: true }) res: Response): Promise<MessageResponseDto> {
         return this.authService.logout(Entity.convertFromReq(req), res);
     }
 
@@ -48,7 +78,16 @@ export class AuthController {
     @Get("get-info")
     @Roles(["Device", "User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    async getInfo(@Request() req) {
+    @ApiOperation({ summary: "Get authenticated user/device information" })
+    @ApiResponse({
+        status: 200,
+        description: "User/device information retrieved",
+        type: AuthInfoResponseDto,
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    // @ApiBearerAuth("JWT-auth")
+    async getInfo(@Request() req): Promise<AuthInfoResponseDto> {
         return this.authService.getInfo(Entity.convertFromReq(req));
     }
 }

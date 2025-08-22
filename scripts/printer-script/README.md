@@ -1,10 +1,9 @@
 # Example scripts that can be used to print the tickets
 
-Example script call: ```python3 <print_tickets.py> '{"categoryShortName": string, "number": number, template: string}'```
+Example script call: ```cups-printer-script.py '{"categoryShortName": string, "number": number, queueLength: string,  template: string}'```
 
 ```template``` is fetched from the server and it could be used to print the ticket.
-
-```printingScriptAddPythonPrefix``` - if false then ```python3``` prefix will be skipped and it will be possible to call binary programs instead of using python. Can be set in kiosk app config
+```queueLength```Count of tickets waiting with the same category as created ticket
 
 ## cups-printer-script.py
 
@@ -22,6 +21,9 @@ These variables will be replaced with the actual values from the json. Check exa
 
 - ```&categoryShortName``` - categoryShortName from json
 - ```&number``` - number from json
+- ```&queueLength``` - count of tickets waiting with the same category as created ticket
+- ```&date``` - current date in format YYYY-MM-DD
+- ```&time``` - current time in format HH:MM:SS
 
 ### Useful cups commands
 

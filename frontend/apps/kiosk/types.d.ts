@@ -4,17 +4,22 @@ interface AppConfigInterface {
     mode: "kiosk" | "tv";
 
     printingScript?: string; //Path to printing script
-    printingScriptAddPythonPrefix?: boolean; //if true call script like this: python3 <printingScript>         Do not use spaces
-    printingScriptDelay?: number; //Show printing screen for this amount of time in ms
+    printingDialogueShowTime?: number; //Block screen and show printing info for this amount of time in ms
 
     audioSynthesizerScript?: string;
-    audioSynthesizerScriptAddPythonPrefix?: boolean; //if true call script like this: python3 <printingScript>         Do not use spaces
 
     configError?: boolean; //If true, config is invalid
+
+    opening_hours_enable_banner: boolean;
+    opening_hours_enable_scripts: boolean;
+    opening_hours_open_script?: string;
+    opening_hours_close_script?: string;
 }
 
 interface ElectronAPIInterface {
     executePrintTicket: (client: ClientInterface, printingTicketTemplate: string) => Promise<void>;
+    executeOpenKioskScript: () => Promise<void>;
+    executeCloseKioskScript: () => Promise<void>;
 
     invokeAudioSynthesizer: (client: ClientInterface) => Promise<void>;
 

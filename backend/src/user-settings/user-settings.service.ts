@@ -23,8 +23,9 @@ export class UserSettingsService {
      * @returns
      */
     async findUserSettings(id: number): Promise<string> {
-        //find all settings in database and complete with default values
-        if (this.usersService.findOneById(id) === null) {
+        //check if user exists
+        if ((await this.usersService.findOneById(id)) === null) {
+            this.logger.warn(`User with id ${id} not found. Cannot update settings.`);
             throw new HttpException(`User with id ${id} not found`, 404);
         }
 
@@ -65,14 +66,14 @@ export class UserSettingsService {
         settings: { [key: string]: string | number },
         entity: Entity,
     ): Promise<string> {
-        this.logger.log(
-            `[${entity.name} id:${entity.id}] Updating settings: ${JSON.stringify(settings)} for user ${id}`,
-        );
-
-        if (this.usersService.findOneById(id) === null) {
+        if ((await this.usersService.findOneById(id)) === null) {
             this.logger.warn(`User with id ${id} not found. Cannot update settings.`);
             throw new HttpException(`User with id ${id} not found`, 404);
         }
+
+        this.logger.log(
+            `[${entity.name} id:${entity.id}] Updating settings: ${JSON.stringify(settings)} for user ${id}`,
+        );
 
         //find setting in globalSettings, convert to string and save to database
         for (const [key, setting] of Object.entries(settings)) {

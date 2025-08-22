@@ -1,24 +1,31 @@
+#!/usr/bin/python3
+
 import os
 import pymupdf
 import sys
 import json
 import cups
+import datetime
 from tempfile import gettempdir
+import time
 
-printerName = "printerName" #Printer name provided by cups - check ReadMe 
+printerName = "printerName"  # Printer name provided by cups - check ReadMe
 printerOptions = {
     # 'media': 'A4'
 }
 
 # Define custom paper size that pdf will be generated with
-customWidth = 210  # in mm
-customHeight = 297  # in mm
+customWidth = 58  # in mm
+customHeight = 70  # in mm
 
-pdfMargins = (36, 36, -36, -36)  # Margins (left, top, right, bottom)
+pdfMargins = (0, -13, 0, 0)  # Margins (left, top, right, bottom)
 
-ticketPDFPath = os.path.join(gettempdir(), "ticket.pdf") #Use temp directory, because file is not cleaned up after printing
+ticketPDFPath = os.path.join(
+    gettempdir(), "ticket.pdf"
+)  # Use temp directory, because file is not cleaned up after printing
 
-disablePrint = True # useful for debugging
+disablePrint = False  # useful for debugging
+
 
 def generatePDF(HTML: str):
     story = pymupdf.Story(html=HTML)
@@ -42,6 +49,7 @@ def generatePDF(HTML: str):
         writer.end_page()  # finish page
     writer.close()  # close the writer
 
+
 def printPDF():
     conn = cups.Connection()
 
@@ -52,22 +60,25 @@ def printPDF():
 def main():
 
     inputs = json.loads(sys.argv[1])
-    
-    
+
     HTML = (
         inputs["template"]
         .replace("&categoryShortName", str(inputs["categoryShortName"]))
         .replace("&number", str(inputs["number"]))
+        .replace("&date", str(datetime.datetime.now().strftime("%Y-%m-%d")))
+        .replace("&time", str(datetime.datetime.now().strftime("%H:%M:%S")))
+        .replace("&queueLength", str(inputs["queueLength"]))
     )
 
     generatePDF(HTML)
 
     if not disablePrint:
         printPDF()
+
+        time.sleep(5) #Wait to ensure the print job is processed
+        os.remove(ticketPDFPath)
     else:
         print("PDF path: ", ticketPDFPath)
-
-
 
 
 if __name__ == "__main__":

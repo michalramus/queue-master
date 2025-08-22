@@ -13,6 +13,7 @@ import { SettingsModule } from "./settings/settings.module";
 import { UserSettingsModule } from "./user-settings/user-settings.module";
 import { MultilingualTextModule } from "./multilingual-text/multilingual-text.module";
 import { FileModule } from "./file/file.module";
+import { OpeningHoursModule } from "./opening-hours/opening-hours.module";
 
 @Module({
     imports: [
@@ -38,6 +39,7 @@ import { FileModule } from "./file/file.module";
         UserSettingsModule,
         MultilingualTextModule,
         FileModule,
+        OpeningHoursModule,
     ],
     controllers: [AppController],
     providers: [AppService],

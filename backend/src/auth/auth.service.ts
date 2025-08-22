@@ -2,13 +2,13 @@ import { ForbiddenException, Injectable, Logger, UnauthorizedException } from "@
 import { UsersService } from "../users/users.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import { DevicesService } from "../devices/devices.service";
-import { LoginUserDto } from "./dto/login-user.dto";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
 import { DatabaseService } from "src/database/database.service";
+import { AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
+import { DevicesService } from "src/devices/devices.service";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const ms = require("ms"); //import syntax not working properly with this package
+const ms = require("ms"); //'import' syntax not working properly with this package. Using 'require' instead
 
 @Injectable()
 export class AuthService {
@@ -24,26 +24,7 @@ export class AuthService {
     readonly accessTokenExpirationTime = "1d";
     readonly refreshTokenExpirationTime = "90d";
 
-    /**
-     * Refresh token of device never expires
-     * @param headers
-     * @returns
-     */
-    async registerDevice(entity: Entity) {
-        const device = await this.devicesService.create();
-
-        this.logger.log(`[${entity.name}] Registered new device ${JSON.stringify(device)}`);
-        const payload = new Entity(device.id, "Device", `Device ${device.id}`).getJwtPayload();
-
-        //Refresh token never expires
-        const jwtToken = await this.jwtService.signAsync(payload, {
-            secret: process.env.JWT_SECRET_KEY,
-        });
-
-        return { message: "Device registered successfully ", jwt_token: jwtToken };
-    }
-
-    async login(loginUserDto: LoginUserDto, ip: string, response: Response) {
+    async login(loginUserDto: AuthLoginUserDto, ip: string, response: Response) {
         const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
 
         if (!user) {
@@ -78,7 +59,7 @@ export class AuthService {
             { sameSite: "lax" },
         );
 
-        return "Successful login";
+        return { message: "Successful login" }; //TODO return token
     }
 
     async refresh(entity: Entity, ip: string, response: Response) {
@@ -115,7 +96,7 @@ export class AuthService {
             { sameSite: "lax" },
         );
 
-        return "Successful token refresh";
+        return { message: "Successful token refresh" };
     }
 
     async logout(entity: Entity, response: Response) {
@@ -124,16 +105,16 @@ export class AuthService {
         response.clearCookie("jwt_expiration_date", { sameSite: "lax" });
         response.clearCookie("jwt_refresh_expiration_date", { sameSite: "lax" });
 
-        return "Logged out successfully";
+        return { message: "Logged out successfully" };
     }
 
     async getInfo(entity: Entity) {
         if (entity.type == "Device") {
-            const device = await this.databaseService.device.findUnique({ where: { id: entity.id } });
-            return { id: device.id, role: "Device" };
+            const device = await this.devicesService.findOne(entity.id);
+            return { id: device.id, role: "Device" } as AuthInfoResponseDto;
         } else if (entity.type == "User") {
-            const user = await this.databaseService.user.findUnique({ where: { id: entity.id } });
-            return { id: user.id, username: user.username, role: user.role };
+            const user = await this.usersService.findOneById(entity.id);
+            return { id: user.id, username: user.username, role: user.role } as AuthInfoResponseDto;
         }
 
         return;
