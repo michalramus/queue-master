@@ -23,28 +23,21 @@ export class OpeningHoursController {
     @Get()
     @Roles(["Device", "User", "Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @ApiOperation({ summary: "Get all opening hours with current status" })
+    @ApiOperation({ summary: "Get all opening hours" })
     @ApiResponse({
         status: 200,
-        description: "Returns all opening hours ordered by day of week and current opening status",
+        description: "Returns all opening hours ordered by day of week",
         schema: {
-            type: "object",
-            properties: {
-                isOpen: { type: "boolean" },
-                openingHours: { type: "array", items: { $ref: "#/components/schemas/OpeningHoursDto" } },
-            },
+            type: "array",
+            items: { $ref: "#/components/schemas/OpeningHoursDto" },
         },
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
-    async findAll(): Promise<{ isOpen: boolean; openingHours: Opening_Hours[] }> {
-        const isOpen = await this.openingHoursService.isCurrentlyOpen();
+    async findAll(): Promise<Opening_Hours[]> {
         const openingHours = await this.openingHoursService.findAll();
 
-        return {
-            isOpen,
-            openingHours,
-        };
+        return openingHours;
     }
 
     @Post()

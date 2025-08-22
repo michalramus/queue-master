@@ -14,9 +14,9 @@ export default function CategoriesForm({ categories }: { categories: CategoryInt
             <p className="text-text-2 mb-5 text-4xl">
                 {(() => {
                     if (categories.length > 1) {
-                        return t("get_a_ticket");
-                    } else if (categories.length === 1) {
                         return t("choose_category");
+                    } else if (categories.length === 1) {
+                        return t("get_a_ticket");
                     } else {
                         return t("category_list_is_empty");
                     }

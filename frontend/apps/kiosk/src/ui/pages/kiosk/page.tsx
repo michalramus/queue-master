@@ -7,6 +7,11 @@ import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { useQuery } from "@tanstack/react-query";
 import useAppConfig from "@/utils/providers/AppConfigProvider";
 
+import { getOpeningHours, OpeningHoursDto } from "shared-utils";
+import OpeningHoursWidget from "@/components/OpeningHoursWidget";
+import { useEffect, useState } from "react";
+import { isKioskOpen } from "@/utils/isKioskOpen";
+
 export default function KioskPage() {
     const appConfig = useAppConfig();
 
@@ -25,15 +30,44 @@ export default function KioskPage() {
         select: (data) => data?.sort((a, b) => a.short_name.localeCompare(b.short_name)),
     });
 
-    if (logoAvailabilitiesLoading || categoriesLoading) {
+    const {
+        data: openingHours,
+        isLoading: openingHoursLoading,
+        isError: openingHoursError,
+    } = useQuery<OpeningHoursDto[]>({
+        queryKey: ["KioskPage_openingHours"],
+        queryFn: () => getOpeningHours(axiosAuthInstance),
+    });
+
+    // Make kioskOpen reactive to time
+    const [kioskOpen, setKioskOpen] = useState(() => isKioskOpen(openingHours || []));
+    useEffect(() => {
+        setKioskOpen(isKioskOpen(openingHours || []));
+        // Calculate ms until next full minute
+        const now = new Date();
+        const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+        let interval: ReturnType<typeof setInterval>;
+        const timeout = setTimeout(() => {
+            setKioskOpen(isKioskOpen(openingHours || []));
+            interval = setInterval(() => {
+                setKioskOpen(isKioskOpen(openingHours || []));
+            }, 60000);
+        }, msToNextMinute);
+        return () => {
+            clearTimeout(timeout);
+            if (interval) clearInterval(interval);
+        };
+    }, [openingHours]);
+
+    if (logoAvailabilitiesLoading || categoriesLoading || openingHoursLoading) {
         return <div>Loading...</div>;
     }
 
-    if (categoriesError) {
+    if (categoriesError || openingHoursError) {
         return (
             <div>
-                Error when fetching categories. Check again jwt token. Check console for more
-                details.
+                Error when fetching categories or opening hours. Check again jwt token. Check
+                console for more details.
             </div>
         );
     }
@@ -64,7 +98,11 @@ export default function KioskPage() {
 
             {!logoAvailabilities!.includes(LogoID.logo_kiosk_main) && <Header />}
 
-            <CategoriesForm categories={categories!} />
+            {kioskOpen ? (
+                <CategoriesForm categories={categories!} />
+            ) : (
+                <OpeningHoursWidget openingHours={openingHours!} className="mt-10" />
+            )}
 
             <div className="fixed right-0 bottom-0 m-7">
                 <SmallHeader />

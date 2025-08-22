@@ -64,7 +64,9 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
             </Modal>
             <Button
                 onClick={() => {
-                    mutation.mutate({ categoryId: category.id });
+                    if (category.id !== undefined) {
+                        mutation.mutate({ categoryId: category.id });
+                    }
                 }}
                 className="border-primary-1 relative! m-3! flex! w-9/12! items-center! justify-center! rounded-3xl! border-2! p-6! text-3xl!"
                 color="secondary"
@@ -75,7 +77,9 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
                         {category.short_name}
                     </span>
                 </div>
-                <span className="text-center">{category.name[locale] || category.short_name}</span>
+                <span className="text-center">
+                    {category.name[locale as keyof typeof category.name] || category.short_name}
+                </span>
             </Button>
         </>
     );
