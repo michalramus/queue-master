@@ -1,6 +1,21 @@
-import { OpeningHoursDto } from "shared-utils";
+import { GlobalSettingsInterface, OpeningHoursDto } from "shared-utils";
 
-export function isKioskOpen(openingHours: OpeningHoursDto[]): boolean {
+export function isKioskOpen(
+    openingHours: OpeningHoursDto[],
+    globalSettings: GlobalSettingsInterface,
+): boolean {
+    if (globalSettings.enable_opening_hours == false) {
+        return true;
+    }
+
+    if (globalSettings.opening_hours_override === "override_to_open") {
+        return true;
+    }
+
+    if (globalSettings.opening_hours_override === "override_to_close") {
+        return false;
+    }
+
     if (!openingHours) return true;
     const now = new Date();
     const dayOfWeek = now.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase();

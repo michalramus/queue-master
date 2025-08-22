@@ -11,9 +11,11 @@ import { getOpeningHours, OpeningHoursDto } from "shared-utils";
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
 import { useEffect, useState } from "react";
 import { isKioskOpen } from "@/utils/isKioskOpen";
+import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 
 export default function KioskPage() {
     const appConfig = useAppConfig();
+    const globalSettings = useGlobalSettings();
 
     const { data: logoAvailabilities, isLoading: logoAvailabilitiesLoading } = useQuery({
         queryKey: ["KioskPage_logoAvailabilities"],
@@ -40,24 +42,26 @@ export default function KioskPage() {
     });
 
     // Make kioskOpen reactive to time
-    const [kioskOpen, setKioskOpen] = useState(() => isKioskOpen(openingHours || []));
+    const [kioskOpen, setKioskOpen] = useState(() =>
+        isKioskOpen(openingHours || [], globalSettings),
+    );
     useEffect(() => {
-        setKioskOpen(isKioskOpen(openingHours || []));
+        setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
         // Calculate ms until next full minute
         const now = new Date();
         const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
         let interval: ReturnType<typeof setInterval>;
         const timeout = setTimeout(() => {
-            setKioskOpen(isKioskOpen(openingHours || []));
+            setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
             interval = setInterval(() => {
-                setKioskOpen(isKioskOpen(openingHours || []));
+                setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
             }, 60000);
         }, msToNextMinute);
         return () => {
             clearTimeout(timeout);
             if (interval) clearInterval(interval);
         };
-    }, [openingHours]);
+    }, [openingHours, globalSettings]);
 
     if (logoAvailabilitiesLoading || categoriesLoading || openingHoursLoading) {
         return <div>Loading...</div>;
