@@ -3,10 +3,20 @@ import CurrentNumberWidget from "./CurrentNumberWidget";
 import { io } from "socket.io-client";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import { SmallHeader, Card } from "shared-components";
-import { ClientInterface, wsEvents, getLogoAvailability, LogoID } from "shared-utils";
+import {
+    ClientInterface,
+    wsEvents,
+    getLogoAvailability,
+    LogoID,
+    getOpeningHours,
+} from "shared-utils";
 import useAppConfig from "@/utils/providers/AppConfigProvider";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { useQuery } from "@tanstack/react-query";
+
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
+import OpeningHoursWidget from "@/components/OpeningHoursWidget";
+import { isKioskOpen } from "@/utils/isKioskOpen";
 
 export default function TVPage() {
     const appConfig = useAppConfig();
@@ -26,6 +36,20 @@ export default function TVPage() {
         queryKey: ["TVPage_logoAvailabilities"],
         queryFn: () => getLogoAvailability(axiosPureInstance),
     });
+
+    const { data: openingHours } = useQuery({
+        queryKey: ["TVPage_OpeningHours"],
+        queryFn: () => getOpeningHours(axiosAuthInstance),
+    });
+
+    // Defensive: unwrap if API returns { opening_hours: [...] }
+    const openingHoursArray = Array.isArray(openingHours)
+        ? openingHours
+        : openingHours && Array.isArray((openingHours as any).opening_hours)
+          ? (openingHours as any).opening_hours
+          : [];
+
+    const isOpen = isKioskOpen(openingHoursArray);
 
     //Socket.io
     useEffect(() => {
@@ -109,16 +133,27 @@ export default function TVPage() {
                 <SmallHeader />
             </div>
             <div className="flex h-screen flex-row flex-nowrap px-24 pt-20 pb-28">
-                <ClientNumbersHistory clientNumbers={previousClients} />
-
-                <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
-                    <CurrentNumberWidget
-                        category_short_name={currentClient?.category?.short_name ?? ""}
-                        number={currentClient?.number ?? ""}
-                        seat={currentClient?.seat ?? ""}
-                        className="w-full"
-                    />
-                </Card>
+                {isOpen ? (
+                    <>
+                        <ClientNumbersHistory clientNumbers={previousClients} />
+                        <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
+                            <CurrentNumberWidget
+                                category_short_name={currentClient?.category?.short_name ?? ""}
+                                number={currentClient?.number ?? ""}
+                                seat={currentClient?.seat ?? ""}
+                                className="w-full"
+                            />
+                        </Card>
+                    </>
+                ) : (
+                    <div className="flex w-full items-center justify-center">
+                        <OpeningHoursWidget
+                            openingHours={openingHoursArray}
+                            className="w-full max-w-3xl"
+                            large={true}
+                        />
+                    </div>
+                )}
             </div>
         </main>
     );
