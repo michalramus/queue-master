@@ -17,9 +17,12 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
 import { isKioskOpen } from "@/utils/isKioskOpen";
+import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 
 export default function TVPage() {
     const appConfig = useAppConfig();
+    const globalSettings = useGlobalSettings();
+
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
     const currentClientRef = useRef<ClientInterface | null>(null);
 
@@ -42,14 +45,27 @@ export default function TVPage() {
         queryFn: () => getOpeningHours(axiosAuthInstance),
     });
 
-    // Defensive: unwrap if API returns { opening_hours: [...] }
-    const openingHoursArray = Array.isArray(openingHours)
-        ? openingHours
-        : openingHours && Array.isArray((openingHours as any).opening_hours)
-          ? (openingHours as any).opening_hours
-          : [];
-
-    const isOpen = isKioskOpen(openingHoursArray);
+    // Make kioskOpen reactive to time
+    const [kioskOpen, setKioskOpen] = useState(() =>
+        isKioskOpen(openingHours || [], globalSettings),
+    );
+    useEffect(() => {
+        setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
+        // Calculate ms until next full minute
+        const now = new Date();
+        const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+        let interval: ReturnType<typeof setInterval>;
+        const timeout = setTimeout(() => {
+            setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
+            interval = setInterval(() => {
+                setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
+            }, 60000);
+        }, msToNextMinute);
+        return () => {
+            clearTimeout(timeout);
+            if (interval) clearInterval(interval);
+        };
+    }, [openingHours, globalSettings]);
 
     //Socket.io
     useEffect(() => {
@@ -133,7 +149,7 @@ export default function TVPage() {
                 <SmallHeader />
             </div>
             <div className="flex h-screen flex-row flex-nowrap px-24 pt-20 pb-28">
-                {isOpen ? (
+                {kioskOpen ? (
                     <>
                         <ClientNumbersHistory clientNumbers={previousClients} />
                         <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
@@ -148,7 +164,7 @@ export default function TVPage() {
                 ) : (
                     <div className="flex w-full items-center justify-center">
                         <OpeningHoursWidget
-                            openingHours={openingHoursArray}
+                            openingHours={openingHours || []}
                             className="w-full max-w-3xl"
                             large={true}
                         />

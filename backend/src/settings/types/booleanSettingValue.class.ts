@@ -23,11 +23,7 @@ export class BooleanSettingValue extends CustomSettingValue {
         return new BooleanSettingValue(value === "true");
     }
 
-    toString(): string {
-        return this.defaultValue.toString();
-    }
-
-    toJSON(): string {
-        return this.defaultValue.toString();
+    toJSON(): any {
+        return this.defaultValue;
     }
 }
