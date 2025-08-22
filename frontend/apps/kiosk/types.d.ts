@@ -9,10 +9,17 @@ interface AppConfigInterface {
     audioSynthesizerScript?: string;
 
     configError?: boolean; //If true, config is invalid
+
+    opening_hours_enable_banner: boolean;
+    opening_hours_enable_scripts: boolean;
+    opening_hours_open_script?: string;
+    opening_hours_close_script?: string;
 }
 
 interface ElectronAPIInterface {
     executePrintTicket: (client: ClientInterface, printingTicketTemplate: string) => Promise<void>;
+    executeOpenKioskScript: () => Promise<void>;
+    executeCloseKioskScript: () => Promise<void>;
 
     invokeAudioSynthesizer: (client: ClientInterface) => Promise<void>;
 

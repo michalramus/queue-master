@@ -104,13 +104,16 @@ export class UsersController {
     @Delete(":id")
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @ApiOperation({ summary: "Delete a user" })
+    @ApiOperation({
+        summary: "Delete a user",
+    })
     @ApiParam({ name: "id", description: "User ID", type: "number" })
     @ApiResponse({
         status: 200,
         description: "User deleted",
         type: UserResponseDto,
     })
+    @ApiConflictResponse({ description: "Cannot delete the only admin." })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     @ApiNotFoundResponse({ description: "User not found" })

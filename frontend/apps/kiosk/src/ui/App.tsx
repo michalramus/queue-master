@@ -5,11 +5,13 @@ import { GlobalSettingsProvider } from "./utils/providers/GlobalSettingsProvider
 
 import TVPage from "@/pages/tv/page";
 
-import { getGlobalSettings } from "shared-utils";
+import { getGlobalSettings, getOpeningHours, OpeningHoursDto } from "shared-utils";
 import { useQuery } from "@tanstack/react-query";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import i18n from "./i18n";
+import { isKioskOpen } from "./utils/isKioskOpen";
+import { axiosAuthInstance } from "./utils/axiosInstances/axiosAuthInstance";
 
 export default function App() {
     const { data: globalSettings, isError: globalSettingsError } = useQuery({
@@ -22,6 +24,55 @@ export default function App() {
         queryKey: ["App_appConfig"],
         queryFn: () => window.electronAPI.getAppConfig(),
     });
+
+    //TODO add error handling for opening hours
+    const {
+        data: openingHours,
+        // isLoading: openingHoursLoading,
+        // isError: openingHoursError,
+    } = useQuery<OpeningHoursDto[]>({
+        queryKey: ["KioskPage_openingHours"],
+        queryFn: () => getOpeningHours(axiosAuthInstance),
+    });
+
+    const [kioskOpen, setKioskOpen] = useState(() => true);
+
+    const executeOpeningHoursScripts = useRef<(isOpen: boolean) => void>((isOpen: boolean) => {
+        if (isOpen) {
+            window.electronAPI.executeOpenKioskScript();
+        } else {
+            window.electronAPI.executeCloseKioskScript();
+        }
+    });
+
+    // Make kioskOpen reactive to time
+    useEffect(() => {
+        setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
+        executeOpeningHoursScripts.current(kioskOpen);
+
+        // Calculate ms until next full minute
+        const now = new Date();
+        const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+        let interval: ReturnType<typeof setInterval>;
+        const timeout = setTimeout(() => {
+            const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
+            if (newKioskOpen !== kioskOpen) {
+                executeOpeningHoursScripts.current(newKioskOpen);
+                setKioskOpen(newKioskOpen);
+            }
+            interval = setInterval(() => {
+                const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
+                if (newKioskOpen !== kioskOpen) {
+                    executeOpeningHoursScripts.current(newKioskOpen);
+                    setKioskOpen(newKioskOpen);
+                }
+            }, 60000);
+        }, msToNextMinute);
+        return () => {
+            clearTimeout(timeout);
+            if (interval) clearInterval(interval);
+        };
+    }, [openingHours, globalSettings, kioskOpen]);
 
     useEffect(() => {
         if (globalSettings?.locale) {
@@ -71,8 +122,12 @@ export default function App() {
             <AppConfigProvider appConfig={appConfig}>
                 <RefreshOnWsEvents />
                 <GlobalSettingsProvider globalSettings={globalSettings}>
-                    {appConfig.mode === "tv" && <TVPage />}
-                    {appConfig.mode === "kiosk" && <KioskPage />}
+                    {appConfig.mode === "tv" && (
+                        <TVPage kioskOpen={kioskOpen} openingHours={openingHours || []} />
+                    )}
+                    {appConfig.mode === "kiosk" && (
+                        <KioskPage kioskOpen={kioskOpen} openingHours={openingHours || []} />
+                    )}
                 </GlobalSettingsProvider>
             </AppConfigProvider>
         </>

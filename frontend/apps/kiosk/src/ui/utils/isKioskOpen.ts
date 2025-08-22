@@ -2,8 +2,10 @@ import { GlobalSettingsInterface, OpeningHoursDto } from "shared-utils";
 
 export function isKioskOpen(
     openingHours: OpeningHoursDto[],
-    globalSettings: GlobalSettingsInterface,
+    globalSettings: GlobalSettingsInterface | undefined,
 ): boolean {
+    if (!globalSettings) return true;
+
     if (globalSettings.enable_opening_hours == false) {
         return true;
     }
