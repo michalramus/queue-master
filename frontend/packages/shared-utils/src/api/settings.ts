@@ -26,6 +26,9 @@ export interface GlobalSettingsInterface {
     kiosk_markdown: string;
 
     printing_ticket_template: string;
+
+    enable_opening_hours: boolean;
+    opening_hours_override: "override_to_open" | "override_to_close" | "off";
 }
 
 const apiPathGlobalSettings = "/settings/global";
