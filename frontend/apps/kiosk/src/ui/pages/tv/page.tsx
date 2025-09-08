@@ -104,45 +104,49 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
 
     return (
         <main>
-            <div className="fixed right-0 bottom-0 mr-7 mb-7 flex w-6/12 items-center justify-end gap-8">
-                {logoAvailabilities?.includes(LogoID.logo_tv_secondary) && (
-                    <img
-                        src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_secondary}`}
-                        alt="TV Secondary Logo"
-                        className="max-h-20 w-auto object-contain"
-                    />
-                )}
-                {logoAvailabilities?.includes(LogoID.logo_tv_main) && (
-                    <img
-                        src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_main}`}
-                        alt="TV Main Logo"
-                        className="max-h-20 w-auto object-contain"
-                    />
-                )}
+            <div className="fixed right-0 bottom-0 m-7">
                 <SmallHeader />
             </div>
-            <div className="flex h-screen flex-row flex-nowrap px-24 pt-20 pb-28">
-                {kioskOpen || !appConfig.opening_hours_enable_banner ? (
-                    <>
-                        <ClientNumbersHistory clientNumbers={previousClients} />
-                        <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
-                            <CurrentNumberWidget
-                                category_short_name={currentClient?.category?.short_name ?? ""}
-                                number={currentClient?.number ?? ""}
-                                seat={currentClient?.seat ?? ""}
-                                className="w-full"
-                            />
-                        </Card>
-                    </>
-                ) : (
-                    <div className="flex w-full items-center justify-center">
-                        <OpeningHoursWidget
-                            openingHours={openingHours || []}
-                            className="w-full max-w-3xl"
-                            large={true}
+            <div className="h-screen">
+                <div className="flex w-3/12 items-center gap-8 px-10 pt-7">
+                    {logoAvailabilities?.includes(LogoID.logo_tv_secondary) && (
+                        <img
+                            src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_secondary}`}
+                            alt="TV Secondary Logo"
+                            className="max-h-16 w-auto object-contain"
                         />
-                    </div>
-                )}
+                    )}
+                    {logoAvailabilities?.includes(LogoID.logo_tv_main) && (
+                        <img
+                            src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_main}`}
+                            alt="TV Main Logo"
+                            className="max-h-16 w-auto object-contain"
+                        />
+                    )}
+                </div>
+                <div className="flex h-11/12 flex-row flex-nowrap px-24 pt-9 pb-28">
+                    {kioskOpen || !appConfig.opening_hours_enable_banner ? (
+                        <>
+                            <ClientNumbersHistory clientNumbers={previousClients} />
+                            <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
+                                <CurrentNumberWidget
+                                    category_short_name={currentClient?.category?.short_name ?? ""}
+                                    number={currentClient?.number ?? ""}
+                                    seat={currentClient?.seat ?? ""}
+                                    className="w-full"
+                                />
+                            </Card>
+                        </>
+                    ) : (
+                        <div className="flex w-full items-center justify-center">
+                            <OpeningHoursWidget
+                                openingHours={openingHours || []}
+                                className="w-full max-w-3xl"
+                                large={true}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
         </main>
     );
