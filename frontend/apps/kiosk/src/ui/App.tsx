@@ -8,7 +8,7 @@ import TVPage from "@/pages/tv/page";
 import { getGlobalSettings, getOpeningHours, OpeningHoursDto } from "shared-utils";
 import { useQuery } from "@tanstack/react-query";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import i18n from "./i18n";
 import { isKioskOpen } from "./utils/isKioskOpen";
 import { axiosAuthInstance } from "./utils/axiosInstances/axiosAuthInstance";
@@ -35,20 +35,26 @@ export default function App() {
         queryFn: () => getOpeningHours(axiosAuthInstance),
     });
 
-    const [kioskOpen, setKioskOpen] = useState(() => true);
+    const kioskOpen = useRef(true);
 
-    const executeOpeningHoursScripts = useRef<(isOpen: boolean) => void>((isOpen: boolean) => {
-        if (isOpen) {
-            window.electronAPI.executeOpenKioskScript();
-        } else {
-            window.electronAPI.executeCloseKioskScript();
-        }
-    });
+    const executeOpeningHoursScripts = useCallback(
+        (isOpen: boolean) => {
+            if (!appConfig?.opening_hours_enable_scripts) return;
+
+            if (isOpen) {
+                window.electronAPI.executeOpenKioskScript();
+            } else {
+                //TODO: check if not to wait 0,5s to execute scripts
+                window.electronAPI.executeCloseKioskScript();
+            }
+        },
+        [appConfig?.opening_hours_enable_scripts],
+    );
 
     // Make kioskOpen reactive to time
     useEffect(() => {
-        setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
-        executeOpeningHoursScripts.current(kioskOpen);
+        kioskOpen.current = isKioskOpen(openingHours || [], globalSettings);
+        executeOpeningHoursScripts(kioskOpen.current);
 
         // Calculate ms until next full minute
         const now = new Date();
@@ -56,15 +62,15 @@ export default function App() {
         let interval: ReturnType<typeof setInterval>;
         const timeout = setTimeout(() => {
             const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
-            if (newKioskOpen !== kioskOpen) {
-                executeOpeningHoursScripts.current(newKioskOpen);
-                setKioskOpen(newKioskOpen);
+            if (newKioskOpen !== kioskOpen.current) {
+                kioskOpen.current = newKioskOpen;
+                executeOpeningHoursScripts(newKioskOpen);
             }
             interval = setInterval(() => {
                 const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
-                if (newKioskOpen !== kioskOpen) {
-                    executeOpeningHoursScripts.current(newKioskOpen);
-                    setKioskOpen(newKioskOpen);
+                if (newKioskOpen !== kioskOpen.current) {
+                    kioskOpen.current = newKioskOpen;
+                    executeOpeningHoursScripts(newKioskOpen);
                 }
             }, 60000);
         }, msToNextMinute);
@@ -72,7 +78,7 @@ export default function App() {
             clearTimeout(timeout);
             if (interval) clearInterval(interval);
         };
-    }, [openingHours, globalSettings, kioskOpen]);
+    }, [openingHours, globalSettings, kioskOpen, executeOpeningHoursScripts]);
 
     useEffect(() => {
         if (globalSettings?.locale) {
@@ -123,10 +129,13 @@ export default function App() {
                 <RefreshOnWsEvents />
                 <GlobalSettingsProvider globalSettings={globalSettings}>
                     {appConfig.mode === "tv" && (
-                        <TVPage kioskOpen={kioskOpen} openingHours={openingHours || []} />
+                        <TVPage kioskOpen={kioskOpen.current} openingHours={openingHours || []} />
                     )}
                     {appConfig.mode === "kiosk" && (
-                        <KioskPage kioskOpen={kioskOpen} openingHours={openingHours || []} />
+                        <KioskPage
+                            kioskOpen={kioskOpen.current}
+                            openingHours={openingHours || []}
+                        />
                     )}
                 </GlobalSettingsProvider>
             </AppConfigProvider>
