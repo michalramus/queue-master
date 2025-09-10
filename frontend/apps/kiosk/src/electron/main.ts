@@ -5,8 +5,6 @@ import { ClientInterface } from "shared-utils";
 
 let config: AppConfigInterface;
 
-let lastOpeningHoursScriptExecuted: "closingScript" | "openingScript" | "none" = "none";
-
 //IPC --------------------------------
 
 async function onExecutePrintTicket(
@@ -43,12 +41,6 @@ async function onExecutePrintTicket(
 }
 
 async function onExecuteOpenKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
-    if (lastOpeningHoursScriptExecuted === "openingScript") {
-        return;
-    }
-    lastOpeningHoursScriptExecuted = "openingScript";
-    await new Promise((resolve) => setTimeout(resolve, 500)); //in case of executing open script right after close script
-
     const openJob = spawnSync(config.opening_hours_open_script || "echo");
 
     if (process.env.NODE_ENV == "development") {
@@ -65,12 +57,6 @@ async function onExecuteOpenKioskScript(_event: IpcMainInvokeEvent): Promise<voi
 }
 
 async function onExecuteCloseKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
-    if (lastOpeningHoursScriptExecuted === "closingScript") {
-        return;
-    }
-    lastOpeningHoursScriptExecuted = "closingScript";
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // in case of executing close script right after open script (different time than open script)
-
     const closeJob = spawnSync(config.opening_hours_close_script || "echo");
 
     if (process.env.NODE_ENV == "development") {
