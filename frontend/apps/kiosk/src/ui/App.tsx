@@ -36,7 +36,7 @@ export default function App() {
     });
 
     //TODO: Fix multi calls to scripts when app starts
-    const [kioskOpen, setKioskOpen] = useState<boolean | null>(null);
+    const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet");
 
     const executeOpeningHoursScripts = useCallback(
         (isOpen: boolean) => {
@@ -53,7 +53,7 @@ export default function App() {
 
     // Execute scripts on kioskOpen change
     useEffect(() => {
-        if (kioskOpen === null) return;
+        if (kioskOpen === "notSet") return;
         executeOpeningHoursScripts(kioskOpen);
     }, [kioskOpen, executeOpeningHoursScripts]);
 
@@ -139,11 +139,14 @@ export default function App() {
                 <RefreshOnWsEvents />
                 <GlobalSettingsProvider globalSettings={globalSettings}>
                     {appConfig.mode === "tv" && (
-                        <TVPage kioskOpen={kioskOpen || true} openingHours={openingHours || []} />
+                        <TVPage
+                            kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
+                            openingHours={openingHours || []}
+                        />
                     )}
                     {appConfig.mode === "kiosk" && (
                         <KioskPage
-                            kioskOpen={kioskOpen || true}
+                            kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
                             openingHours={openingHours || []}
                         />
                     )}
