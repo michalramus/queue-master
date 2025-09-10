@@ -103,23 +103,23 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
     }, [newClientsQueue, showNewClients]);
 
     return (
-        <main>
+        <main className="overflow-hidden">
             <div className="fixed right-0 bottom-0 m-7">
                 <SmallHeader />
             </div>
             <div className="h-screen">
-                <div className="flex w-3/12 items-center gap-8 px-10 pt-7">
-                    {logoAvailabilities?.includes(LogoID.logo_tv_secondary) && (
-                        <img
-                            src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_secondary}`}
-                            alt="TV Secondary Logo"
-                            className="max-h-16 w-auto object-contain"
-                        />
-                    )}
+                <div className="ml-7 flex max-h-16 max-w-md items-center gap-8 pt-7">
                     {logoAvailabilities?.includes(LogoID.logo_tv_main) && (
                         <img
                             src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_main}`}
                             alt="TV Main Logo"
+                            className="max-h-16 w-auto object-contain"
+                        />
+                    )}
+                    {logoAvailabilities?.includes(LogoID.logo_tv_secondary) && (
+                        <img
+                            src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_secondary}`}
+                            alt="TV Secondary Logo"
                             className="max-h-16 w-auto object-contain"
                         />
                     )}

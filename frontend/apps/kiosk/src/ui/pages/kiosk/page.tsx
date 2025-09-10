@@ -49,7 +49,7 @@ export default function KioskPage({
     return (
         <main className="flex min-h-screen flex-col items-center px-10">
             <div className="flex w-full items-center justify-between">
-                <div className="relative flex h-48 w-4/12 items-center justify-start pt-4">
+                <div className="relative flex h-48 w-md items-center justify-start pt-4">
                     {logoAvailabilities?.includes(LogoID.logo_kiosk_secondary) && (
                         <img
                             src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_kiosk_secondary}`}
@@ -61,11 +61,11 @@ export default function KioskPage({
                 <LanguageSwitcher />
             </div>
             {logoAvailabilities?.includes(LogoID.logo_kiosk_main) && (
-                <div className="relative mb-2 flex h-64 w-6/12 items-center justify-center">
+                <div className="relative mb-2 flex h-72 w-2xl items-center justify-center">
                     <img
                         src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_kiosk_main}`}
                         alt="External Logo"
-                        className="max-h-64"
+                        className="max-h-72"
                     />
                 </div>
             )}
