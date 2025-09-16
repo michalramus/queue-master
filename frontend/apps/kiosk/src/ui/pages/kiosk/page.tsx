@@ -72,7 +72,7 @@ export default function KioskPage({
 
             {!logoAvailabilities!.includes(LogoID.logo_kiosk_main) && <Header />}
 
-            {kioskOpen || !appConfig.opening_hours_enable_banner ? (
+            {kioskOpen || !appConfig.openingHoursEnableBanner ? (
                 <CategoriesForm categories={categories!} />
             ) : (
                 <OpeningHoursWidget openingHours={openingHours || []} className="mt-10" />

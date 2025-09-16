@@ -40,7 +40,7 @@ export default function App() {
 
     const executeOpeningHoursScripts = useCallback(
         (isOpen: boolean) => {
-            if (!appConfig?.opening_hours_enable_scripts) return;
+            if (!appConfig?.openingHoursEnableScripts) return;
 
             if (isOpen) {
                 window.electronAPI.executeOpenKioskScript();
@@ -48,7 +48,7 @@ export default function App() {
                 window.electronAPI.executeCloseKioskScript();
             }
         },
-        [appConfig?.opening_hours_enable_scripts],
+        [appConfig?.openingHoursEnableScripts],
     );
 
     // Execute scripts on kioskOpen change

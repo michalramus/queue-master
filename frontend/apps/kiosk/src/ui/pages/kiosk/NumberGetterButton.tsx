@@ -19,6 +19,7 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
     const [loadingPage, setLoadingPage] = useState(false);
     const [lastTicketString, setLastTicketString] = useState(""); //category.shortname+number
 
+    //TODO: Add loading when waiting for ticket
     // Create new client
     const mutation = useMutation({
         mutationFn: ({ categoryId }: { categoryId: number }) =>
@@ -39,7 +40,7 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
         },
     });
 
-    //TODO fix printing screen
+    //TODO fix printing screen - block button for 0,5s after clicked
     return (
         <>
             <Modal hidden={!loadingPage}>

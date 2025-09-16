@@ -125,7 +125,7 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
                     )}
                 </div>
                 <div className="flex h-11/12 flex-row flex-nowrap px-24 pt-9 pb-28">
-                    {kioskOpen || !appConfig.opening_hours_enable_banner ? (
+                    {kioskOpen || !appConfig.openingHoursEnableBanner ? (
                         <>
                             <ClientNumbersHistory clientNumbers={previousClients} />
                             <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
