@@ -2,6 +2,7 @@ interface AppConfigInterface {
     JWTToken: string;
     backendUrl: string;
     mode: "kiosk" | "tv";
+    zoomFactor?: number; //Zoom factor for the window
 
     printingScript?: string; //Path to printing script
     printingDialogueShowTime?: number; //Block screen and show printing info for this amount of time in ms

@@ -130,7 +130,7 @@ async function handleGetAppConfig(): Promise<AppConfigInterface> {
 }
 
 // -----------------------------------
-function createWindow() {
+function createWindow(zoomFactor: number = 1) {
     const isDevelopment = process.env.NODE_ENV == "development";
     const mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
@@ -145,6 +145,17 @@ function createWindow() {
             ),
         },
     });
+
+    if (zoomFactor && zoomFactor > 0) {
+        console.log("Setting zoom factor to", zoomFactor);
+        mainWindow.webContents.on("did-finish-load", () => {
+            mainWindow.webContents.setZoomFactor(zoomFactor || 1);
+        });
+    }
+
+    // Enable user zoom controls (Ctrl/Cmd + +/-/0)
+    // mainWindow.webContents.setVisualZoomLevelLimits(1, 3); // Allow zoom between 100% and 300%
+    // mainWindow.webContents.setZoomLevel(0); // Default zoom level
 
     if (isDevelopment) {
         mainWindow.loadURL("http://localhost:5123");
@@ -180,11 +191,11 @@ app.on("ready", async () => {
     ipcMain.handle("getTranslation", handleGetTranslation);
     ipcMain.handle("getAppConfig", handleGetAppConfig);
 
-    createWindow();
+    createWindow(config.zoomFactor);
 
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow();
+            createWindow(config.zoomFactor);
         }
     });
 });
