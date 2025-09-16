@@ -1,9 +1,39 @@
-import { spawnSync } from "child_process";
+import { spawnSync, spawn } from "child_process";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import path from "path";
 import { ClientInterface } from "shared-utils";
 
 let config: AppConfigInterface;
+
+/**
+ * Execute external script asynchronously
+ * @param scriptPath path to script
+ * @param scriptName only for logging purposes
+ * @param scriptArgs arguments to script
+ */
+async function executeScript(
+    scriptPath: string,
+    scriptName: string,
+    scriptArgs: string[] = [],
+): Promise<void> {
+    const scriptProcess = spawn(scriptPath, scriptArgs);
+
+    scriptProcess.stdout?.on("data", (data: Buffer) => {
+        if (process.env.NODE_ENV == "development" && data.length > 0) {
+            console.log(data.toString());
+        }
+    });
+
+    scriptProcess.stderr?.on("data", (data: Buffer) => {
+        if (data.length > 0) {
+            console.error(data.toString());
+        }
+    });
+
+    scriptProcess.on("close", (code: number) => {
+        console.log(`Script ${scriptName} ended with ${code}`);
+    });
+}
 
 //IPC --------------------------------
 
@@ -25,51 +55,25 @@ async function onExecutePrintTicket(
         template: printingTicketTemplate || "",
     })}`;
 
-    const printJob = spawnSync(config.printingScript, [callParameters]);
-
-    if (process.env.NODE_ENV == "development") {
-        if (printJob.stdout) {
-            console.log(printJob.stdout.toString());
-        }
-
-        if (printJob.stderr) {
-            console.error(printJob.stderr.toString());
-        }
-    }
-
-    console.log(`Printing script ended with ${printJob.status}`);
+    executeScript(config.printingScript, "printingScript", [callParameters]);
 }
 
 async function onExecuteOpenKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
-    const openJob = spawnSync(config.opening_hours_open_script || "echo");
-
-    if (process.env.NODE_ENV == "development") {
-        if (openJob.stdout) {
-            console.log(openJob.stdout.toString());
-        }
-
-        if (openJob.stderr) {
-            console.error(openJob.stderr.toString());
-        }
+    if (!config.openingHoursOpenScript) {
+        console.log("No opening script configured");
+        return;
     }
 
-    console.log(`Opening hours script ended with ${openJob.status}`);
+    executeScript(config.openingHoursOpenScript, "openingHoursOpenScript");
 }
 
 async function onExecuteCloseKioskScript(_event: IpcMainInvokeEvent): Promise<void> {
-    const closeJob = spawnSync(config.opening_hours_close_script || "echo");
-
-    if (process.env.NODE_ENV == "development") {
-        if (closeJob.stdout) {
-            console.log(closeJob.stdout.toString());
-        }
-
-        if (closeJob.stderr) {
-            console.error(closeJob.stderr.toString());
-        }
+    if (!config.openingHoursCloseScript) {
+        console.log("No closing script configured");
+        return;
     }
 
-    console.log(`Closing hours script ended with ${closeJob.status}`);
+    executeScript(config.openingHoursCloseScript, "openingHoursCloseScript");
 }
 
 async function handleInvokeAudioSynthesizer(
@@ -172,6 +176,7 @@ app.on("ready", async () => {
 
     ipcMain.handle("invokeAudioSynthesizer", handleInvokeAudioSynthesizer);
 
+    //TODO: refactor to use invoke with handle name convention
     ipcMain.handle("getTranslation", handleGetTranslation);
     ipcMain.handle("getAppConfig", handleGetAppConfig);
 
