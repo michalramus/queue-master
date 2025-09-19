@@ -21,6 +21,7 @@
     "dependencies": {
         "@tailwindcss/cli": "^4.1.11",
         "@tailwindcss/typography": "^0.5.16",
+        "react-error-boundary": "^6.0.0",
         "react-markdown": "^10.1.0",
         "rehype-raw": "^7.0.0",
         "remark-gfm": "^4.0.1",

@@ -155,3 +155,4 @@ export default function App() {
         </>
     );
 }
+//TODO: Move kioskOpen and openingHours to (use...) instead of providing by props to pages

@@ -5,6 +5,7 @@ import ReactQueryProvider from "@/utils/providers/ReactQueryProvider";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import RefreshOnWsEvents from "@/components/RefreshOnWsEvents";
+import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { GlobalSettingsProvider } from "@/utils/providers/GlobalSettingsProvider";
 import { getGlobalSettings, GlobalSettingsInterface } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
@@ -61,13 +62,15 @@ export default async function RootLayout({
                                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2} !important;` : ""}
                                 }`}</style>
                 <RefreshOnWsEvents />
-                <NextIntlClientProvider messages={messages}>
-                    <GlobalSettingsProvider globalSettings={globalSettings}>
-                        <ReactQueryProvider>
-                            <main>{children}</main>
-                        </ReactQueryProvider>
-                    </GlobalSettingsProvider>
-                </NextIntlClientProvider>
+                <ClientErrorBoundary>
+                    <NextIntlClientProvider messages={messages}>
+                        <GlobalSettingsProvider globalSettings={globalSettings}>
+                            <ReactQueryProvider>
+                                <main>{children}</main>
+                            </ReactQueryProvider>
+                        </GlobalSettingsProvider>
+                    </NextIntlClientProvider>
+                </ClientErrorBoundary>
             </body>
         </html>
     );

@@ -60,7 +60,7 @@ export default function Button({
         <button
             type={type}
             onClick={onClick}
-            className={`m-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md ${colorClass} ${className}`}
+            className={`m-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md transition-colors ${colorClass} ${className}`}
             disabled={disabled}
         >
             {children}
