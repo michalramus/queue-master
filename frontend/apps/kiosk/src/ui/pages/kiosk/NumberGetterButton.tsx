@@ -40,6 +40,12 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
         },
     });
 
+    const handleButtonClick = () => {
+        if (category.id !== undefined) {
+            mutation.mutate({ categoryId: category.id });
+        }
+    };
+
     //TODO fix printing screen - block button for 0,5s after clicked
     return (
         <>
@@ -64,11 +70,7 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
                 </div>
             </Modal>
             <Button
-                onClick={() => {
-                    if (category.id !== undefined) {
-                        mutation.mutate({ categoryId: category.id });
-                    }
-                }}
+                onClick={handleButtonClick}
                 className="border-primary-1 relative! m-3! flex! w-9/12! items-center! justify-center! rounded-3xl! border-2! p-6! text-3xl!"
                 color="secondary"
             >

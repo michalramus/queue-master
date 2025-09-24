@@ -53,6 +53,8 @@ export default function LoginForm() {
         }
     }
 
+   
+
     return (
         //TODO separate form to component
         <>
@@ -94,7 +96,6 @@ export default function LoginForm() {
                     type="submit"
                     color="primary"
                     className="float-right mx-0"
-                    onClick={() => {}}
                 >
                     {t("login")}
                 </Button>

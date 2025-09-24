@@ -70,8 +70,6 @@ interface ErrorBoundaryProps {
 }
 
 export default function ErrorBoundary({ children, onReset }: ErrorBoundaryProps) {
-    console.log("ErrorBoundary: Component loaded and rendered");
-
     const handleReset = () => {
         console.log("ErrorBoundary: Reset called");
         if (onReset) {

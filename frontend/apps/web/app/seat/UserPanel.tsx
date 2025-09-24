@@ -19,6 +19,11 @@ export default function UserPanel({
         logout(axiosPureInstance);
         router.replace("/login");
     }
+
+    const handleLogout = () => {
+        logoutHandler();
+    };
+
     return (
         //TODO Add buttons onClick functionality
         <Card className="flex flex-nowrap items-center py-0!">
@@ -33,12 +38,7 @@ export default function UserPanel({
             <Button onClick={() => {}} color="primary">
                 {t("settings")}
             </Button>
-            <Button
-                color="red"
-                onClick={() => {
-                    logoutHandler();
-                }}
-            >
+            <Button color="red" onClick={handleLogout}>
                 {t("logout")}
             </Button>
         </Card>

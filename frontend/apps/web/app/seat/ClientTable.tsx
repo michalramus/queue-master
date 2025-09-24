@@ -52,6 +52,34 @@ export default function ClientTable({
         (client) => categoryIds.indexOf(client.category_id) != -1,
     );
 
+    const handleDeleteClick = (client: ClientInterface) => {
+        setClientToDelete(client);
+        setDeleteNumberModalHidden(false);
+    };
+
+    const handleChooseClick = (client: ClientInterface) => {
+        setClientToChoose(client);
+        setChooseNumberModalHidden(false);
+    };
+
+    const handleDeleteConfirm = () => {
+        deleteClient.mutate(clientToDelete!);
+        setDeleteNumberModalHidden(true);
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteNumberModalHidden(true);
+    };
+
+    const handleChooseConfirm = () => {
+        clientInService.mutate(clientToChoose!);
+        setChooseNumberModalHidden(true);
+    };
+
+    const handleChooseCancel = () => {
+        setChooseNumberModalHidden(true);
+    };
+
     const columns = [t("number"), t("category"), t("creation_date"), ""];
     const rows: (string | number | ReactNode | null)[][] = [];
     filteredClientNumbers?.forEach((client, index) =>
@@ -71,10 +99,7 @@ export default function ClientTable({
             </span>,
             <span key={index} className="flex grow flex-wrap-reverse justify-center">
                 <Button
-                    onClick={() => {
-                        setClientToDelete(client);
-                        setDeleteNumberModalHidden(false);
-                    }}
+                    onClick={() => handleDeleteClick(client)}
                     color="red"
                     className="flex items-center"
                 >
@@ -82,10 +107,7 @@ export default function ClientTable({
                     <RejectIcon />
                 </Button>
                 <Button
-                    onClick={() => {
-                        setClientToChoose(client);
-                        setChooseNumberModalHidden(false);
-                    }}
+                    onClick={() => handleChooseClick(client)}
                     color="green"
                     className="flex items-center"
                 >
@@ -103,13 +125,8 @@ export default function ClientTable({
                     (clientToDelete?.category.short_name ?? "") + (clientToDelete?.number ?? "")
                 }
                 hidden={deleteNumberModalHidden}
-                deleteHandler={() => {
-                    deleteClient.mutate(clientToDelete!);
-                    setDeleteNumberModalHidden(true);
-                }}
-                cancelHandler={() => {
-                    setDeleteNumberModalHidden(true);
-                }}
+                deleteHandler={handleDeleteConfirm}
+                cancelHandler={handleDeleteCancel}
             />
 
             <ChooseNumberModal
@@ -117,13 +134,8 @@ export default function ClientTable({
                     (clientToChoose?.category.short_name ?? "") + (clientToChoose?.number ?? "")
                 }
                 hidden={chooseNumberModalHidden}
-                chooseHandler={() => {
-                    clientInService.mutate(clientToChoose!);
-                    setChooseNumberModalHidden(true);
-                }}
-                cancelHandler={() => {
-                    setChooseNumberModalHidden(true);
-                }}
+                chooseHandler={handleChooseConfirm}
+                cancelHandler={handleChooseCancel}
             />
             <Table columns={columns} rows={rows} />
         </>
