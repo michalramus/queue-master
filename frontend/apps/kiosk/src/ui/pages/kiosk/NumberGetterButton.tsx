@@ -8,7 +8,13 @@ import { useTranslation } from "react-i18next";
 import { Button, Modal } from "shared-components";
 import { addClient, CategoryInterface } from "shared-utils";
 
-export default function NumberGetterButton({ category }: { category: CategoryInterface }) {
+export default function NumberGetterButton({
+    category,
+    showCategoryShortName,
+}: {
+    category: CategoryInterface;
+    showCategoryShortName: boolean;
+}) {
     const { i18n, t } = useTranslation();
     const globalSettings = useGlobalSettings();
     const appConfig = useAppConfig();
@@ -75,11 +81,13 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
                 color="secondary"
             >
                 {/* TODO: text-white class replace with custom class or left it to be ok */}
-                <div className="absolute top-1/2 left-6 -translate-y-1/2 transform">
-                    <span className="bg-primary-1 rounded-lg px-4 py-2 text-2xl font-bold text-white shadow-md">
-                        {category.short_name}
-                    </span>
-                </div>
+                {showCategoryShortName && (
+                    <div className="absolute top-1/2 left-6 -translate-y-1/2 transform">
+                        <span className="bg-primary-1 rounded-lg px-4 py-2 text-2xl font-bold text-white shadow-md">
+                            {category.short_name}
+                        </span>
+                    </div>
+                )}
                 <span className="text-center">
                     {category.name[locale as keyof typeof category.name] || category.short_name}
                 </span>

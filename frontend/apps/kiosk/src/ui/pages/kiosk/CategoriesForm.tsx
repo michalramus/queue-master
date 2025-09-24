@@ -9,7 +9,15 @@ export default function CategoriesForm({ categories }: { categories: CategoryInt
     const globalSettings = useGlobalSettings();
     const { t } = useTranslation();
 
-    const getHeaderText = () => {
+    let showCategoryShortName: boolean = true;
+
+    if (categories.length < 2) {
+        showCategoryShortName = false;
+    } else {
+        showCategoryShortName = true;
+    }
+
+    function getHeaderText() {
         if (categories.length > 1) {
             return t("choose_category");
         } else if (categories.length === 1) {
@@ -17,7 +25,7 @@ export default function CategoriesForm({ categories }: { categories: CategoryInt
         } else {
             return t("category_list_is_empty");
         }
-    };
+    }
 
     return (
         <div className="mt-10 flex w-full flex-col items-center">
@@ -26,7 +34,13 @@ export default function CategoriesForm({ categories }: { categories: CategoryInt
 
             {Array.isArray(categories) &&
                 categories?.map((category: CategoryInterface) => {
-                    return <NumberGetterButton key={category.id} category={category} />;
+                    return (
+                        <NumberGetterButton
+                            key={category.id}
+                            category={category}
+                            showCategoryShortName={showCategoryShortName}
+                        />
+                    );
                 })}
         </div>
     );
