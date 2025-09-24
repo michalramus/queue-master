@@ -5,6 +5,7 @@ import { MultilingualTextService } from "src/multilingual-text/multilingual-text
 import { ModuleNameMultilingualText } from "src/multilingual-text/types/multilingualTextCategories.enum";
 import { WebsocketsService } from "src/websockets/websockets.service";
 import { Entity } from "../auth/types/entity.class";
+import { ClientsService } from "src/clients/clients.service";
 
 @Injectable()
 export class CategoriesService {
@@ -12,6 +13,7 @@ export class CategoriesService {
         private readonly databaseService: DatabaseService,
         private readonly multilingualTextService: MultilingualTextService,
         private readonly websocketsService: WebsocketsService,
+        private readonly clientsService: ClientsService,
     ) {}
 
     private logger = new Logger(CategoriesService.name);
@@ -202,7 +204,10 @@ export class CategoriesService {
             throw new NotFoundException(`Category with ID ${id} not found`);
         }
 
-        // Delete category first
+        // Delete all clients from this category
+        await this.clientsService.removeAllFromCategory(id, entity);
+
+        // Delete category
         await this.databaseService.category.delete({
             where: { id },
         });

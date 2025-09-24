@@ -10,5 +10,6 @@ import { MultilingualTextModule } from "src/multilingual-text/multilingual-text.
     imports: [DatabaseModule, WebsocketsModule, AuthModule, MultilingualTextModule],
     controllers: [ClientsController],
     providers: [ClientsService],
+    exports: [ClientsService],
 })
 export class ClientsModule {}

@@ -170,6 +170,22 @@ export class ClientsService {
         return client;
     }
 
+    async removeAllFromCategory(categoryId: number, entity: Entity): Promise<void> {
+        const category = await this.databaseService.category.findUnique({ where: { id: categoryId } });
+        if (!category) {
+            this.logger.warn(
+                `[${entity.name}] Delete failed - Category with ID ${categoryId} not found when trying to delete all clients from category`,
+            );
+            throw new NotFoundException(`Category with ID ${categoryId} not found`);
+        }
+
+        const deletedClients = await this.databaseService.client.deleteMany({ where: { category_id: categoryId } });
+        this.websocketsService.reloadFrontend();
+        this.logger.log(
+            `[${entity.name}] Successfully deleted ${deletedClients.count} clients from category: ${category.short_name} (ID: ${categoryId})`,
+        );
+    }
+
     async resetCounterAfterTime(categoryId: number) {
         const category = await this.databaseService.category.findUnique({ where: { id: categoryId } });
         if (!category) {

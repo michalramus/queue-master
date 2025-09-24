@@ -5,9 +5,10 @@ import { DatabaseModule } from "src/database/database.module";
 import { AuthModule } from "src/auth/auth.module";
 import { MultilingualTextModule } from "src/multilingual-text/multilingual-text.module";
 import { WebsocketsModule } from "src/websockets/websockets.module";
+import { ClientsModule } from "src/clients/clients.module";
 
 @Module({
-    imports: [DatabaseModule, AuthModule, MultilingualTextModule, WebsocketsModule],
+    imports: [DatabaseModule, AuthModule, MultilingualTextModule, WebsocketsModule, ClientsModule],
     controllers: [CategoriesController],
     providers: [CategoriesService],
 })
