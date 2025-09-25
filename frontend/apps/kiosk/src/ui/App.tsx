@@ -1,42 +1,32 @@
 import RefreshOnWsEvents from "./components/RefreshOnWsEvents";
 import KioskPage from "./pages/kiosk/page";
-import { AppConfigProvider } from "./utils/providers/AppConfigProvider";
-import { GlobalSettingsProvider } from "./utils/providers/GlobalSettingsProvider";
+
 
 import TVPage from "@/pages/tv/page";
 
-import { getGlobalSettings, getOpeningHours, OpeningHoursDto } from "shared-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useGlobalSettings, useOpeningHours } from "shared-utils";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
 import { useCallback, useEffect, useState } from "react";
 import i18n from "./i18n";
 import { isKioskOpen } from "./utils/isKioskOpen";
 import { axiosAuthInstance } from "./utils/axiosInstances/axiosAuthInstance";
+import { useAppConfig } from "./utils/hooks/useAppConfig";
 
 export default function App() {
-    const { data: globalSettings, isError: globalSettingsError } = useQuery({
-        queryKey: ["App_globalSettings"],
-        queryFn: () => getGlobalSettings(axiosPureInstance),
-        retry: true,
-    });
+    const { data: globalSettings, isError: globalSettingsError } =
+        useGlobalSettings(axiosPureInstance);
 
-    const { data: appConfig, isError: appConfigError } = useQuery({
-        queryKey: ["App_appConfig"],
-        queryFn: () => window.electronAPI.getAppConfig(),
-    });
+    const { data: appConfig, isError: appConfigError } = useAppConfig();
 
     //TODO add error handling for opening hours
     const {
         data: openingHours,
         // isLoading: openingHoursLoading,
         // isError: openingHoursError,
-    } = useQuery<OpeningHoursDto[]>({
-        queryKey: ["KioskPage_openingHours"],
-        queryFn: () => getOpeningHours(axiosAuthInstance),
-    });
+    } = useOpeningHours(axiosAuthInstance, { retry: true });
 
     //TODO: Fix multi calls to scripts when app starts
-    const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet");
+    const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet"); //TODO: use openingHoursLoading instead of "notSet"
 
     const executeOpeningHoursScripts = useCallback(
         (isOpen: boolean) => {
@@ -135,9 +125,7 @@ export default function App() {
                                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2} !important;` : ""}
                                 }`}</style>
 
-            <AppConfigProvider appConfig={appConfig}>
                 <RefreshOnWsEvents />
-                <GlobalSettingsProvider globalSettings={globalSettings}>
                     {appConfig.mode === "tv" && (
                         <TVPage
                             kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
@@ -150,8 +138,6 @@ export default function App() {
                             openingHours={openingHours || []}
                         />
                     )}
-                </GlobalSettingsProvider>
-            </AppConfigProvider>
         </>
     );
 }

@@ -4,9 +4,15 @@ import ClientTable from "./ClientTable";
 
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
-import { ClientInterface, getClients, UserSettingsInterface, wsEvents } from "shared-utils";
+import {
+    ClientInterface,
+    UserSettingsInterface,
+    wsEvents,
+    useWaitingClients,
+    useInServiceClients,
+} from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 export default function QueuePanel({
@@ -23,25 +29,15 @@ export default function QueuePanel({
     const queryClient = useQueryClient();
 
     //Api data fetch
-    const { data: waitingClients } = useQuery({
-        queryKey: ["waitingClients"],
-        queryFn: () =>
-            getClients(axiosAuthInstance).then((res) =>
-                res.filter((client) => client.status === "Waiting"),
-            ),
+    const { data: waitingClients } = useWaitingClients(axiosAuthInstance, {
         initialData: clients.filter((client) => client.status === "Waiting"),
     });
 
-    const { data: inServiceClients } = useQuery({
-        queryKey: ["inServiceClients"],
-        queryFn: () =>
-            getClients(axiosAuthInstance).then((res) =>
-                res.filter((client) => client.status === "InService" && client.seat === seat),
-            ), //should be only one client in service per seat
-        initialData: clients.filter(
-            (client) => client.status === "InService" && client.seat === seat,
-        ),
-    });
+    const { data: inServiceClients } = useInServiceClients(
+        axiosAuthInstance,
+        seat,
+        {initialData: clients.filter((client) => client.status === "InService" && client.seat === seat)},
+    );
 
     //Socket.io update clients when clients changed
     useEffect(() => {

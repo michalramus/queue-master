@@ -6,14 +6,13 @@ import { SmallHeader, Card } from "shared-components";
 import {
     ClientInterface,
     wsEvents,
-    getLogoAvailability,
     LogoID,
     OpeningHoursDto,
+    useLogoAvailabilities,
 } from "shared-utils";
-import useAppConfig from "@/utils/providers/AppConfigProvider";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
-import { useQuery } from "@tanstack/react-query";
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
+import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
 interface TVPageProps {
     kioskOpen: boolean;
@@ -21,7 +20,7 @@ interface TVPageProps {
 }
 
 export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
-    const appConfig = useAppConfig();
+    const { data: appConfig } = useAppConfig();
 
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
     const currentClientRef = useRef<ClientInterface | null>(null);
@@ -35,14 +34,11 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
     const maxHistory = 20; // max stored history of clients. Clients are automatically trimmed to match screen size in ClientNumbersHistoryTable component
 
     // Logo availability query
-    const { data: logoAvailabilities } = useQuery({
-        queryKey: ["TVPage_logoAvailabilities"],
-        queryFn: () => getLogoAvailability(axiosPureInstance),
-    });
+    const { data: logoAvailabilities } = useLogoAvailabilities(axiosPureInstance);
 
     //Socket.io
     useEffect(() => {
-        const socket = io(appConfig.backendUrl);
+        const socket = io(appConfig?.backendUrl);
 
         function onClientToShow(client: ClientInterface) {
             setNewClientsQueue((e) => [...e, client]);
@@ -54,7 +50,7 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
             socket.off(wsEvents.ClientInService, onClientToShow);
             socket.off(wsEvents.ClientCallAgain, onClientToShow);
         };
-    }, [appConfig.backendUrl]);
+    }, [appConfig?.backendUrl]);
 
     //Update Refs
     useEffect(() => {
@@ -111,21 +107,21 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
                 <div className="ml-7 flex max-h-16 max-w-md items-center gap-8 pt-7">
                     {logoAvailabilities?.includes(LogoID.logo_tv_main) && (
                         <img
-                            src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_main}`}
+                            src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_tv_main}`}
                             alt="TV Main Logo"
                             className="max-h-16 w-auto object-contain"
                         />
                     )}
                     {logoAvailabilities?.includes(LogoID.logo_tv_secondary) && (
                         <img
-                            src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_tv_secondary}`}
+                            src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_tv_secondary}`}
                             alt="TV Secondary Logo"
                             className="max-h-16 w-auto object-contain"
                         />
                     )}
                 </div>
                 <div className="flex h-11/12 flex-row flex-nowrap px-24 pt-9 pb-28">
-                    {kioskOpen || !appConfig.openingHoursEnableBanner ? (
+                    {kioskOpen || !appConfig?.openingHoursEnableBanner ? (
                         <>
                             <ClientNumbersHistory clientNumbers={previousClients} />
                             <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">

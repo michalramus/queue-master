@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { wsEvents } from "shared-utils";
-import useAppConfig from "@/utils/providers/AppConfigProvider";
+import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
 /**
  * Add a listener to the globalSettingsChange websocket event and refresh the page when it happens
  * @returns null
  */
 export default function RefreshOnWsEvents() {
-    const appConfig = useAppConfig();
+    const {data: appConfig} = useAppConfig();
 
     useEffect(() => {
-        const socket = io(appConfig.backendUrl);
+        const socket = io(appConfig?.backendUrl);
 
         function onGlobalSettingsChanged() {
             window.location.reload();
@@ -27,7 +27,7 @@ export default function RefreshOnWsEvents() {
             socket.off(wsEvents.GlobalSettingsChanged, onGlobalSettingsChanged);
             socket.off(wsEvents.ReloadFrontend, onReloadFrontend);
         };
-    }, [appConfig.backendUrl]);
+    }, [appConfig?.backendUrl]);
 
     return null;
 }

@@ -2,12 +2,11 @@ import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import CategoriesForm from "./CategoriesForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Header, SmallHeader } from "shared-components";
-import { getCategories, getLogoAvailability, LogoID, OpeningHoursDto } from "shared-utils";
+import { LogoID, OpeningHoursDto, useCategories, useLogoAvailabilities as useLogoAvailability } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
-import { useQuery } from "@tanstack/react-query";
-import useAppConfig from "@/utils/providers/AppConfigProvider";
 
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
+import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
 export default function KioskPage({
     openingHours,
@@ -16,24 +15,17 @@ export default function KioskPage({
     openingHours: OpeningHoursDto[];
     kioskOpen: boolean;
 }) {
-    const appConfig = useAppConfig();
+    const { data: appConfig } = useAppConfig();
 
-    const { data: logoAvailabilities, isLoading: logoAvailabilitiesLoading } = useQuery({
-        queryKey: ["KioskPage_logoAvailabilities"],
-        queryFn: () => getLogoAvailability(axiosPureInstance),
-    });
+    const { data: logoAvailability, isLoading: logoAvailabilityLoading } = useLogoAvailability(axiosPureInstance);
 
     const {
         data: categories,
         isLoading: categoriesLoading,
         isError: categoriesError,
-    } = useQuery({
-        queryKey: ["KioskPage_categories"],
-        queryFn: () => getCategories(axiosAuthInstance),
-        select: (data) => data?.sort((a, b) => a.short_name.localeCompare(b.short_name)),
-    });
+    } = useCategories(axiosAuthInstance);
 
-    if (logoAvailabilitiesLoading || categoriesLoading) {
+    if (logoAvailabilityLoading || categoriesLoading) {
         return <div>Loading...</div>;
     }
 
@@ -50,9 +42,9 @@ export default function KioskPage({
         <main className="flex min-h-screen flex-col items-center px-10">
             <div className="flex w-full items-center justify-between">
                 <div className="relative flex h-48 w-md items-center justify-start pt-4">
-                    {logoAvailabilities?.includes(LogoID.logo_kiosk_secondary) && (
+                    {logoAvailability?.includes(LogoID.logo_kiosk_secondary) && (
                         <img
-                            src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_kiosk_secondary}`}
+                            src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_kiosk_secondary}`}
                             alt="External Logo"
                             className="max-h-48 w-auto object-contain"
                         />
@@ -60,19 +52,19 @@ export default function KioskPage({
                 </div>
                 <LanguageSwitcher />
             </div>
-            {logoAvailabilities?.includes(LogoID.logo_kiosk_main) && (
+            {logoAvailability?.includes(LogoID.logo_kiosk_main) && (
                 <div className="relative mb-2 flex h-72 w-2xl items-center justify-center">
                     <img
-                        src={`${appConfig.backendUrl}/file/logo/${LogoID.logo_kiosk_main}`}
+                        src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_kiosk_main}`}
                         alt="External Logo"
                         className="max-h-72"
                     />
                 </div>
             )}
 
-            {!logoAvailabilities!.includes(LogoID.logo_kiosk_main) && <Header />}
+            {!logoAvailability!.includes(LogoID.logo_kiosk_main) && <Header />}
 
-            {kioskOpen || !appConfig.openingHoursEnableBanner ? (
+            {kioskOpen || !appConfig?.openingHoursEnableBanner ? (
                 <CategoriesForm categories={categories!} />
             ) : (
                 <OpeningHoursWidget openingHours={openingHours || []} className="mt-10" />

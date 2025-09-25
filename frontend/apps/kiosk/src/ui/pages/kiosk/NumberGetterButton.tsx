@@ -1,12 +1,12 @@
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
-import useAppConfig from "@/utils/providers/AppConfigProvider";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
+import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
-import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Modal } from "shared-components";
-import { addClient, CategoryInterface } from "shared-utils";
+import { addClient, CategoryInterface, useGlobalSettings } from "shared-utils";
 
 export default function NumberGetterButton({
     category,
@@ -16,11 +16,11 @@ export default function NumberGetterButton({
     showCategoryShortName: boolean;
 }) {
     const { i18n, t } = useTranslation();
-    const globalSettings = useGlobalSettings();
-    const appConfig = useAppConfig();
+    const {data: globalSettings} = useGlobalSettings(axiosPureInstance);
+    const {data: appConfig} = useAppConfig();
     const locale = i18n.language;
 
-    const printingTime = appConfig.printingDialogueShowTime || 5000;
+    const printingTime = appConfig?.printingDialogueShowTime || 5000;
 
     const [loadingPage, setLoadingPage] = useState(false);
     const [lastTicketString, setLastTicketString] = useState(""); //category.shortname+number
@@ -38,7 +38,7 @@ export default function NumberGetterButton({
                 setLastTicketString(data.category.short_name + data.number.toString());
                 window.electronAPI.executePrintTicket(
                     data,
-                    globalSettings.printing_ticket_template,
+                    globalSettings?.printing_ticket_template || "",
                 );
                 await new Promise((resolve) => setTimeout(resolve, printingTime));
                 setLoadingPage(false);
