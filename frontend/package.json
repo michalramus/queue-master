@@ -11,7 +11,7 @@
   },
   "scripts": {
     "prepare": "cd .. && husky frontend/.husky",
-    "lint-staged": "yarn workspaces foreach run lint-staged",
+    "precommit": "yarn workspaces foreach --since --parallel run precommit",
     "start:web": "yarn --cwd apps/web start",
     "build:web": "yarn --cwd apps/web build"
   },

@@ -2,6 +2,9 @@
     "name": "shared-utils",
     "version": "1.0.0",
     "main": "src/index.ts",
+    "scripts": {
+        "precommit": "lint-staged"
+    },
     "devDependencies": {
         "@eslint/js": "^9.35.0",
         "@types/node": "^24.0.14",

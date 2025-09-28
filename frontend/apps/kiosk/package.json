@@ -19,7 +19,8 @@
         "transpile:electron": "tsc -p src/electron/tsconfig.json",
         "dist:mac": "yarn run transpile:electron && yarn run build && electron-builder --mac --arm64",
         "dist:win": "yarn run transpile:electron && yarn run build && electron-builder --win --x64",
-        "dist:linux": "yarn run transpile:electron && yarn run build && electron-builder --linux --x64"
+        "dist:linux": "yarn run transpile:electron && yarn run build && electron-builder --linux --x64",
+        "precommit": "tsc -p src/electron/tsconfig.json --noEmit && tsc -b --noEmit && npx lint-staged"
     },
     "dependencies": {
         "@tailwindcss/typography": "^0.5.16",
