@@ -1,2 +1,2 @@
-cd backend && yarn run precommit
-cd ../frontend && yarn run precommit
+cd backend && npx lint-staged
+cd ../frontend && npx lint-staged

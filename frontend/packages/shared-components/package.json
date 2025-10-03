@@ -2,9 +2,11 @@
     "name": "shared-components",
     "version": "1.0.0",
     "main": "src/index.ts",
+
     "scripts": {
-        "precommit": "lint-staged"
+        "pre-push": ""
     },
+
     "devDependencies": {
         "@eslint/js": "^9.35.0",
         "@types/node": "^24.0.14",
