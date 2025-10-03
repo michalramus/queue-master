@@ -33,19 +33,19 @@ export default function QueuePanel({
         initialData: clients.filter((client) => client.status === "Waiting"),
     });
 
-    const { data: inServiceClients } = useInServiceClients(
-        axiosAuthInstance,
-        seat,
-        {initialData: clients.filter((client) => client.status === "InService" && client.seat === seat)},
-    );
+    const { data: inServiceClients } = useInServiceClients(axiosAuthInstance, seat, {
+        initialData: clients.filter(
+            (client) => client.status === "InService" && client.seat === seat,
+        ),
+    });
 
     //Socket.io update clients when clients changed
     useEffect(() => {
         const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL ?? "");
 
-        function onClientModification(client: ClientInterface) {
+        function onClientModification() {
             queryClient.invalidateQueries({ queryKey: ["waitingClients"] });
-            queryClient.invalidateQueries({ queryKey: ["inServiceClients"] });
+            queryClient.invalidateQueries({ queryKey: ["inServiceClients", seat] });
         }
 
         socket.on(wsEvents.ClientWaiting, onClientModification);
@@ -56,7 +56,7 @@ export default function QueuePanel({
             socket.off(wsEvents.ClientInService, onClientModification);
             socket.off(wsEvents.ClientRemoved, onClientModification);
         };
-    }, [queryClient]);
+    }, [queryClient, seat]);
 
     return (
         <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">

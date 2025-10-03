@@ -123,7 +123,6 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
                 <div className="flex h-11/12 flex-row flex-nowrap px-24 pt-9 pb-28">
                     {kioskOpen || !appConfig?.openingHoursEnableBanner ? (
                         <>
-                            <ClientNumbersHistory clientNumbers={previousClients} />
                             <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
                                 <CurrentNumberWidget
                                     category_short_name={currentClient?.category?.short_name ?? ""}
@@ -132,6 +131,7 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
                                     className="w-full"
                                 />
                             </Card>
+                            <ClientNumbersHistory clientNumbers={previousClients} />
                         </>
                     ) : (
                         <div className="flex w-full items-center justify-center">
