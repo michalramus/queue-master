@@ -33,7 +33,7 @@ export class ClientsService {
         // Prepare client number
         let counter = category.counter + 1;
         if (counter > this.maxClientsCounter) {
-            this.logger.log(
+            this.logger.debug(
                 `Counter exceeded ${this.maxClientsCounter}. Resetting counter to 1 for category ${category.short_name}`,
             );
             counter = 1;
@@ -68,7 +68,7 @@ export class ClientsService {
         const client = await this.addCategoryNameFieldToClient({ queue_length: queueLength, ...dbClient });
 
         this.websocketsService.emit(wsEvents.ClientWaiting, client);
-        this.logger.log(
+        this.logger.debug(
             `[${entity.name}] Client created with number ${client.category.short_name}${client.number} and status 'Waiting'`,
         );
         this.resetCounterAfterTime(createClientDto.categoryId);
@@ -125,7 +125,7 @@ export class ClientsService {
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
         this.websocketsService.emit(wsEvents.ClientInService, client);
-        this.logger.log(
+        this.logger.debug(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and seat ${updateClientDto.seat}`,
         );
         return client;
@@ -145,7 +145,7 @@ export class ClientsService {
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
         this.websocketsService.emit(wsEvents.ClientCallAgain, client);
-        this.logger.log(
+        this.logger.debug(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} called again`,
         );
         return client;
@@ -164,7 +164,7 @@ export class ClientsService {
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
         this.websocketsService.emit(wsEvents.ClientRemoved, client);
-        this.logger.log(
+        this.logger.debug(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number}  deleted`,
         );
         return client;
@@ -181,7 +181,7 @@ export class ClientsService {
 
         const deletedClients = await this.databaseService.client.deleteMany({ where: { category_id: categoryId } });
         this.websocketsService.reloadFrontend();
-        this.logger.log(
+        this.logger.debug(
             `[${entity.name}] Successfully deleted ${deletedClients.count} clients from category: ${category.short_name} (ID: ${categoryId})`,
         );
     }
@@ -209,7 +209,7 @@ export class ClientsService {
         const deletedClients = await this.databaseService.client.deleteMany({
             where: { creation_date: { lt: resetTime } },
         });
-        this.logger.log(`Deleted ${deletedClients.count} clients older than ${resetTime} for category ${categoryId}`);
+        this.logger.debug(`Deleted ${deletedClients.count} clients older than ${resetTime} for category ${categoryId}`);
 
         //Check if there are clients with number lower than
         const clientsLowerThan = await this.databaseService.client.findMany({
@@ -217,7 +217,7 @@ export class ClientsService {
         });
 
         if (clientsLowerThan.length > 0) {
-            this.logger.log(
+            this.logger.debug(
                 `Cannot reset counter for category ${categoryId}. Clients with number lower than ${this.minClientsCounterToReset} exist`,
             );
             return;
@@ -229,7 +229,7 @@ export class ClientsService {
             data: { counter: 0, last_counter_reset: now },
         });
 
-        this.logger.log(`Counter reset to 0 for category ${categoryId}`);
+        this.logger.debug(`Counter reset to 0 for category ${categoryId}`);
     }
 
     /**

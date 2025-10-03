@@ -71,7 +71,7 @@ export class UserSettingsService {
             throw new HttpException(`User with id ${id} not found`, 404);
         }
 
-        this.logger.log(
+        this.logger.debug(
             `[${entity.name} id:${entity.id}] Updating settings: ${JSON.stringify(settings)} for user ${id}`,
         );
 

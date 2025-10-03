@@ -10,11 +10,40 @@ import { ValidationPipe } from "@nestjs/common";
 async function bootstrap() {
     ConfigModule.forRoot();
 
+    let log_level: ("verbose" | "debug" | "log" | "warn" | "error" | "fatal")[];
+    switch (process.env.NODE_ENV) {
+        case "development":
+            log_level = ["verbose", "debug", "log", "warn", "error", "fatal"];
+            break;
+        case "production":
+            switch (process.env.LOG_LEVEL) {
+                case "verbose":
+                    log_level = ["verbose", "log", "warn", "error", "fatal"];
+                    break;
+                case "debug":
+                    log_level = ["debug", "log", "warn", "error", "fatal"];
+                    break;
+                case "log":
+                    log_level = ["log", "warn", "error", "fatal"];
+                    break;
+                case "warn":
+                    log_level = ["warn", "error", "fatal"];
+                    break;
+                case "error":
+                    log_level = ["error", "fatal"];
+                    break;
+                default:
+                    log_level = ["log", "warn", "error", "fatal"];
+                    break;
+            }
+            break;
+        default:
+            log_level = ["log", "warn", "error", "fatal"];
+            break;
+    }
+
     const app = await NestFactory.create(AppModule, {
-        logger:
-            process.env.NODE_ENV === "development"
-                ? ["verbose", "debug", "log", "warn", "error"]
-                : ["error", "warn", "log"],
+        logger: log_level,
     });
     app.useGlobalInterceptors(new LoggingInterceptor());
     app.useGlobalPipes(
