@@ -34,7 +34,7 @@ export class AuthService {
             throw new UnauthorizedException("Incorrect username or password");
         }
 
-        this.logger.debug(`[${loginUserDto.username}] Successful login`);
+        this.logger.log(`[${loginUserDto.username}] Successful login`);
         const payload = new Entity(user.id, "User", user.username).getJwtPayload();
         const accessToken = await this.jwtService.signAsync(payload, {
             expiresIn: this.accessTokenExpirationTime,
@@ -67,7 +67,7 @@ export class AuthService {
 
         // Check if entity still exists
         if (entity.type == "User" && !(await this.usersService.findOneById(entity.id))) {
-            this.logger.debug(
+            this.logger.warn(
                 `[${entity.type}: ${entity.id}] UnauthorizedException: Deleted user tried to retrieve new access token from ${ip}`,
             );
             throw new UnauthorizedException("User does not exist");
@@ -142,7 +142,7 @@ export class AuthService {
                 const user = await this.usersService.findOneById(entity.id);
 
                 if (!user) {
-                    this.logger.debug(
+                    this.logger.warn(
                         `[${entity.name}] UnauthorizedException: Deleted user tried to access ${method} ${url} from ${ip} `,
                     );
                     throw new UnauthorizedException("User is deleted");
@@ -157,14 +157,14 @@ export class AuthService {
                 const device = await this.devicesService.findOne(entity.id);
 
                 if (!device) {
-                    this.logger.debug(
+                    this.logger.warn(
                         `[${entity.name}] UnauthorizedException: Deleted device tried to access ${method} ${url} from ${ip} `,
                     );
                     throw new UnauthorizedException("Device is deleted");
                 }
 
                 if (!device.accepted) {
-                    this.logger.debug(
+                    this.logger.warn(
                         `[${entity.name}] UnauthorizedException: Not accepted device tried to access ${method} ${url} from ${ip} `,
                     );
                     throw new ForbiddenException("Device is not accepted");

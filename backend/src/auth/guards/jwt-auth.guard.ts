@@ -11,7 +11,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
         const { method, ip, url } = request;
 
         if (err || !user) {
-            this.logger.debug(`${info} | ${method} ${url} ${ip}`, `Token: ${jwtTokenExtractor(request)}`);
+            this.logger.warn(`${info} | ${method} ${url} ${ip}`, `Token: ${jwtTokenExtractor(request)}`);
             throw new UnauthorizedException(info);
         }
         return user;
