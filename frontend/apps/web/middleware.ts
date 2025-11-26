@@ -11,7 +11,7 @@ interface Page {
 
 const pages: Page[] = [
     {
-        matcher: "/seat",
+        matcher: "/desk",
         roles: ["User", "Admin"],
         error401Redirect: "/login",
         error403Redirect: "/login",

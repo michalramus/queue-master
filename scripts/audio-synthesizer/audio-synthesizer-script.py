@@ -11,10 +11,10 @@ def main():
 
     categoryShortName = str(inputs["categoryShortName"])
     number = str(inputs["number"])
-    seat = str(inputs["seat"])
+    desk = str(inputs["desk"])
 
 
-    textToSay = categoryShortName + number + ", Desk " + seat
+    textToSay = categoryShortName + number + ", Desk " + desk
 
     result = subprocess.run(["espeak", textToSay], capture_output=True, text=True)
     print(result.stdout)

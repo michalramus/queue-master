@@ -6,7 +6,7 @@ import UserPanel from "./UserPanel";
 import { SmallHeader } from "shared-components";
 import { getClients, getInfo, getUserSettings } from "shared-utils";
 
-export default async function SeatPage() {
+export default async function DeskPage() {
     const clients = await getClients(axiosAuthInstance);
     const user = (await getInfo(axiosAuthInstance)).data;
     const userSettings = await getUserSettings(axiosAuthInstance);

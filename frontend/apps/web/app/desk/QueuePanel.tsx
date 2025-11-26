@@ -22,7 +22,7 @@ export default function QueuePanel({
     clients: ClientInterface[];
     userSettings: UserSettingsInterface;
 }) {
-    let seat = userSettings.seat;
+    let desk = userSettings.desk;
     let categoryIds = [1, 2, 3, 4, 5, 6]; //TODO: get categoryIds from context | What if category will be removed after user settings are saved?
 
     //React query clients fetch
@@ -33,9 +33,9 @@ export default function QueuePanel({
         initialData: clients.filter((client) => client.status === "Waiting"),
     });
 
-    const { data: inServiceClients } = useInServiceClients(axiosAuthInstance, seat, {
+    const { data: inServiceClients } = useInServiceClients(axiosAuthInstance, desk, {
         initialData: clients.filter(
-            (client) => client.status === "InService" && client.seat === seat,
+            (client) => client.status === "InService" && client.desk === desk,
         ),
     });
 
@@ -45,7 +45,7 @@ export default function QueuePanel({
 
         function onClientModification() {
             queryClient.invalidateQueries({ queryKey: ["waitingClients"] });
-            queryClient.invalidateQueries({ queryKey: ["inServiceClients", seat] });
+            queryClient.invalidateQueries({ queryKey: ["inServiceClients", desk] });
         }
 
         socket.on(wsEvents.ClientWaiting, onClientModification);
@@ -56,7 +56,7 @@ export default function QueuePanel({
             socket.off(wsEvents.ClientInService, onClientModification);
             socket.off(wsEvents.ClientRemoved, onClientModification);
         };
-    }, [queryClient, seat]);
+    }, [queryClient, desk]);
 
     return (
         <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">
@@ -65,7 +65,7 @@ export default function QueuePanel({
                     <ClientTable
                         clientNumbers={waitingClients}
                         categoryIds={categoryIds}
-                        seat={seat ? seat : 1}
+                        desk={desk ? desk : 1}
                     />
                 )}
             </div>
@@ -74,7 +74,7 @@ export default function QueuePanel({
                     <InServicePanel
                         clientNumber={inServiceClients[0]}
                         nextClientNumber={waitingClients ? waitingClients[0] : undefined}
-                        seat={seat ? seat : 1}
+                        desk={desk ? desk : 1}
                     />
                 </div>
             )}

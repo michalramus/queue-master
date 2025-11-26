@@ -38,7 +38,7 @@
     "register_device_instruction_after_registration": "Accept device inside the admin panel and refresh this site.",
     "register_device_instruction_before_registration": "After registering new device, it is necessary to accept it in the admin panel.",
     "register_new_device": "Register New Device",
-    "seat": "Seat",
+    "desk": "Desk",
     "settings": "Settings",
     "user": "User",
     "username": "Username",

@@ -89,7 +89,7 @@ async function handleInvokeAudioSynthesizer(
     const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
-        seat: client.seat,
+        desk: client.desk,
     })}`;
 
     const audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);

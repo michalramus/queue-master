@@ -2,7 +2,7 @@ import os
 import subprocess
 
 path = "samples"
-seat_word = "seat"
+desk_word = "desk"
 voice = "Zira" #To see all available voices run: balcon.exe -l
 
 os.mkdir(path)
@@ -18,6 +18,6 @@ for letter in letters:
 
 for i in range(1, 100):
     f = open(f"in.txt", "w")
-    f.write(f"{seat_word} {i}")
+    f.write(f"{desk_word} {i}")
     f.close()
-    subprocess.run(["balcon.exe", "-f", "in.txt", "-w", f"{path}\\SEAT{i}.wav", "-n", voice])
+    subprocess.run(["balcon.exe", "-f", "in.txt", "-w", f"{path}\\DESK{i}.wav", "-n", voice])

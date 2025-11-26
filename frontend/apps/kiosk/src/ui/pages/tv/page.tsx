@@ -127,7 +127,7 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
                                 <CurrentNumberWidget
                                     category_short_name={currentClient?.category?.short_name ?? ""}
                                     number={currentClient?.number ?? ""}
-                                    seat={currentClient?.seat ?? ""}
+                                    desk={currentClient?.desk ?? ""}
                                     className="w-full"
                                 />
                             </Card>

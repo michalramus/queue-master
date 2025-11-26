@@ -1,7 +1,7 @@
 import { AxiosAuthInstance, AxiosPureInstance } from "../axiosInstances.interface";
 
 export interface UserSettingsInterface {
-    seat?: number;
+    desk?: number;
 }
 export interface GlobalSettingsInterface {
     //colors

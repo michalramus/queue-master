@@ -17,11 +17,11 @@ import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 export default function ClientTable({
     clientNumbers,
     categoryIds,
-    seat,
+    desk,
 }: {
     clientNumbers: ClientInterface[] | undefined;
     categoryIds: number[];
-    seat: number;
+    desk: number;
 }) {
     const t = useTranslations();
     const locale = useLocale();
@@ -37,7 +37,7 @@ export default function ClientTable({
     // set client as in service
     const clientInService = useMutation({
         mutationFn: (clientNumber: ClientInterface) =>
-            setClientAsInService(clientNumber, seat, axiosAuthInstance),
+            setClientAsInService(clientNumber, desk, axiosAuthInstance),
     });
 
     // remove client

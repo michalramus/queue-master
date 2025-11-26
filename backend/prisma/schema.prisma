@@ -19,7 +19,7 @@ model Client {
     category_id   Int
     category      Category @relation(fields: [category_id], references: [id])
     status        Status
-    seat          Int?
+    desk          Int?
     creation_date DateTime @default(now())
 
     @@unique([number, category_id])

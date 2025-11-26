@@ -7,7 +7,7 @@ export interface ClientInterface {
     category_id: number;
     category: CategoryInterface;
     status: "Waiting" | "InService";
-    seat: number | null;
+    desk: number | null;
     creation_date: Date;
     queue_length?: number;
 }
@@ -25,10 +25,10 @@ export async function addClient(
 
 export async function setClientAsInService(
     clientNumber: ClientInterface,
-    seat: number,
+    desk: number,
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<ClientInterface | null> {
-    clientNumber.seat = seat;
+    clientNumber.desk = desk;
     clientNumber.status = "InService";
 
     const response = await axiosAuthInstance.auth.patch(

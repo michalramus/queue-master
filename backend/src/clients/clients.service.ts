@@ -84,7 +84,7 @@ export class ClientsService {
                 category_id: true,
                 category: { select: { id: true, short_name: true } },
                 status: true,
-                seat: true,
+                desk: true,
                 creation_date: true,
             },
         });
@@ -95,7 +95,7 @@ export class ClientsService {
     }
 
     /**
-     * If any other client is in service by the same seat, it will be removed
+     * If any other client is in service by the same desk, it will be removed
      * @param id
      * @param updateClientDto
      * @returns
@@ -108,15 +108,15 @@ export class ClientsService {
             throw new NotFoundException("Client not found");
         }
 
-        // Delete any other client in service from the same seat
+        // Delete any other client in service from the same desk
         await this.databaseService.client.deleteMany({
-            where: { status: "InService", seat: updateClientDto.seat },
+            where: { status: "InService", desk: updateClientDto.desk },
         });
 
         // Update client
         const dbClient = await this.databaseService.client.update({
             where: { id: id },
-            data: { status: updateClientDto.status, seat: updateClientDto.seat },
+            data: { status: updateClientDto.status, desk: updateClientDto.desk },
             include: {
                 category: true,
             },
@@ -126,7 +126,7 @@ export class ClientsService {
 
         this.websocketsService.emit(wsEvents.ClientInService, client);
         this.logger.log(
-            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and seat ${updateClientDto.seat}`,
+            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and desk ${updateClientDto.desk}`,
         );
         return client;
     }
@@ -242,7 +242,7 @@ export class ClientsService {
         number: number;
         category_id: number;
         status: "Waiting" | "InService";
-        seat: number | null;
+        desk: number | null;
         creation_date: Date;
         queue_length?: number;
         category: { id: number; short_name: string };
