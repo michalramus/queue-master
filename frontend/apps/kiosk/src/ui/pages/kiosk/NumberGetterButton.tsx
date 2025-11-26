@@ -3,7 +3,7 @@ import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Modal } from "shared-components";
 import { addClient, CategoryInterface, useGlobalSettings } from "shared-utils";
@@ -16,14 +16,24 @@ export default function NumberGetterButton({
     showCategoryShortName: boolean;
 }) {
     const { i18n, t } = useTranslation();
-    const {data: globalSettings} = useGlobalSettings(axiosPureInstance);
-    const {data: appConfig} = useAppConfig();
+    const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
+    const { data: appConfig } = useAppConfig();
     const locale = i18n.language;
 
     const printingTime = appConfig?.printingDialogueShowTime || 5000;
 
     const [loadingPage, setLoadingPage] = useState(false);
     const [lastTicketString, setLastTicketString] = useState(""); //category.shortname+number
+
+    const defaultLanguage = globalSettings?.locale || "en";
+
+    // Reset language to default when printing dialog closes
+    useEffect(() => {
+        if (!loadingPage && lastTicketString) {
+            // Dialog just closed, reset language
+            i18n.changeLanguage(defaultLanguage);
+        }
+    }, [loadingPage, lastTicketString, i18n, defaultLanguage]);
 
     //TODO: Add loading when waiting for ticket
     // Create new client
