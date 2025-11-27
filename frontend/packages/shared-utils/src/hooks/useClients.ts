@@ -2,6 +2,8 @@ import { useQuery, UseQueryOptions, UseQueryResult } from "@tanstack/react-query
 import { getClients, ClientInterface } from "../api/clients";
 import { AxiosAuthInstance } from "../axiosInstances.interface";
 
+//TODO: Only fetch clients - do filtering within the components
+
 export function useWaitingClients(
     axiosAuthInstance: AxiosAuthInstance,
     options?: Omit<UseQueryOptions<ClientInterface[], Error>, "queryKey" | "queryFn">,

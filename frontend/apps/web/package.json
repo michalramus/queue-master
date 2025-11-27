@@ -23,8 +23,8 @@
         "react-error-boundary": "^6.0.0",
         "shared-components": "1.0.0",
         "shared-utils": "1.0.0",
-        "socket.io-client": "^4.8.1",
-        "tailwindcss": "^4.1.11"
+        "tailwindcss": "^4.1.11",
+        "undici": "^7.16.0"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.1",

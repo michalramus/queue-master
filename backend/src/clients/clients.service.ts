@@ -1,9 +1,9 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
-import { WebsocketsService } from "../websockets/websockets.service";
+import { SseService } from "../sse/sse.service";
 import { Entity } from "src/auth/types/entity.class";
-import { wsEvents } from "src/websockets/wsEvents.enum";
+import { sseEvents } from "src/sse/sseEvents.enum";
 import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
 import { ModuleNameMultilingualText } from "src/multilingual-text/types/multilingualTextCategories.enum";
 
@@ -11,7 +11,7 @@ import { ModuleNameMultilingualText } from "src/multilingual-text/types/multilin
 export class ClientsService {
     constructor(
         private readonly databaseService: DatabaseService,
-        private readonly websocketsService: WebsocketsService,
+        private readonly sseService: SseService,
         private readonly multilingualTextService: MultilingualTextService,
     ) {}
     private logger = new Logger(ClientsService.name);
@@ -67,7 +67,7 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient({ queue_length: queueLength, ...dbClient });
 
-        this.websocketsService.emit(wsEvents.ClientWaiting, client);
+        this.sseService.emit(sseEvents.ClientWaiting, client);
         this.logger.log(
             `[${entity.name}] Client created with number ${client.category.short_name}${client.number} and status 'Waiting'`,
         );
@@ -124,7 +124,7 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
-        this.websocketsService.emit(wsEvents.ClientInService, client);
+        this.sseService.emit(sseEvents.ClientInService, client);
         this.logger.log(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and desk ${updateClientDto.desk}`,
         );
@@ -144,7 +144,7 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
-        this.websocketsService.emit(wsEvents.ClientCallAgain, client);
+        this.sseService.emit(sseEvents.ClientCallAgain, client);
         this.logger.log(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} called again`,
         );
@@ -163,7 +163,7 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
-        this.websocketsService.emit(wsEvents.ClientRemoved, client);
+        this.sseService.emit(sseEvents.ClientRemoved, client);
         this.logger.log(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number}  deleted`,
         );
@@ -180,7 +180,7 @@ export class ClientsService {
         }
 
         const deletedClients = await this.databaseService.client.deleteMany({ where: { category_id: categoryId } });
-        this.websocketsService.reloadFrontend();
+        this.sseService.reloadFrontend();
         this.logger.log(
             `[${entity.name}] Successfully deleted ${deletedClients.count} clients from category: ${category.short_name} (ID: ${categoryId})`,
         );

@@ -1,5 +1,5 @@
-//Websocket events names
-export enum wsEvents {
+//SSE events names
+export enum sseEvents {
     ClientWaiting = "ClientWaiting",
     ClientInService = "ClientInService",
     ClientRemoved = "ClientRemoved",

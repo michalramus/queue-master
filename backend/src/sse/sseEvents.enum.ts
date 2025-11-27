@@ -1,5 +1,5 @@
-// Websockets events names
-export enum wsEvents {
+// SSE events names
+export enum sseEvents {
     //clients module
     ClientWaiting = "ClientWaiting",
     ClientInService = "ClientInService",

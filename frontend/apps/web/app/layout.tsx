@@ -4,10 +4,11 @@ import "./globals.css";
 import ReactQueryProvider from "@/utils/providers/ReactQueryProvider";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import RefreshOnWsEvents from "@/components/RefreshOnWsEvents";
+import RefreshOnSseEvents from "@/components/RefreshOnSseEvents";
 import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { getGlobalSettings, GlobalSettingsInterface } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
+import { SseProvider } from "@/utils/providers/SseProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -60,15 +61,19 @@ export default async function RootLayout({
                                 ${globalSettings.color_text_1 ? `--color-text-1: ${globalSettings.color_text_1} !important;` : ""}
                                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2} !important;` : ""}
                                 }`}</style>
-                <RefreshOnWsEvents />
                 <ClientErrorBoundary>
                     <NextIntlClientProvider messages={messages}>
+                        <SseProvider>
+                            <RefreshOnSseEvents />
                             <ReactQueryProvider>
                                 <main>{children}</main>
                             </ReactQueryProvider>
+                        </SseProvider>
                     </NextIntlClientProvider>
                 </ClientErrorBoundary>
             </body>
         </html>
     );
 }
+
+//TODO: RefreshOnSSEEvents as hook instead of tag

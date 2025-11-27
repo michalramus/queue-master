@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import CurrentNumberWidget from "./CurrentNumberWidget";
-import { io } from "socket.io-client";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import { SmallHeader, Card } from "shared-components";
 import {
     ClientInterface,
-    wsEvents,
+    sseEvents,
     LogoID,
     OpeningHoursDto,
     useLogoAvailabilities,
@@ -13,6 +12,7 @@ import {
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
+import { useSse } from "@/utils/hooks/useSse";
 
 interface TVPageProps {
     kioskOpen: boolean;
@@ -36,21 +36,23 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
     // Logo availability query
     const { data: logoAvailabilities } = useLogoAvailabilities(axiosPureInstance);
 
-    //Socket.io
-    useEffect(() => {
-        const socket = io(appConfig?.backendUrl);
+    const { addEventListener, removeEventListener } = useSse();
 
-        function onClientToShow(client: ClientInterface) {
+    //SSE
+    useEffect(() => {
+        function onClientToShow(event: MessageEvent) {
+            const client: ClientInterface = JSON.parse(event.data);
             setNewClientsQueue((e) => [...e, client]);
         }
 
-        socket.on(wsEvents.ClientInService, onClientToShow);
-        socket.on(wsEvents.ClientCallAgain, onClientToShow);
+        addEventListener(sseEvents.ClientInService, onClientToShow);
+        addEventListener(sseEvents.ClientCallAgain, onClientToShow);
+
         return () => {
-            socket.off(wsEvents.ClientInService, onClientToShow);
-            socket.off(wsEvents.ClientCallAgain, onClientToShow);
+            removeEventListener(sseEvents.ClientInService, onClientToShow);
+            removeEventListener(sseEvents.ClientCallAgain, onClientToShow);
         };
-    }, [appConfig?.backendUrl]);
+    }, [addEventListener, removeEventListener]);
 
     //Update Refs
     useEffect(() => {

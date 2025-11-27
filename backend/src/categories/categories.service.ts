@@ -3,7 +3,7 @@ import { DatabaseService } from "../database/database.service";
 import { CategoryResponseDto, CategoryCreateDto, CategoryUpdateDto } from "./dto/category.dto";
 import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
 import { ModuleNameMultilingualText } from "src/multilingual-text/types/multilingualTextCategories.enum";
-import { WebsocketsService } from "src/websockets/websockets.service";
+import { SseService } from "src/sse/sse.service";
 import { Entity } from "../auth/types/entity.class";
 import { ClientsService } from "src/clients/clients.service";
 
@@ -12,7 +12,7 @@ export class CategoriesService {
     constructor(
         private readonly databaseService: DatabaseService,
         private readonly multilingualTextService: MultilingualTextService,
-        private readonly websocketsService: WebsocketsService,
+        private readonly sseService: SseService,
         private readonly clientsService: ClientsService,
     ) {}
 
@@ -107,8 +107,8 @@ export class CategoriesService {
             createCategoryDto.name,
         );
 
-        // Emit WebSocket event to reload frontend
-        this.websocketsService.reloadFrontend();
+        // Emit SSE event to reload frontend
+        this.sseService.reloadFrontend();
 
         this.logger.log(`[${entity.name}] Successfully created category: ${category.short_name} (ID: ${category.id})`);
 
@@ -178,8 +178,8 @@ export class CategoriesService {
             updatedCategory.id,
         );
 
-        // Emit WebSocket event to reload frontend
-        this.websocketsService.reloadFrontend();
+        // Emit SSE event to reload frontend
+        this.sseService.reloadFrontend();
 
         this.logger.log(`[${entity.name}] Successfully updated category: ${updatedCategory.short_name} (ID: ${id})`);
 
@@ -215,8 +215,8 @@ export class CategoriesService {
         // Delete associated multilingual text
         await this.multilingualTextService.deleteMultilingualText(ModuleNameMultilingualText.categories, id);
 
-        // Emit WebSocket event to reload frontend
-        this.websocketsService.reloadFrontend();
+        // Emit SSE event to reload frontend
+        this.sseService.reloadFrontend();
 
         this.logger.log(`[${entity.name}] Successfully deleted category: ${category.short_name} (ID: ${id})`);
     }

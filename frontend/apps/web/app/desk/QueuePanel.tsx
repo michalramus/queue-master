@@ -3,17 +3,17 @@
 import ClientTable from "./ClientTable";
 
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
 import {
     ClientInterface,
     UserSettingsInterface,
-    wsEvents,
+    sseEvents,
     useWaitingClients,
     useInServiceClients,
 } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
+import { useSse } from "@/utils/hooks/useSse";
 
 export default function QueuePanel({
     clients,
@@ -27,7 +27,9 @@ export default function QueuePanel({
 
     //React query clients fetch
     const queryClient = useQueryClient();
+    const { addEventListener, removeEventListener } = useSse();
 
+    //TODO: Don't fetch twice - fetch once and filter within the hooks
     //Api data fetch
     const { data: waitingClients } = useWaitingClients(axiosAuthInstance, {
         initialData: clients.filter((client) => client.status === "Waiting"),
@@ -39,24 +41,23 @@ export default function QueuePanel({
         ),
     });
 
-    //Socket.io update clients when clients changed
+    //SSE update clients when clients changed
     useEffect(() => {
-        const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL ?? "");
-
         function onClientModification() {
             queryClient.invalidateQueries({ queryKey: ["waitingClients"] });
             queryClient.invalidateQueries({ queryKey: ["inServiceClients", desk] });
         }
 
-        socket.on(wsEvents.ClientWaiting, onClientModification);
-        socket.on(wsEvents.ClientInService, onClientModification);
-        socket.on(wsEvents.ClientRemoved, onClientModification);
+        addEventListener(sseEvents.ClientWaiting, onClientModification);
+        addEventListener(sseEvents.ClientInService, onClientModification);
+        addEventListener(sseEvents.ClientRemoved, onClientModification);
+
         return () => {
-            socket.off(wsEvents.ClientWaiting, onClientModification);
-            socket.off(wsEvents.ClientInService, onClientModification);
-            socket.off(wsEvents.ClientRemoved, onClientModification);
+            removeEventListener(sseEvents.ClientWaiting, onClientModification);
+            removeEventListener(sseEvents.ClientInService, onClientModification);
+            removeEventListener(sseEvents.ClientRemoved, onClientModification);
         };
-    }, [queryClient, desk]);
+    }, [queryClient, desk, addEventListener, removeEventListener]);
 
     return (
         <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">

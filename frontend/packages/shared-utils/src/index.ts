@@ -1,5 +1,5 @@
 export * from "./axiosInstances.interface";
-export * from "./wsEvents";
+export * from "./sseEvents";
 
 export * from "./api";
 

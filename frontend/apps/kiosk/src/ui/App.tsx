@@ -1,6 +1,5 @@
-import RefreshOnWsEvents from "./components/RefreshOnWsEvents";
+import RefreshOnSseEvents from "./components/RefreshOnSseEvents";
 import KioskPage from "./pages/kiosk/page";
-
 
 import TVPage from "@/pages/tv/page";
 
@@ -125,19 +124,19 @@ export default function App() {
                                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2} !important;` : ""}
                                 }`}</style>
 
-                <RefreshOnWsEvents />
-                    {appConfig.mode === "tv" && (
-                        <TVPage
-                            kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
-                            openingHours={openingHours || []}
-                        />
-                    )}
-                    {appConfig.mode === "kiosk" && (
-                        <KioskPage
-                            kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
-                            openingHours={openingHours || []}
-                        />
-                    )}
+            <RefreshOnSseEvents />
+            {appConfig.mode === "tv" && (
+                <TVPage
+                    kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
+                    openingHours={openingHours || []}
+                />
+            )}
+            {appConfig.mode === "kiosk" && (
+                <KioskPage
+                    kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
+                    openingHours={openingHours || []}
+                />
+            )}
         </>
     );
 }

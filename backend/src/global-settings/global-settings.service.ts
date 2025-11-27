@@ -3,14 +3,14 @@ import { DatabaseService } from "../database/database.service";
 import { globalSettingsList } from "./global-settings.list";
 import { SettingSupportedTypes } from "src/settings/setting.class";
 import { Entity } from "src/auth/types/entity.class";
-import { WebsocketsService } from "../websockets/websockets.service";
-import { wsEvents } from "src/websockets/wsEvents.enum";
+import { SseService } from "../sse/sse.service";
+import { sseEvents } from "src/sse/sseEvents.enum";
 
 @Injectable()
 export class GlobalSettingsService {
     constructor(
         private readonly databaseService: DatabaseService,
-        private readonly websocketsService: WebsocketsService,
+        private readonly sseService: SseService,
     ) {}
     private logger = new Logger(GlobalSettingsService.name);
 
@@ -66,8 +66,8 @@ export class GlobalSettingsService {
 
         const newSettings = this.findAll();
 
-        //emit webSocket on globalSettings change
-        this.websocketsService.emit(wsEvents.GlobalSettingsChanged, newSettings);
+        //emit SSE event on globalSettings change
+        this.sseService.emit(sseEvents.GlobalSettingsChanged, newSettings);
 
         return newSettings;
     }

@@ -3,7 +3,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ClientsModule } from "./clients/clients.module";
 import { DatabaseModule } from "./database/database.module";
-import { WebsocketsModule } from "./websockets/websockets.module";
+import { SseModule } from "./sse/sse.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
@@ -19,7 +19,7 @@ import { OpeningHoursModule } from "./opening-hours/opening-hours.module";
     imports: [
         ClientsModule,
         DatabaseModule,
-        WebsocketsModule,
+        SseModule,
         CategoriesModule,
         //ServeStaticModule is disabled because it is not used in the project
 

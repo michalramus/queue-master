@@ -5,7 +5,10 @@ import { axiosPureInstance } from "./axiosPureInstance";
 
 export const axiosAuthInstance: AxiosAuthInstance = {
     auth: axios.create({
-        baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+        baseURL:
+            typeof window === "undefined"
+                ? process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001"
+                : "/api",
         withCredentials: true,
     }),
 };
