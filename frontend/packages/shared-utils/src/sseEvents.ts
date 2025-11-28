@@ -4,8 +4,13 @@ export enum sseEvents {
     ClientInService = "ClientInService",
     ClientRemoved = "ClientRemoved",
     ClientCallAgain = "ClientCallAgain",
+    ClientsFlushed = "ClientsChanged",
 
     GlobalSettingsChanged = "GlobalSettingsChanged",
+    CategoriesChanged = "CategoriesChanged",
+    OpeningHoursChanged = "OpeningHoursChanged",
+    LogoAvailabilityChanged = "LogoAvailabilityChanged",
+    UserSettingsChanged = "UserSettingsChanged",
 
     ReloadFrontend = "ReloadFrontend",
 }

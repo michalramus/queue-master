@@ -5,9 +5,16 @@ export enum sseEvents {
     ClientInService = "ClientInService",
     ClientRemoved = "ClientRemoved",
     ClientCallAgain = "ClientCallAgain",
+    ClientsFlushed = "ClientsFlushed",
 
     //global settings module
     GlobalSettingsChanged = "GlobalSettingsChanged",
+
+    // frontend cache-invalidation events
+    CategoriesChanged = "CategoriesChanged",
+    OpeningHoursChanged = "OpeningHoursChanged",
+    LogoAvailabilityChanged = "LogoAvailabilityChanged",
+    UserSettingsChanged = "UserSettingsChanged",
 
     ReloadFrontend = "ReloadFrontend",
 }

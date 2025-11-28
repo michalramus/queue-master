@@ -3,6 +3,7 @@ import { DayOfWeek, Opening_Hours } from "@prisma/client";
 import { DatabaseService } from "../database/database.service";
 import { OpeningHoursDto, CreateOpeningHoursDto } from "./dto/opening-hours.dto";
 import { SseService } from "../sse/sse.service";
+import { sseEvents } from "src/sse/sseEvents.enum";
 import { Entity } from "../auth/types/entity.class";
 
 @Injectable()
@@ -86,8 +87,7 @@ export class OpeningHoursService {
             }
         }
 
-        // Emit SSE event for real-time updates
-        this.sseService.reloadFrontend();
+        this.sseService.emit(sseEvents.OpeningHoursChanged, null);
 
         const results = await this.findAll();
 

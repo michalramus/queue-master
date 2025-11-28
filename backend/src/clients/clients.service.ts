@@ -180,7 +180,7 @@ export class ClientsService {
         }
 
         const deletedClients = await this.databaseService.client.deleteMany({ where: { category_id: categoryId } });
-        this.sseService.reloadFrontend();
+        this.sseService.emit(sseEvents.ClientsFlushed, null);
         this.logger.log(
             `[${entity.name}] Successfully deleted ${deletedClients.count} clients from category: ${category.short_name} (ID: ${categoryId})`,
         );

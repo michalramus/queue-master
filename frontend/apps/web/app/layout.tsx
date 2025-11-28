@@ -9,6 +9,7 @@ import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { getGlobalSettings, GlobalSettingsInterface } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { SseProvider } from "@/utils/providers/SseProvider";
+import GlobalStylesProvider from "@/components/GlobalStylesProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,7 +43,7 @@ export default async function RootLayout({
     return (
         <html lang={locale}>
             <body className={inter.className}>
-                {/* Setup global colors */}
+                {/* Setup global colors - server-side initial render */}
                 <style>{`:root { 
                                 ${globalSettings.color_background ? `--color-background: ${globalSettings.color_background} !important;` : ""}
                                 ${globalSettings.color_primary_1 ? `--color-primary-1: ${globalSettings.color_primary_1} !important;` : ""}
@@ -63,12 +64,13 @@ export default async function RootLayout({
                                 }`}</style>
                 <ClientErrorBoundary>
                     <NextIntlClientProvider messages={messages}>
-                        <SseProvider>
-                            <RefreshOnSseEvents />
-                            <ReactQueryProvider>
+                        <ReactQueryProvider>
+                            <SseProvider>
+                                <GlobalStylesProvider initialData={globalSettings} />
+                                <RefreshOnSseEvents />
                                 <main>{children}</main>
-                            </ReactQueryProvider>
-                        </SseProvider>
+                            </SseProvider>
+                        </ReactQueryProvider>
                     </NextIntlClientProvider>
                 </ClientErrorBoundary>
             </body>

@@ -5,6 +5,7 @@ import * as fsSync from "fs";
 import * as path from "path";
 import { Entity } from "src/auth/types/entity.class";
 import { SseService } from "src/sse/sse.service";
+import { sseEvents } from "src/sse/sseEvents.enum";
 import { LogoID } from "./types/logoID.enum";
 
 @Injectable()
@@ -62,7 +63,7 @@ export class LogoFileService {
         await fs.mkdir(path.resolve(this.uploadsPath, this.logoFolder), { recursive: true });
         await fs.writeFile(path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`), file.buffer);
 
-        this.sseService.reloadFrontend();
+        this.sseService.emit(sseEvents.LogoAvailabilityChanged, null);
         this.logger.log(`[${entity.name}] Uploaded new logo with id ${id}`);
         return { message: "Logo uploaded successfully" };
     }
@@ -78,7 +79,7 @@ export class LogoFileService {
         }
 
         await fs.unlink(filePath);
-        this.sseService.reloadFrontend();
+        this.sseService.emit(sseEvents.LogoAvailabilityChanged, null);
         this.logger.log(`[${entity.name}] Deleted logo with id ${id}`);
         return { message: "Logo deleted successfully" };
     }
