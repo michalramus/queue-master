@@ -1,5 +1,6 @@
 import { IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { LangCode } from "@prisma/client";
 import { CategoryResponseDto } from "src/categories/dto/category.dto";
 
 export class ClientCreateDto {
@@ -11,6 +12,15 @@ export class ClientCreateDto {
     @IsNumber()
     @IsNotEmpty()
     categoryId: number;
+
+    @ApiProperty({
+        description: "Language code for the client ticket",
+        enum: LangCode,
+        example: LangCode.en,
+    })
+    @IsString()
+    @IsNotEmpty()
+    language: LangCode;
 }
 
 export class ClientUpdateDto {
@@ -58,6 +68,13 @@ export class ClientResponseDto {
         nullable: true,
     })
     desk: number | null;
+
+    @ApiProperty({
+        description: "Language code for the client ticket",
+        enum: LangCode,
+        example: LangCode.en,
+    })
+    language: LangCode;
 
     @ApiProperty({
         description: "Creation date",

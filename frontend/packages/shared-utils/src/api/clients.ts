@@ -1,5 +1,6 @@
 import { CategoryInterface } from "./categories";
 import { AxiosAuthInstance } from "../axiosInstances.interface";
+import { LangCode } from "../types/LangCode";
 
 export interface ClientInterface {
     id: number;
@@ -8,6 +9,7 @@ export interface ClientInterface {
     category: CategoryInterface;
     status: "Waiting" | "InService";
     desk: number | null;
+    language: LangCode;
     creation_date: Date;
     queue_length?: number;
 }
@@ -16,9 +18,13 @@ const apiPath = "/clients";
 
 export async function addClient(
     categoryId: number,
+    language: LangCode,
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<ClientInterface> {
-    const response = await axiosAuthInstance.auth.post(apiPath, { categoryId: categoryId });
+    const response = await axiosAuthInstance.auth.post(apiPath, {
+        categoryId: categoryId,
+        language: language,
+    });
 
     return response.data;
 }

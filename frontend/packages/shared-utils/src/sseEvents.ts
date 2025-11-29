@@ -7,6 +7,7 @@ export enum sseEvents {
     ClientsFlushed = "ClientsChanged",
 
     GlobalSettingsChanged = "GlobalSettingsChanged",
+    MultilingualSettingsChanged = "MultilingualSettingsChanged",
     CategoriesChanged = "CategoriesChanged",
     OpeningHoursChanged = "OpeningHoursChanged",
     LogoAvailabilityChanged = "LogoAvailabilityChanged",

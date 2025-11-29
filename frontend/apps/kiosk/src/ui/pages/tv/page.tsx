@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
 import { SmallHeader, Card } from "shared-components";
@@ -8,6 +9,7 @@ import {
     LogoID,
     OpeningHoursDto,
     useLogoAvailabilities,
+    useGlobalSettings,
 } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
@@ -20,7 +22,9 @@ interface TVPageProps {
 }
 
 export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
+    const { i18n } = useTranslation();
     const { data: appConfig } = useAppConfig();
+    const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
 
     const [currentClient, setCurrentClient] = useState<ClientInterface | null>(null);
     const currentClientRef = useRef<ClientInterface | null>(null);
@@ -73,6 +77,11 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
         isShowNewClientsRunning.current = true;
 
         for (const client of newClientsQueue) {
+            // Switch language if auto-switch is enabled
+            if (globalSettings?.tv_auto_switch_language && client.language) {
+                await i18n.changeLanguage(client.language);
+            }
+
             if (
                 currentClientRef.current?.number != client.number &&
                 previousClientsRef.current?.findIndex((e) => e.number === client.number) === -1
@@ -94,7 +103,7 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
         }
 
         isShowNewClientsRunning.current = false;
-    }, [newClientsQueue]);
+    }, [newClientsQueue, globalSettings, i18n]);
 
     useEffect(() => {
         showNewClients();

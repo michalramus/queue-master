@@ -11,6 +11,7 @@ import { DevicesModule } from "./devices/devices.module";
 import { GlobalSettingsModule } from "./global-settings/global-settings.module";
 import { SettingsModule } from "./settings/settings.module";
 import { UserSettingsModule } from "./user-settings/user-settings.module";
+import { MultilingualSettingsModule } from "./multilingual-settings/multilingual-settings.module";
 import { MultilingualTextModule } from "./multilingual-text/multilingual-text.module";
 import { FileModule } from "./file/file.module";
 import { OpeningHoursModule } from "./opening-hours/opening-hours.module";
@@ -37,6 +38,7 @@ import { OpeningHoursModule } from "./opening-hours/opening-hours.module";
         GlobalSettingsModule,
         SettingsModule,
         UserSettingsModule,
+        MultilingualSettingsModule,
         MultilingualTextModule,
         FileModule,
         OpeningHoursModule,

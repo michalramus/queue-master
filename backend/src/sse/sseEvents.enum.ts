@@ -9,6 +9,7 @@ export enum sseEvents {
 
     //global settings module
     GlobalSettingsChanged = "GlobalSettingsChanged",
+    MultilingualSettingsChanged = "MultilingualSettingsChanged",
 
     // frontend cache-invalidation events
     CategoriesChanged = "CategoriesChanged",

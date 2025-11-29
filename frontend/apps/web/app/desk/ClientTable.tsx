@@ -6,8 +6,11 @@ import DeleteNumberModal from "./DeleteNumberModal";
 import ChooseNumberModal from "./ChooseNumberModal";
 import { useLocale, useTranslations } from "next-intl";
 import { AcceptIcon, Button, RejectIcon, Table } from "shared-components";
-import { ClientInterface, removeClient, setClientAsInService } from "shared-utils";
+import { ClientInterface, removeClient, setClientAsInService, LangCode } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
+import Image from "next/image";
+import plFlag from "flag-icons/flags/4x3/pl.svg";
+import gbFlag from "flag-icons/flags/4x3/gb.svg";
 
 /**
  * Table with clients waiting for service
@@ -80,7 +83,7 @@ export default function ClientTable({
         setChooseNumberModalHidden(true);
     };
 
-    const columns = [t("number"), t("category"), t("creation_date"), ""];
+    const columns = [t("number"), t("category"), t("language"), t("creation_date"), ""];
     const rows: (string | number | ReactNode | null)[][] = [];
     filteredClientNumbers?.forEach((client, index) =>
         rows.push([
@@ -89,6 +92,14 @@ export default function ClientTable({
             </span>,
             <span key={index} className="text-text-2 text-lg">
                 {client.category.name[locale] || client.category.short_name}
+            </span>,
+            <span key={index} className="flex items-center justify-center">
+                <Image
+                    src={client.language === LangCode.pl ? plFlag : gbFlag}
+                    alt={client.language.toUpperCase()}
+                    height={48}
+                    className="rounded border border-gray-300"
+                />
             </span>,
             <span key={index} className="text-base">
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}

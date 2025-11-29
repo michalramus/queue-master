@@ -4,3 +4,5 @@ export * from "./sseEvents";
 export * from "./api";
 
 export * from "./hooks";
+
+export * from "./types/LangCode";

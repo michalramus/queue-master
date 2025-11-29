@@ -3,6 +3,11 @@ import { AxiosAuthInstance, AxiosPureInstance } from "../axiosInstances.interfac
 export interface UserSettingsInterface {
     desk?: number;
 }
+
+export interface MultilingualSettingsInterface {
+    printing_ticket_template?: { [lang: string]: string };
+}
+
 export interface GlobalSettingsInterface {
     //colors
     color_background: string;
@@ -25,14 +30,13 @@ export interface GlobalSettingsInterface {
     locale: string;
     kiosk_markdown: string;
 
-    printing_ticket_template: string;
-
     enable_opening_hours: boolean;
     opening_hours_override: "override_to_open" | "override_to_close" | "off";
 }
 
 const apiPathGlobalSettings = "/settings/global";
 const apiPathUserSettings = "/settings/user";
+const apiPathMultilingualSettings = "/settings/multilingual";
 
 /**
  *
@@ -87,6 +91,31 @@ export async function setGlobalSettings(
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<GlobalSettingsInterface> {
     const response = await axiosAuthInstance.auth.patch(apiPathGlobalSettings, globalSettings);
+
+    return response.data;
+}
+
+export async function getMultilingualSettings(
+    axiosPureInstance: AxiosPureInstance,
+): Promise<MultilingualSettingsInterface> {
+    const response = await axiosPureInstance.pure.get(apiPathMultilingualSettings);
+
+    return response.data;
+}
+
+/**
+ * Use this endpoint only from Admin account
+ * @param multilingualSettings
+ * @returns
+ */
+export async function setMultilingualSettings(
+    multilingualSettings: MultilingualSettingsInterface,
+    axiosAuthInstance: AxiosAuthInstance,
+): Promise<MultilingualSettingsInterface> {
+    const response = await axiosAuthInstance.auth.patch(
+        apiPathMultilingualSettings,
+        multilingualSettings,
+    );
 
     return response.data;
 }

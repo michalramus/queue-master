@@ -1,4 +1,5 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { LangCode } from "@prisma/client";
 import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
 import { SseService } from "../sse/sse.service";
@@ -49,6 +50,7 @@ export class ClientsService {
             data: {
                 number: counter,
                 status: "Waiting",
+                language: createClientDto.language,
                 category: {
                     connect: {
                         id: createClientDto.categoryId,
@@ -85,6 +87,7 @@ export class ClientsService {
                 category: { select: { id: true, short_name: true } },
                 status: true,
                 desk: true,
+                language: true,
                 creation_date: true,
             },
         });
@@ -243,6 +246,7 @@ export class ClientsService {
         category_id: number;
         status: "Waiting" | "InService";
         desk: number | null;
+        language: LangCode;
         creation_date: Date;
         queue_length?: number;
         category: { id: number; short_name: string };

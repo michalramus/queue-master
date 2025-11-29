@@ -16,6 +16,10 @@ export default function RefreshOnSseEvents() {
             queryClient.invalidateQueries({ queryKey: ["globalSettings"] });
         }
 
+        function onMultilingualSettingsChanged() {
+            queryClient.invalidateQueries({ queryKey: ["multilingualSettings"] });
+        }
+
         function onCategoriesChanged() {
             queryClient.invalidateQueries({ queryKey: ["categories"] });
         }
@@ -38,6 +42,7 @@ export default function RefreshOnSseEvents() {
         }
 
         addEventListener(sseEvents.GlobalSettingsChanged, onGlobalSettingsChanged);
+        addEventListener(sseEvents.MultilingualSettingsChanged, onMultilingualSettingsChanged);
         addEventListener(sseEvents.CategoriesChanged, onCategoriesChanged);
         addEventListener(sseEvents.OpeningHoursChanged, onOpeningHoursChanged);
         addEventListener(sseEvents.LogoAvailabilityChanged, onLogoAvailabilityChanged);
@@ -46,6 +51,10 @@ export default function RefreshOnSseEvents() {
 
         return () => {
             removeEventListener(sseEvents.GlobalSettingsChanged, onGlobalSettingsChanged);
+            removeEventListener(
+                sseEvents.MultilingualSettingsChanged,
+                onMultilingualSettingsChanged,
+            );
             removeEventListener(sseEvents.CategoriesChanged, onCategoriesChanged);
             removeEventListener(sseEvents.OpeningHoursChanged, onOpeningHoursChanged);
             removeEventListener(sseEvents.LogoAvailabilityChanged, onLogoAvailabilityChanged);

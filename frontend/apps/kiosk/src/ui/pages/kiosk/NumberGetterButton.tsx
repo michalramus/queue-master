@@ -6,7 +6,13 @@ import { useMutation } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Modal } from "shared-components";
-import { addClient, CategoryInterface, useGlobalSettings } from "shared-utils";
+import {
+    addClient,
+    CategoryInterface,
+    useGlobalSettings,
+    useMultilingualSettings,
+    LangCode,
+} from "shared-utils";
 
 export default function NumberGetterButton({
     category,
@@ -17,6 +23,7 @@ export default function NumberGetterButton({
 }) {
     const { i18n, t } = useTranslation();
     const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
+    const { data: multilingualSettings } = useMultilingualSettings(axiosPureInstance);
     const { data: appConfig } = useAppConfig();
     const locale = i18n.language;
 
@@ -38,18 +45,21 @@ export default function NumberGetterButton({
     //TODO: Add loading when waiting for ticket
     // Create new client
     const mutation = useMutation({
-        mutationFn: ({ categoryId }: { categoryId: number }) =>
-            addClient(categoryId, axiosAuthInstance),
+        mutationFn: ({ categoryId, language }: { categoryId: number; language: LangCode }) =>
+            addClient(categoryId, language, axiosAuthInstance),
         onSuccess: async (data) => {
             if (data != null) {
                 console.log("Client", data);
 
                 setLoadingPage(true);
                 setLastTicketString(data.category.short_name + data.number.toString());
-                window.electronAPI.executePrintTicket(
-                    data,
-                    globalSettings?.printing_ticket_template || "",
-                );
+
+                // Get the ticket template for the current language
+                const ticketTemplate =
+                    multilingualSettings?.printing_ticket_template?.[locale] ||
+                    "Specify ticket template in settings for language " + locale;
+
+                window.electronAPI.executePrintTicket(data, ticketTemplate);
                 await new Promise((resolve) => setTimeout(resolve, printingTime));
                 setLoadingPage(false);
             }
@@ -58,7 +68,10 @@ export default function NumberGetterButton({
 
     const handleButtonClick = () => {
         if (category.id !== undefined) {
-            mutation.mutate({ categoryId: category.id });
+            mutation.mutate({
+                categoryId: category.id,
+                language: locale as LangCode,
+            });
         }
     };
 

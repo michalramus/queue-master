@@ -90,6 +90,7 @@ async function handleInvokeAudioSynthesizer(
         categoryShortName: client.category.short_name,
         number: client.number,
         desk: client.desk,
+        language: client.language,
     })}`;
 
     const audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);

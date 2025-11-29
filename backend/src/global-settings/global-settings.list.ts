@@ -1,3 +1,4 @@
+import { LangCode } from "@prisma/client";
 import { HexColorSettingValue } from "src/settings/types/hexColorSettingValue.class";
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
 import { EnumSettingValue } from "src/settings/types/enumSettingValue.class";
@@ -24,23 +25,16 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
     color_text_2: new Setting<HexColorSettingValue>("color_text_2", new HexColorSettingValue("#4b5563")),
 
     kiosk_markdown: new Setting<string>("kiosk_markdown", ""), //markdown text shown on kiosk page
-    locale: new Setting<EnumSettingValue>("locale", new EnumSettingValue("en", ["en", "pl"])),
-
-    printing_ticket_template: new Setting<string>(
-        "printing_ticket_template",
-        `
-        <div style="text-align:center;font-family:Helvetica"> 
-            <p style="font-size:12px;font-weight:bold;margin-bottom:1px">Your</br>Brand</p> 
-            <p style="font-size:28px;font-weight:bold">&categoryShortName&number</p> 
-            <p style="font-size:9px">&date&nbsp&nbsp&nbsp&time</p> 
-        </div>
-        `,
-    ), //Template used for printing tickets
+    locale: new Setting<EnumSettingValue>("locale", new EnumSettingValue(LangCode.en, Object.values(LangCode))),
 
     enable_opening_hours: new Setting<BooleanSettingValue>("enable_opening_hours", new BooleanSettingValue(false)),
     opening_hours_override: new Setting<EnumSettingValue>(
         "opening_hours_override",
         new EnumSettingValue("off", ["off", "override_to_open", "override_to_close"]),
+    ),
+    tv_auto_switch_language: new Setting<BooleanSettingValue>(
+        "tv_auto_switch_language",
+        new BooleanSettingValue(false),
     ),
 };
 
