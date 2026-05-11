@@ -1,9 +1,11 @@
 "use client";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button, Card } from "shared-components";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { logout } from "shared-utils";
+import { useTopLoadingBar } from "@/utils/providers/TopLoadingBarProvider";
 
 export default function UserPanel({
     username,
@@ -14,14 +16,17 @@ export default function UserPanel({
 }) {
     const router = useRouter();
     const t = useTranslations();
+    const { show: showLoadingBar } = useTopLoadingBar();
 
-    function logoutHandler() {
-        logout(axiosPureInstance);
+    const handleLogout = async () => {
+        showLoadingBar();
+        await logout(axiosPureInstance);
         router.replace("/login");
-    }
+    };
 
-    const handleLogout = () => {
-        logoutHandler();
+    const handleAdminClick = () => {
+        showLoadingBar();
+        router.push("/admin");
     };
 
     return (
@@ -31,7 +36,7 @@ export default function UserPanel({
                 {t("user")}: {username}
             </p>
             {adminButton && (
-                <Button onClick={() => {}} color="blue">
+                <Button onClick={handleAdminClick} color="blue">
                     {t("admin_dashboard")}
                 </Button>
             )}

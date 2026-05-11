@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional, IsObject } from "class-validator";
 import { UserRole } from "@prisma/client";
 
 export class UserCreateDto {
@@ -21,6 +21,15 @@ export class UserCreateDto {
     })
     @IsEnum(UserRole)
     role: UserRole;
+
+    @ApiProperty({
+        description: "Initial user settings (optional)",
+        example: { desk: 1 },
+        required: false,
+    })
+    @IsOptional()
+    @IsObject()
+    settings?: { [key: string]: string | number };
 }
 
 export class UserUpdateDto {

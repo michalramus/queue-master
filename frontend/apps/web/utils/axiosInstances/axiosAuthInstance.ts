@@ -98,7 +98,7 @@ axiosAuthInstance.auth.interceptors.request.use(
             return config;
         }
 
-        logout(axiosPureInstance);
+        await logout(axiosPureInstance);
         // token expired
         return Promise.reject({
             response: {
@@ -124,16 +124,6 @@ axiosAuthInstance.auth.interceptors.response.use(
     },
     function (error) {
         // Do something with response error
-        if (error.response) {
-            // Server responded with a status code outside the 2xx range
-            console.error("Error Response:", error.response.data);
-        } else if (error.request) {
-            // Request was made but no response received
-            console.error("No response received:", error.request);
-        } else {
-            // Something happened in setting up the request
-            console.error("Request error:", error.message);
-        }
         return Promise.reject(error);
     },
 );

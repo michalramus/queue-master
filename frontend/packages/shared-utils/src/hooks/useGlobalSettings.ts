@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
-import { getGlobalSettings, GlobalSettingsInterface } from "../api/settings";
+import { getGlobalSettings, GlobalSettingsInterface } from "../api/globalSettings";
 import { AxiosPureInstance } from "../axiosInstances.interface";
 
 export function useGlobalSettings(

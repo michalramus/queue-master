@@ -4,3 +4,8 @@ export * from "./useCategories";
 export * from "./useLogoAvailabilities";
 export * from "./useOpeningHours";
 export * from "./useClients";
+export * from "./useAuthInfo";
+export * from "./useUserSettings";
+export * from "./useUsers";
+export * from "./useDevices";
+export * from "./useAllUsersSettings";

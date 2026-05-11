@@ -34,6 +34,8 @@ export default function GlobalStylesProvider({
             ${globalSettings.color_red_2 ? `--color-red-2: ${globalSettings.color_red_2} !important;` : ""}
             ${globalSettings.color_gray_1 ? `--color-gray-1: ${globalSettings.color_gray_1} !important;` : ""}
             ${globalSettings.color_gray_2 ? `--color-gray-2: ${globalSettings.color_gray_2} !important;` : ""}
+            ${globalSettings.color_yellow_1 ? `--color-yellow-1: ${globalSettings.color_yellow_1} !important;` : ""}
+            ${globalSettings.color_yellow_2 ? `--color-yellow-2: ${globalSettings.color_yellow_2} !important;` : ""}
             ${globalSettings.color_text_1 ? `--color-text-1: ${globalSettings.color_text_1} !important;` : ""}
             ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2} !important;` : ""}
         }`}</style>

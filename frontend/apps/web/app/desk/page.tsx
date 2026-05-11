@@ -4,11 +4,12 @@ import QueuePanel from "./QueuePanel";
 import UserPanel from "./UserPanel";
 
 import { SmallHeader } from "shared-components";
-import { getClients, getInfo, getUserSettings } from "shared-utils";
+import { getClients, getUserSettings } from "shared-utils";
+import { getCachedAuthInfo } from "@/utils/server/getCachedAuthInfo";
 
 export default async function DeskPage() {
     const clients = await getClients(axiosAuthInstance);
-    const user = (await getInfo(axiosAuthInstance)).data;
+    const user = await getCachedAuthInfo();
     const userSettings = await getUserSettings(axiosAuthInstance);
 
     return (
@@ -16,8 +17,8 @@ export default async function DeskPage() {
             <div className="flex flex-wrap justify-center sm:justify-between">
                 <SmallHeader />
                 <UserPanel
-                    username={user.username}
-                    adminButton={user.role === "Admin" ? true : false}
+                    username={user?.username || "Loading..."}
+                    adminButton={user?.role === "Admin" ? true : false}
                 />
             </div>
             <QueuePanel clients={clients} userSettings={userSettings} />

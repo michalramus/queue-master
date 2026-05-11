@@ -71,4 +71,35 @@ export class GlobalSettingsService {
 
         return newSettings;
     }
+
+    /**
+     * Reset global settings to defaults by deleting specified records
+     * @param settings array of setting keys to reset. If empty, reset all settings.
+     * @param entity entity performing the action
+     * @returns global settings after reset
+     */
+    async reset(settings: string[], entity: Entity): Promise<string> {
+        if (!settings || settings.length === 0) {
+            this.logger.log(`[${entity.name}] Resetting all global settings to defaults`);
+            // Delete all global settings from database
+            await this.databaseService.global_Setting.deleteMany();
+        } else {
+            this.logger.log(`[${entity.name}] Resetting global settings: ${settings.join(", ")} to defaults`);
+            // Delete only specified settings
+            await this.databaseService.global_Setting.deleteMany({
+                where: {
+                    key: {
+                        in: settings,
+                    },
+                },
+            });
+        }
+
+        const settingsAfterReset = await this.findAll();
+
+        // Emit SSE event on globalSettings change
+        this.sseService.emit(sseEvents.GlobalSettingsChanged, settingsAfterReset);
+
+        return settingsAfterReset;
+    }
 }

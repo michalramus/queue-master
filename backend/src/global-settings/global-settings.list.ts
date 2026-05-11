@@ -21,6 +21,8 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
     color_red_2: new Setting<HexColorSettingValue>("color_red_2", new HexColorSettingValue("#e04c34")),
     color_gray_1: new Setting<HexColorSettingValue>("color_gray_1", new HexColorSettingValue("#B1B2B5")),
     color_gray_2: new Setting<HexColorSettingValue>("color_gray_2", new HexColorSettingValue("#949494")),
+    color_yellow_1: new Setting<HexColorSettingValue>("color_yellow_1", new HexColorSettingValue("#f5c842")),
+    color_yellow_2: new Setting<HexColorSettingValue>("color_yellow_2", new HexColorSettingValue("#d4a017")),
     color_text_1: new Setting<HexColorSettingValue>("color_text_1", new HexColorSettingValue("#050315")),
     color_text_2: new Setting<HexColorSettingValue>("color_text_2", new HexColorSettingValue("#4b5563")),
 

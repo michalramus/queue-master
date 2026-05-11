@@ -50,7 +50,7 @@ export async function callAgainForClient(
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<ClientInterface | null> {
     const response = await axiosAuthInstance.auth.post(
-        apiPath + "/" + clientNumber.id + "/call-again",
+        `${apiPath}/${clientNumber.id}/call-again`,
         {},
     );
 

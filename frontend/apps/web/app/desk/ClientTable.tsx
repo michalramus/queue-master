@@ -2,10 +2,9 @@
 
 import React, { ReactNode, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import DeleteNumberModal from "./DeleteNumberModal";
-import ChooseNumberModal from "./ChooseNumberModal";
+import { AcceptIcon, Button, ConfirmModal, RejectIcon, Table } from "shared-components";
+
 import { useLocale, useTranslations } from "next-intl";
-import { AcceptIcon, Button, RejectIcon, Table } from "shared-components";
 import { ClientInterface, removeClient, setClientAsInService, LangCode } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import Image from "next/image";
@@ -29,10 +28,10 @@ export default function ClientTable({
     const t = useTranslations();
     const locale = useLocale();
 
-    const [deleteNumberModalHidden, setDeleteNumberModalHidden] = useState(true);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [clientToDelete, setClientToDelete] = useState<ClientInterface | null>(null);
 
-    const [chooseNumberModalHidden, setChooseNumberModalHidden] = useState(true);
+    const [chooseModalOpen, setChooseModalOpen] = useState(false);
     const [clientToChoose, setClientToChoose] = useState<ClientInterface | null>(null);
     //----------------------------------------
     //Api calls
@@ -57,30 +56,30 @@ export default function ClientTable({
 
     const handleDeleteClick = (client: ClientInterface) => {
         setClientToDelete(client);
-        setDeleteNumberModalHidden(false);
+        setDeleteModalOpen(true);
     };
 
     const handleChooseClick = (client: ClientInterface) => {
         setClientToChoose(client);
-        setChooseNumberModalHidden(false);
+        setChooseModalOpen(true);
     };
 
     const handleDeleteConfirm = () => {
         deleteClient.mutate(clientToDelete!);
-        setDeleteNumberModalHidden(true);
+        setDeleteModalOpen(false);
     };
 
     const handleDeleteCancel = () => {
-        setDeleteNumberModalHidden(true);
+        setDeleteModalOpen(false);
     };
 
     const handleChooseConfirm = () => {
         clientInService.mutate(clientToChoose!);
-        setChooseNumberModalHidden(true);
+        setChooseModalOpen(false);
     };
 
     const handleChooseCancel = () => {
-        setChooseNumberModalHidden(true);
+        setChooseModalOpen(false);
     };
 
     const columns = [t("number"), t("category"), t("language"), t("creation_date"), ""];
@@ -91,7 +90,7 @@ export default function ClientTable({
                 {client.category?.short_name + client.number}
             </span>,
             <span key={index} className="text-text-2 text-lg">
-                {client.category.name[locale] || client.category.short_name}
+                {client.category.name[locale as LangCode] || client.category.short_name}
             </span>,
             <span key={index} className="flex items-center justify-center">
                 <Image
@@ -131,22 +130,26 @@ export default function ClientTable({
 
     return (
         <>
-            <DeleteNumberModal
-                number={
-                    (clientToDelete?.category.short_name ?? "") + (clientToDelete?.number ?? "")
-                }
-                hidden={deleteNumberModalHidden}
-                deleteHandler={handleDeleteConfirm}
-                cancelHandler={handleDeleteCancel}
+            <ConfirmModal
+                isOpen={deleteModalOpen}
+                title={`${clientToDelete?.category.short_name ?? ""}${clientToDelete?.number ?? ""}`}
+                message={t("are_you_sure_delete_ticket")}
+                confirmText={t("delete")}
+                cancelText={t("cancel")}
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
+                type="danger"
             />
 
-            <ChooseNumberModal
-                number={
-                    (clientToChoose?.category.short_name ?? "") + (clientToChoose?.number ?? "")
-                }
-                hidden={chooseNumberModalHidden}
-                chooseHandler={handleChooseConfirm}
-                cancelHandler={handleChooseCancel}
+            <ConfirmModal
+                isOpen={chooseModalOpen}
+                title={`${clientToChoose?.category.short_name ?? ""}${clientToChoose?.number ?? ""}`}
+                message={t("are_you_sure_choose_ticket")}
+                confirmText={t("choose")}
+                cancelText={t("cancel")}
+                onConfirm={handleChooseConfirm}
+                onCancel={handleChooseCancel}
+                type="primary"
             />
             <Table columns={columns} rows={rows} />
         </>
