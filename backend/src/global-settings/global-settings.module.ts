@@ -3,10 +3,10 @@ import { GlobalSettingsService } from "./global-settings.service";
 import { GlobalSettingsController } from "./global-settings.controller";
 import { DatabaseModule } from "../database/database.module";
 import { AuthModule } from "src/auth/auth.module";
-import { WebsocketsModule } from "src/websockets/websockets.module";
+import { SseModule } from "src/sse/sse.module";
 
 @Module({
-    imports: [DatabaseModule, AuthModule, WebsocketsModule],
+    imports: [DatabaseModule, AuthModule, SseModule],
     controllers: [GlobalSettingsController],
     providers: [GlobalSettingsService],
 })

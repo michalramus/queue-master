@@ -1,5 +1,6 @@
 import { CategoryInterface } from "./categories";
 import { AxiosAuthInstance } from "../axiosInstances.interface";
+import { LangCode } from "../types/LangCode";
 
 export interface ClientInterface {
     id: number;
@@ -7,7 +8,8 @@ export interface ClientInterface {
     category_id: number;
     category: CategoryInterface;
     status: "Waiting" | "InService";
-    seat: number | null;
+    desk: number | null;
+    language: LangCode;
     creation_date: Date;
     queue_length?: number;
 }
@@ -16,19 +18,23 @@ const apiPath = "/clients";
 
 export async function addClient(
     categoryId: number,
+    language: LangCode,
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<ClientInterface> {
-    const response = await axiosAuthInstance.auth.post(apiPath, { categoryId: categoryId });
+    const response = await axiosAuthInstance.auth.post(apiPath, {
+        categoryId: categoryId,
+        language: language,
+    });
 
     return response.data;
 }
 
 export async function setClientAsInService(
     clientNumber: ClientInterface,
-    seat: number,
+    desk: number,
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<ClientInterface | null> {
-    clientNumber.seat = seat;
+    clientNumber.desk = desk;
     clientNumber.status = "InService";
 
     const response = await axiosAuthInstance.auth.patch(
@@ -44,7 +50,7 @@ export async function callAgainForClient(
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<ClientInterface | null> {
     const response = await axiosAuthInstance.auth.post(
-        apiPath + "/" + clientNumber.id + "/call-again",
+        `${apiPath}/${clientNumber.id}/call-again`,
         {},
     );
 

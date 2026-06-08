@@ -4,14 +4,14 @@ import { useTranslation } from "react-i18next";
 interface CurrentNumberWidgetProps {
     category_short_name: string;
     number: number | string;
-    seat: number | string;
+    desk: number | string;
     className?: React.ComponentProps<"div">["className"];
 }
 
 export default function CurrentNumberWidget({
     category_short_name,
     number,
-    seat,
+    desk,
     className,
 }: CurrentNumberWidgetProps) {
     const { t } = useTranslation();
@@ -40,11 +40,11 @@ export default function CurrentNumberWidget({
             />
             <Table
                 columns={[
-                    <span key={"Seat"} className="font-light">
-                        {t("seat")}
+                    <span key={"Desk"} className="font-light">
+                        {t("desk")}
                     </span>,
                 ]}
-                rows={[[seat != "" ? seat : <br />]]}
+                rows={[[desk != "" ? desk : <br />]]}
                 theadClassName="text-text-1 text-5xl"
                 tbodyClassName="text-text-1 border-0! text-7xl font-semibold"
             />

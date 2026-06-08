@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
-import { DeviceResponseDto, DevicePatchDto } from "./dto/device.dto";
+import { DeviceResponseDto, DevicePatchDto, DeviceCreateDto } from "./dto/device.dto";
 import { Entity } from "../auth/types/entity.class";
 import { JwtService } from "@nestjs/jwt";
 import { DeviceRegistrationResponseDto } from "../auth/dto/auth.dto";
@@ -28,11 +28,17 @@ export class DevicesService {
 
     /**
      * Register a new device and return JWT token
+     * @param deviceCreateDto - DTO containing device creation data
      * @param entity - Entity from request
      * @returns Device registration response with JWT token
      */
-    async createDevice(entity: Entity): Promise<DeviceRegistrationResponseDto> {
-        const device = await this.databaseService.device.create({ data: { accepted: true } });
+    async createDevice(deviceCreateDto: DeviceCreateDto, entity: Entity): Promise<DeviceRegistrationResponseDto> {
+        const device = await this.databaseService.device.create({
+            data: {
+                accepted: true,
+                comment: deviceCreateDto.comment,
+            },
+        });
 
         this.logger.log(`[${entity.name}] Registered new device ${JSON.stringify(device)}`);
         const payload = new Entity(device.id, "Device", `Device ${device.id}`).getJwtPayload();

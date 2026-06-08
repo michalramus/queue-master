@@ -6,12 +6,11 @@
     :root {
         /* Interface colors */
         --color-background: hsl(120, 60%, 99%);
-
-       
     }
 }
 
 @theme {
+    --color-background: hsl(120, 60%, 99%);
 
     --color-primary-1: hsl(139.8, 68.2%, 48%); /* L:48% */
     --color-primary-2: hsl(140, 82.4%, 37.8%); /* L:38% */
@@ -33,6 +32,21 @@
     --color-gray-1: #b1b2b5;
     --color-gray-2: #949494;
 
+    --color-yellow-1: #f5c842;
+    --color-yellow-2: #d4a017;
+
     --color-text-1: #050315;
     --color-text-2: #4b5563;
+
+    /* Animations */
+    --animate-slide: slide 1s ease-in-out infinite;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(400%);
+    }
 }

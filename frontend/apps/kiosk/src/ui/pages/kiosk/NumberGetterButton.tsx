@@ -1,45 +1,81 @@
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
-import useAppConfig from "@/utils/providers/AppConfigProvider";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
+import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
-import useGlobalSettings from "@/utils/providers/GlobalSettingsProvider";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Modal } from "shared-components";
-import { addClient, CategoryInterface } from "shared-utils";
+import {
+    addClient,
+    CategoryInterface,
+    useGlobalSettings,
+    useMultilingualSettings,
+    LangCode,
+} from "shared-utils";
 
-export default function NumberGetterButton({ category }: { category: CategoryInterface }) {
+export default function NumberGetterButton({
+    category,
+    showCategoryShortName,
+}: {
+    category: CategoryInterface;
+    showCategoryShortName: boolean;
+}) {
     const { i18n, t } = useTranslation();
-    const globalSettings = useGlobalSettings();
-    const appConfig = useAppConfig();
+    const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
+    const { data: multilingualSettings } = useMultilingualSettings(axiosPureInstance);
+    const { data: appConfig } = useAppConfig();
     const locale = i18n.language;
 
-    const printingTime = appConfig.printingDialogueShowTime || 5000;
+    const printingTime = appConfig?.printingDialogueShowTime || 5000;
 
     const [loadingPage, setLoadingPage] = useState(false);
     const [lastTicketString, setLastTicketString] = useState(""); //category.shortname+number
 
+    const defaultLanguage = globalSettings?.locale || "en";
+
+    // Reset language to default when printing dialog closes
+    useEffect(() => {
+        if (!loadingPage && lastTicketString) {
+            // Dialog just closed, reset language
+            i18n.changeLanguage(defaultLanguage);
+        }
+    }, [loadingPage, lastTicketString, i18n, defaultLanguage]);
+
+    //TODO: Add loading when waiting for ticket
     // Create new client
     const mutation = useMutation({
-        mutationFn: ({ categoryId }: { categoryId: number }) =>
-            addClient(categoryId, axiosAuthInstance),
+        mutationFn: ({ categoryId, language }: { categoryId: number; language: LangCode }) =>
+            addClient(categoryId, language, axiosAuthInstance),
         onSuccess: async (data) => {
             if (data != null) {
                 console.log("Client", data);
 
                 setLoadingPage(true);
                 setLastTicketString(data.category.short_name + data.number.toString());
-                window.electronAPI.executePrintTicket(
-                    data,
-                    globalSettings.printing_ticket_template,
-                );
+
+                // Get the ticket template for the current language
+                const ticketTemplate =
+                    multilingualSettings?.printing_ticket_template?.[locale] ||
+                    "Specify ticket template in settings for language " + locale;
+
+                window.electronAPI.executePrintTicket(data, ticketTemplate);
                 await new Promise((resolve) => setTimeout(resolve, printingTime));
                 setLoadingPage(false);
             }
         },
     });
 
-    //TODO fix printing screen
+    const handleButtonClick = () => {
+        if (category.id !== undefined) {
+            mutation.mutate({
+                categoryId: category.id,
+                language: locale as LangCode,
+            });
+        }
+    };
+
+    //TODO fix printing screen - block button for 0,5s after clicked
     return (
         <>
             <Modal hidden={!loadingPage}>
@@ -63,20 +99,18 @@ export default function NumberGetterButton({ category }: { category: CategoryInt
                 </div>
             </Modal>
             <Button
-                onClick={() => {
-                    if (category.id !== undefined) {
-                        mutation.mutate({ categoryId: category.id });
-                    }
-                }}
+                onClick={handleButtonClick}
                 className="border-primary-1 relative! m-3! flex! w-9/12! items-center! justify-center! rounded-3xl! border-2! p-6! text-3xl!"
                 color="secondary"
             >
                 {/* TODO: text-white class replace with custom class or left it to be ok */}
-                <div className="absolute top-1/2 left-6 -translate-y-1/2 transform">
-                    <span className="bg-primary-1 rounded-lg px-4 py-2 text-2xl font-bold text-white shadow-md">
-                        {category.short_name}
-                    </span>
-                </div>
+                {showCategoryShortName && (
+                    <div className="absolute top-1/2 left-6 -translate-y-1/2 transform">
+                        <span className="bg-primary-1 rounded-lg px-4 py-2 text-2xl font-bold text-white shadow-md">
+                            {category.short_name}
+                        </span>
+                    </div>
+                )}
                 <span className="text-center">
                     {category.name[locale as keyof typeof category.name] || category.short_name}
                 </span>

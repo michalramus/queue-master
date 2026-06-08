@@ -1,9 +1,10 @@
-import { Controller, Get, Body, Patch, Param, UseGuards, Request, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Body, Patch, Param, UseGuards, Request, ParseIntPipe, Delete } from "@nestjs/common";
 import { UserSettingsService } from "./user-settings.service";
 import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import { ResetUserSettingsDto } from "./dto/reset-settings.dto";
 import {
     ApiTags,
     ApiOperation,
@@ -41,6 +42,28 @@ export class UserSettingsController {
     // @ApiBearerAuth("JWT-auth")
     findSettings(@Request() req) {
         return this.userSettingsService.findSettings(Entity.convertFromReq(req));
+    }
+
+    /**
+     * Get settings for all users (Admin only)
+     */
+    @Get("all")
+    @Roles(["Admin"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Get settings for all users (Admin only)" })
+    @ApiResponse({
+        status: 200,
+        description: "All users' settings retrieved",
+        schema: {
+            type: "object",
+            description: "Object mapping user IDs to their settings",
+            example: '{ "1": {"desk": 1}, "2": {"desk": 2} }',
+        },
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    findAllUsersSettings() {
+        return this.userSettingsService.findAllUsersSettings();
     }
 
     /**
@@ -129,5 +152,62 @@ export class UserSettingsController {
         @Request() req,
     ) {
         return this.userSettingsService.updateUserSettings(id, settings, Entity.convertFromReq(req));
+    }
+
+    /**
+     * Reset settings for a specific user to defaults (Admin only)
+     * @param id
+     */
+    @Delete(":id")
+    @Roles(["Admin"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Reset settings for a specific user to defaults (Admin only)" })
+    @ApiParam({ name: "id", description: "User ID", type: "number" })
+    @ApiBody({
+        description: "Settings keys to reset. If keys array is empty or not provided, all settings will be reset.",
+        type: ResetUserSettingsDto,
+        required: false,
+    })
+    @ApiResponse({
+        status: 200,
+        description: "User settings reset to defaults",
+        schema: {
+            type: "object",
+            description: "JSON string containing user settings after reset",
+            example: '{"desk": "1", "notifications": false}',
+        },
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    resetUserSettings(@Param("id", ParseIntPipe) id: number, @Body() resetDto: ResetUserSettingsDto, @Request() req) {
+        return this.userSettingsService.resetUserSettings(id, resetDto.settings || [], Entity.convertFromReq(req));
+    }
+
+    /**
+     * Reset settings for currently logged in user to defaults
+     */
+    @Delete()
+    @Roles(["Admin", "User"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Reset settings for currently logged in user to defaults" })
+    @ApiBody({
+        description: "Settings keys to reset. If keys array is empty or not provided, all settings will be reset.",
+        type: ResetUserSettingsDto,
+        required: false,
+    })
+    @ApiResponse({
+        status: 200,
+        description: "User settings reset to defaults",
+        schema: {
+            type: "object",
+            description: "JSON string containing user settings after reset",
+            example: '{"desk": "1", "notifications": false}',
+        },
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    resetOwnSettings(@Body() resetDto: ResetUserSettingsDto, @Request() req) {
+        const entity = Entity.convertFromReq(req);
+
+        return this.userSettingsService.resetUserSettings(entity.id, resetDto.settings || [], entity);
     }
 }

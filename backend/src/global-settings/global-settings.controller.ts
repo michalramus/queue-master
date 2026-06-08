@@ -1,9 +1,10 @@
-import { Controller, Get, Body, Patch, UseGuards, Request } from "@nestjs/common";
+import { Controller, Get, Body, Patch, UseGuards, Request, Delete } from "@nestjs/common";
 import { GlobalSettingsService } from "./global-settings.service";
 import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import { ResetGlobalSettingsDto } from "./dto/reset-settings.dto";
 import {
     ApiTags,
     ApiOperation,
@@ -61,5 +62,29 @@ export class GlobalSettingsController {
     // @ApiBearerAuth("JWT-auth")
     update(@Body() settings: { [key: string]: string | number }, @Request() req) {
         return this.globalSettingsService.update(settings, Entity.convertFromReq(req));
+    }
+
+    @Delete()
+    @Roles(["Admin"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Reset global settings to defaults" })
+    @ApiBody({
+        description: "Settings keys to reset. If keys array is empty or not provided, all settings will be reset.",
+        type: ResetGlobalSettingsDto,
+        required: false,
+    })
+    @ApiResponse({
+        status: 200,
+        description: "Settings reset to defaults",
+        schema: {
+            type: "string",
+            description: "JSON object containing global settings after reset",
+            example: '{"color_background": "#fbfefb", "locale": "en"}',
+        },
+    })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
+    reset(@Body() resetDto: ResetGlobalSettingsDto, @Request() req) {
+        return this.globalSettingsService.reset(resetDto.settings || [], Entity.convertFromReq(req));
     }
 }

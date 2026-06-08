@@ -1,5 +1,11 @@
 import { AxiosAuthInstance, AxiosPureInstance } from "shared-utils";
 
+export interface AuthInfoInterface {
+    id: number;
+    role: "Device" | "User" | "Admin";
+    username?: string;
+}
+
 const apiPath = "/auth";
 
 export async function login(username: string, password: string, axiosInstance: AxiosPureInstance) {
@@ -8,12 +14,6 @@ export async function login(username: string, password: string, axiosInstance: A
         { username, password },
         { headers: { "Content-Type": "application/json" } },
     );
-
-    return response;
-}
-
-export async function registerDevice(axiosInstance: AxiosPureInstance) {
-    const response = await axiosInstance.pure.post(apiPath + "/register-device", {});
 
     return response;
 }
@@ -33,7 +33,7 @@ export async function refreshJWTToken(
     cookie: null | string = null,
     authorization: null | string = null,
 ) {
-    const headers: any = {};
+    const headers: Record<string, string> = {};
     if (cookie) {
         headers["Cookie"] = cookie;
     }
@@ -61,7 +61,7 @@ export async function logout(axiosInstance: AxiosPureInstance) {
  */
 export async function getInfo(
     axiosAuthInstance: AxiosAuthInstance,
-): Promise<{ data: any; status: number }> {
+): Promise<{ data: AuthInfoInterface; status: number }> {
     const response = await axiosAuthInstance.auth.get(apiPath + "/get-info");
 
     return response;

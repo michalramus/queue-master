@@ -62,13 +62,13 @@ Token is automatically saved in cookies, so you don't have to do anything more.
     }
 
     @Post("logout")
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    // @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "User logout" })
     @ApiResponse({ status: 200, description: "Logout successful", type: MessageResponseDto })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     // @ApiBearerAuth("JWT-auth")
-    async logout(@Request() req, @Res({ passthrough: true }) res: Response): Promise<MessageResponseDto> {
-        return this.authService.logout(Entity.convertFromReq(req), res);
+    async logout(@Res({ passthrough: true }) res: Response): Promise<MessageResponseDto> {
+        return this.authService.logout(res);
     }
 
     /**

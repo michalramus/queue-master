@@ -1,69 +1,73 @@
-import RefreshOnWsEvents from "./components/RefreshOnWsEvents";
+import RefreshOnSseEvents from "./components/RefreshOnSseEvents";
 import KioskPage from "./pages/kiosk/page";
-import { AppConfigProvider } from "./utils/providers/AppConfigProvider";
-import { GlobalSettingsProvider } from "./utils/providers/GlobalSettingsProvider";
 
 import TVPage from "@/pages/tv/page";
 
-import { getGlobalSettings, getOpeningHours, OpeningHoursDto } from "shared-utils";
-import { useQuery } from "@tanstack/react-query";
+import { useGlobalSettings, useOpeningHours } from "shared-utils";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import i18n from "./i18n";
 import { isKioskOpen } from "./utils/isKioskOpen";
 import { axiosAuthInstance } from "./utils/axiosInstances/axiosAuthInstance";
+import { useAppConfig } from "./utils/hooks/useAppConfig";
 
 export default function App() {
-    const { data: globalSettings, isError: globalSettingsError } = useQuery({
-        queryKey: ["App_globalSettings"],
-        queryFn: () => getGlobalSettings(axiosPureInstance),
-        retry: true,
-    });
+    const { data: globalSettings, isError: globalSettingsError } =
+        useGlobalSettings(axiosPureInstance);
 
-    const { data: appConfig, isError: appConfigError } = useQuery({
-        queryKey: ["App_appConfig"],
-        queryFn: () => window.electronAPI.getAppConfig(),
-    });
+    const { data: appConfig, isError: appConfigError } = useAppConfig();
 
     //TODO add error handling for opening hours
     const {
         data: openingHours,
         // isLoading: openingHoursLoading,
         // isError: openingHoursError,
-    } = useQuery<OpeningHoursDto[]>({
-        queryKey: ["KioskPage_openingHours"],
-        queryFn: () => getOpeningHours(axiosAuthInstance),
-    });
+    } = useOpeningHours(axiosAuthInstance, { retry: true });
 
-    const [kioskOpen, setKioskOpen] = useState(() => true);
+    //TODO: Fix multi calls to scripts when app starts
+    const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet"); //TODO: use openingHoursLoading instead of "notSet"
 
-    const executeOpeningHoursScripts = useRef<(isOpen: boolean) => void>((isOpen: boolean) => {
-        if (isOpen) {
-            window.electronAPI.executeOpenKioskScript();
-        } else {
-            window.electronAPI.executeCloseKioskScript();
-        }
-    });
+    const executeOpeningHoursScripts = useCallback(
+        (isOpen: boolean) => {
+            if (!appConfig?.openingHoursEnableScripts) return;
 
-    // Make kioskOpen reactive to time
+            if (isOpen) {
+                window.electronAPI.executeOpenKioskScript();
+            } else {
+                window.electronAPI.executeCloseKioskScript();
+            }
+        },
+        [appConfig?.openingHoursEnableScripts],
+    );
+
+    // Execute scripts on kioskOpen change
     useEffect(() => {
-        setKioskOpen(isKioskOpen(openingHours || [], globalSettings));
-        executeOpeningHoursScripts.current(kioskOpen);
+        if (kioskOpen === "notSet") return;
+        executeOpeningHoursScripts(kioskOpen);
+    }, [kioskOpen, executeOpeningHoursScripts]);
 
+    // Set initial kioskOpen state
+    useEffect(() => {
+        if (!openingHours || !globalSettings) return;
+        setKioskOpen(isKioskOpen(openingHours, globalSettings));
+    }, [openingHours, globalSettings]);
+
+    // Set up periodic checks for kiosk state changes
+    useEffect(() => {
         // Calculate ms until next full minute
         const now = new Date();
         const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
         let interval: ReturnType<typeof setInterval>;
+
         const timeout = setTimeout(() => {
             const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
             if (newKioskOpen !== kioskOpen) {
-                executeOpeningHoursScripts.current(newKioskOpen);
                 setKioskOpen(newKioskOpen);
             }
+
             interval = setInterval(() => {
                 const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
                 if (newKioskOpen !== kioskOpen) {
-                    executeOpeningHoursScripts.current(newKioskOpen);
                     setKioskOpen(newKioskOpen);
                 }
             }, 60000);
@@ -72,7 +76,8 @@ export default function App() {
             clearTimeout(timeout);
             if (interval) clearInterval(interval);
         };
-    }, [openingHours, globalSettings, kioskOpen]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [openingHours, globalSettings]);
 
     useEffect(() => {
         if (globalSettings?.locale) {
@@ -119,17 +124,20 @@ export default function App() {
                                 ${globalSettings.color_text_2 ? `--color-text-2: ${globalSettings.color_text_2} !important;` : ""}
                                 }`}</style>
 
-            <AppConfigProvider appConfig={appConfig}>
-                <RefreshOnWsEvents />
-                <GlobalSettingsProvider globalSettings={globalSettings}>
-                    {appConfig.mode === "tv" && (
-                        <TVPage kioskOpen={kioskOpen} openingHours={openingHours || []} />
-                    )}
-                    {appConfig.mode === "kiosk" && (
-                        <KioskPage kioskOpen={kioskOpen} openingHours={openingHours || []} />
-                    )}
-                </GlobalSettingsProvider>
-            </AppConfigProvider>
+            <RefreshOnSseEvents />
+            {appConfig.mode === "tv" && (
+                <TVPage
+                    kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
+                    openingHours={openingHours || []}
+                />
+            )}
+            {appConfig.mode === "kiosk" && (
+                <KioskPage
+                    kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
+                    openingHours={openingHours || []}
+                />
+            )}
         </>
     );
 }
+//TODO: Move kioskOpen and openingHours to (use...) instead of providing by props to pages

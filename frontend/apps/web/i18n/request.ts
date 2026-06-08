@@ -19,9 +19,13 @@ export default getRequestConfig(async () => {
 
     // set locale from globalSettings
     if (locale == null) {
-        const globalSettings = await getGlobalSettings(axiosPureInstance);
-        if (locales.includes(globalSettings.locale as any)) {
-            locale = globalSettings.locale;
+        try {
+            const globalSettings = await getGlobalSettings(axiosPureInstance);
+            if (locales.includes(globalSettings.locale as any)) {
+                locale = globalSettings.locale;
+            }
+        } catch {
+            // backend unavailable, fall through to defaultLocale
         }
     }
 

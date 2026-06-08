@@ -4,10 +4,11 @@ import Card from "./Card";
 export default function Modal({
     children,
     hidden = false,
+    color = "secondary",
 }: {
     children: React.ReactNode;
-
     hidden?: boolean;
+    color?: "secondary" | "background";
 }) {
     return (
         <div
@@ -15,7 +16,9 @@ export default function Modal({
             tabIndex={-1}
             className={`fixed ${hidden ? "hidden" : ""} bg-gray-1/85 inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto`}
         >
-            <Card shadow={false}>{children}</Card>
+            <Card color={color} shadow={false} className="p-0!">
+                {children}
+            </Card>
         </div>
     );
 }

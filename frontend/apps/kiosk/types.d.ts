@@ -2,6 +2,7 @@ interface AppConfigInterface {
     JWTToken: string;
     backendUrl: string;
     mode: "kiosk" | "tv";
+    zoomFactor?: number; //Zoom factor for the window
 
     printingScript?: string; //Path to printing script
     printingDialogueShowTime?: number; //Block screen and show printing info for this amount of time in ms
@@ -10,10 +11,10 @@ interface AppConfigInterface {
 
     configError?: boolean; //If true, config is invalid
 
-    opening_hours_enable_banner: boolean;
-    opening_hours_enable_scripts: boolean;
-    opening_hours_open_script?: string;
-    opening_hours_close_script?: string;
+    openingHoursEnableBanner: boolean;
+    openingHoursEnableScripts: boolean;
+    openingHoursOpenScript?: string;
+    openingHoursCloseScript?: string;
 }
 
 interface ElectronAPIInterface {

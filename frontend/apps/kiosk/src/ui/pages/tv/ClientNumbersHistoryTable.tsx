@@ -74,7 +74,7 @@ export default function ClientNumbersHistory({
         rows.push([
             (clientNumber.category?.short_name ? clientNumber.category.short_name : "") +
                 clientNumber.number,
-            clientNumber.seat,
+            clientNumber.desk,
         ]),
     );
 
@@ -85,8 +85,8 @@ export default function ClientNumbersHistory({
                     <span key={"Number"} className="font-light">
                         {t("number")}
                     </span>,
-                    <span key={"Seat"} className="font-light">
-                        {t("seat")}
+                    <span key={"Desk"} className="font-light">
+                        {t("desk")}
                     </span>,
                 ]}
                 rows={rows}

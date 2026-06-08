@@ -1,0 +1,2 @@
+cd backend && yarn run pre-push
+cd ../frontend && yarn run pre-push

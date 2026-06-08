@@ -1,16 +1,21 @@
-import { Injectable, Logger, NotFoundException, ConflictException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, ConflictException, forwardRef, Inject } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
 import { User } from "./types/user.class";
 import { UserCreateDto, UserUpdateDto, UserPasswordUpdateDto, UserResponseDto } from "./dto/user.dto";
 import { Entity } from "../auth/types/entity.class";
 import { MessageResponseDto } from "../dto/messageResponse.dto";
+import { UserSettingsService } from "../user-settings/user-settings.service";
 import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UsersService {
     private readonly logger = new Logger(UsersService.name);
 
-    constructor(private readonly databaseService: DatabaseService) {}
+    constructor(
+        private readonly databaseService: DatabaseService,
+        @Inject(forwardRef(() => UserSettingsService))
+        private readonly userSettingsService: UserSettingsService,
+    ) {}
 
     /**
      *
@@ -83,6 +88,19 @@ export class UsersService {
         });
 
         this.logger.log(`[${entity.name}] Created user "${user.username}" with role "${user.role}"`);
+
+        // Set initial settings if provided
+        if (userCreateDto.settings && Object.keys(userCreateDto.settings).length > 0) {
+            try {
+                await this.userSettingsService.updateUserSettings(user.id, userCreateDto.settings, entity);
+                this.logger.log(
+                    `[${entity.name}] Set initial settings for user "${user.username}": ${JSON.stringify(userCreateDto.settings)}`,
+                );
+            } catch (error) {
+                this.logger.warn(`Failed to set initial settings for user "${user.username}": ${error.message}`);
+            }
+        }
+
         return user;
     }
 
@@ -104,6 +122,14 @@ export class UsersService {
             const existingUser = await this.findOneByUsername(userUpdateDto.username);
             if (existingUser) {
                 throw new ConflictException(`Username "${userUpdateDto.username}" already exists`);
+            }
+        }
+
+        // Prevent changing the last admin's role to User
+        if (userUpdateDto.role !== undefined && user.role === "Admin" && userUpdateDto.role === "User") {
+            const adminCount = await this.databaseService.user.count({ where: { role: "Admin" } });
+            if (adminCount <= 1) {
+                throw new ConflictException("Cannot change the role of the only administrator to user.");
             }
         }
 

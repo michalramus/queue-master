@@ -2,7 +2,8 @@ import { Injectable, Logger } from "@nestjs/common";
 import { DayOfWeek, Opening_Hours } from "@prisma/client";
 import { DatabaseService } from "../database/database.service";
 import { OpeningHoursDto, CreateOpeningHoursDto } from "./dto/opening-hours.dto";
-import { WebsocketsService } from "../websockets/websockets.service";
+import { SseService } from "../sse/sse.service";
+import { sseEvents } from "src/sse/sseEvents.enum";
 import { Entity } from "../auth/types/entity.class";
 
 @Injectable()
@@ -11,7 +12,7 @@ export class OpeningHoursService {
 
     constructor(
         private readonly databaseService: DatabaseService,
-        private readonly websocketsService: WebsocketsService,
+        private readonly sseService: SseService,
     ) {}
 
     async findAll(): Promise<Opening_Hours[]> {
@@ -86,8 +87,7 @@ export class OpeningHoursService {
             }
         }
 
-        // Emit websocket event for real-time updates
-        this.websocketsService.reloadFrontend();
+        this.sseService.emit(sseEvents.OpeningHoursChanged, null);
 
         const results = await this.findAll();
 

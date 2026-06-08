@@ -99,7 +99,7 @@ export class AuthService {
         return { message: "Successful token refresh" };
     }
 
-    async logout(entity: Entity, response: Response) {
+    async logout(response: Response) {
         response.clearCookie("jwt", { httpOnly: true, sameSite: "lax" });
         response.clearCookie("jwt_refresh", { httpOnly: true, sameSite: "lax" });
         response.clearCookie("jwt_expiration_date", { sameSite: "lax" });

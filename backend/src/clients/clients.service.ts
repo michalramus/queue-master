@@ -1,9 +1,10 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { LangCode } from "@prisma/client";
 import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
-import { WebsocketsService } from "../websockets/websockets.service";
+import { SseService } from "../sse/sse.service";
 import { Entity } from "src/auth/types/entity.class";
-import { wsEvents } from "src/websockets/wsEvents.enum";
+import { sseEvents } from "src/sse/sseEvents.enum";
 import { MultilingualTextService } from "src/multilingual-text/multilingual-text.service";
 import { ModuleNameMultilingualText } from "src/multilingual-text/types/multilingualTextCategories.enum";
 
@@ -11,7 +12,7 @@ import { ModuleNameMultilingualText } from "src/multilingual-text/types/multilin
 export class ClientsService {
     constructor(
         private readonly databaseService: DatabaseService,
-        private readonly websocketsService: WebsocketsService,
+        private readonly sseService: SseService,
         private readonly multilingualTextService: MultilingualTextService,
     ) {}
     private logger = new Logger(ClientsService.name);
@@ -49,6 +50,7 @@ export class ClientsService {
             data: {
                 number: counter,
                 status: "Waiting",
+                language: createClientDto.language,
                 category: {
                     connect: {
                         id: createClientDto.categoryId,
@@ -67,7 +69,7 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient({ queue_length: queueLength, ...dbClient });
 
-        this.websocketsService.emit(wsEvents.ClientWaiting, client);
+        this.sseService.emit(sseEvents.ClientWaiting, client);
         this.logger.log(
             `[${entity.name}] Client created with number ${client.category.short_name}${client.number} and status 'Waiting'`,
         );
@@ -84,7 +86,8 @@ export class ClientsService {
                 category_id: true,
                 category: { select: { id: true, short_name: true } },
                 status: true,
-                seat: true,
+                desk: true,
+                language: true,
                 creation_date: true,
             },
         });
@@ -95,7 +98,7 @@ export class ClientsService {
     }
 
     /**
-     * If any other client is in service by the same seat, it will be removed
+     * If any other client is in service by the same desk, it will be removed
      * @param id
      * @param updateClientDto
      * @returns
@@ -108,15 +111,15 @@ export class ClientsService {
             throw new NotFoundException("Client not found");
         }
 
-        // Delete any other client in service from the same seat
+        // Delete any other client in service from the same desk
         await this.databaseService.client.deleteMany({
-            where: { status: "InService", seat: updateClientDto.seat },
+            where: { status: "InService", desk: updateClientDto.desk },
         });
 
         // Update client
         const dbClient = await this.databaseService.client.update({
             where: { id: id },
-            data: { status: updateClientDto.status, seat: updateClientDto.seat },
+            data: { status: updateClientDto.status, desk: updateClientDto.desk },
             include: {
                 category: true,
             },
@@ -124,9 +127,9 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
-        this.websocketsService.emit(wsEvents.ClientInService, client);
+        this.sseService.emit(sseEvents.ClientInService, client);
         this.logger.log(
-            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and seat ${updateClientDto.seat}`,
+            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and desk ${updateClientDto.desk}`,
         );
         return client;
     }
@@ -144,7 +147,7 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
-        this.websocketsService.emit(wsEvents.ClientCallAgain, client);
+        this.sseService.emit(sseEvents.ClientCallAgain, client);
         this.logger.log(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} called again`,
         );
@@ -163,11 +166,27 @@ export class ClientsService {
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
-        this.websocketsService.emit(wsEvents.ClientRemoved, client);
+        this.sseService.emit(sseEvents.ClientRemoved, client);
         this.logger.log(
             `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number}  deleted`,
         );
         return client;
+    }
+
+    async removeAllFromCategory(categoryId: number, entity: Entity): Promise<void> {
+        const category = await this.databaseService.category.findUnique({ where: { id: categoryId } });
+        if (!category) {
+            this.logger.warn(
+                `[${entity.name}] Delete failed - Category with ID ${categoryId} not found when trying to delete all clients from category`,
+            );
+            throw new NotFoundException(`Category with ID ${categoryId} not found`);
+        }
+
+        const deletedClients = await this.databaseService.client.deleteMany({ where: { category_id: categoryId } });
+        this.sseService.emit(sseEvents.ClientsFlushed, null);
+        this.logger.log(
+            `[${entity.name}] Successfully deleted ${deletedClients.count} clients from category: ${category.short_name} (ID: ${categoryId})`,
+        );
     }
 
     async resetCounterAfterTime(categoryId: number) {
@@ -201,7 +220,7 @@ export class ClientsService {
         });
 
         if (clientsLowerThan.length > 0) {
-            this.logger.log(
+            this.logger.debug(
                 `Cannot reset counter for category ${categoryId}. Clients with number lower than ${this.minClientsCounterToReset} exist`,
             );
             return;
@@ -226,7 +245,8 @@ export class ClientsService {
         number: number;
         category_id: number;
         status: "Waiting" | "InService";
-        seat: number | null;
+        desk: number | null;
+        language: LangCode;
         creation_date: Date;
         queue_length?: number;
         category: { id: number; short_name: string };

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Delete, Patch, Param, Body, UseGuards, Request, ParseIntPipe } from "@nestjs/common";
 import { DevicesService } from "./devices.service";
-import { DeviceResponseDto, DevicePatchDto } from "./dto/device.dto";
+import { DeviceResponseDto, DevicePatchDto, DeviceCreateDto } from "./dto/device.dto";
 import { Roles } from "../auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -26,12 +26,16 @@ export class DevicesController {
     @Roles(["Admin", "User"])
     @UseGuards(JwtAuthGuard, RolesGuard)
     @ApiOperation({ summary: "Register a new device" })
+    @ApiBody({ type: DeviceCreateDto })
     @ApiResponse({ status: 201, description: "Device created", type: DeviceRegistrationResponseDto })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    async registerDevice(@Request() req): Promise<DeviceRegistrationResponseDto> {
-        return this.devicesService.createDevice(Entity.convertFromReq(req));
+    async registerDevice(
+        @Body() deviceCreateDto: DeviceCreateDto,
+        @Request() req,
+    ): Promise<DeviceRegistrationResponseDto> {
+        return this.devicesService.createDevice(deviceCreateDto, Entity.convertFromReq(req));
     }
 
     @Get()

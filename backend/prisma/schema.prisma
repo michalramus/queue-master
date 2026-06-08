@@ -19,7 +19,8 @@ model Client {
     category_id   Int
     category      Category @relation(fields: [category_id], references: [id])
     status        Status
-    seat          Int?
+    desk          Int?
+    language      LangCode @default(en)
     creation_date DateTime @default(now())
 
     @@unique([number, category_id])
@@ -82,6 +83,7 @@ enum UserRole {
 model Device {
     id       Int     @id @default(autoincrement())
     accepted Boolean @default(false)
+    comment  String? @db.VarChar(500)
 }
 
 model Global_Setting {

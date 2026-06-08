@@ -22,7 +22,8 @@ export function isKioskOpen(
     const now = new Date();
     const dayOfWeek = now.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase();
     const today = openingHours.find((entry) => entry.day_of_week === dayOfWeek);
-    if (!today || today.is_closed) return false;
+    if (!today) return true; // No hours set for today, assume open
+    if (today.is_closed) return false;
     if (!today.open_time || !today.close_time) return false;
 
     // Compare current time to open/close

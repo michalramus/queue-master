@@ -3,14 +3,14 @@ import { DatabaseService } from "../database/database.service";
 import { globalSettingsList } from "./global-settings.list";
 import { SettingSupportedTypes } from "src/settings/setting.class";
 import { Entity } from "src/auth/types/entity.class";
-import { WebsocketsService } from "../websockets/websockets.service";
-import { wsEvents } from "src/websockets/wsEvents.enum";
+import { SseService } from "../sse/sse.service";
+import { sseEvents } from "src/sse/sseEvents.enum";
 
 @Injectable()
 export class GlobalSettingsService {
     constructor(
         private readonly databaseService: DatabaseService,
-        private readonly websocketsService: WebsocketsService,
+        private readonly sseService: SseService,
     ) {}
     private logger = new Logger(GlobalSettingsService.name);
 
@@ -66,9 +66,40 @@ export class GlobalSettingsService {
 
         const newSettings = this.findAll();
 
-        //emit webSocket on globalSettings change
-        this.websocketsService.emit(wsEvents.GlobalSettingsChanged, newSettings);
+        //emit SSE event on globalSettings change
+        this.sseService.emit(sseEvents.GlobalSettingsChanged, newSettings);
 
         return newSettings;
+    }
+
+    /**
+     * Reset global settings to defaults by deleting specified records
+     * @param settings array of setting keys to reset. If empty, reset all settings.
+     * @param entity entity performing the action
+     * @returns global settings after reset
+     */
+    async reset(settings: string[], entity: Entity): Promise<string> {
+        if (!settings || settings.length === 0) {
+            this.logger.log(`[${entity.name}] Resetting all global settings to defaults`);
+            // Delete all global settings from database
+            await this.databaseService.global_Setting.deleteMany();
+        } else {
+            this.logger.log(`[${entity.name}] Resetting global settings: ${settings.join(", ")} to defaults`);
+            // Delete only specified settings
+            await this.databaseService.global_Setting.deleteMany({
+                where: {
+                    key: {
+                        in: settings,
+                    },
+                },
+            });
+        }
+
+        const settingsAfterReset = await this.findAll();
+
+        // Emit SSE event on globalSettings change
+        this.sseService.emit(sseEvents.GlobalSettingsChanged, settingsAfterReset);
+
+        return settingsAfterReset;
     }
 }

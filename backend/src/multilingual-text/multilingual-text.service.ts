@@ -62,15 +62,19 @@ export class MultilingualTextService {
      * Delete multilingual text entries
      * @param moduleName
      * @param key
+     * @param lang - Optional language code to delete specific language entry
      */
-    async deleteMultilingualText(moduleName: ModuleNameMultilingualText, key: number): Promise<void> {
+    async deleteMultilingualText(moduleName: ModuleNameMultilingualText, key: number, lang?: string): Promise<void> {
         await this.databaseService.multilingual_Text.deleteMany({
             where: {
                 module_name: moduleName,
                 key: key,
+                ...(lang && { lang: lang as any }),
             },
         });
 
-        this.logger.debug(`Deleted multilingual text for module ${moduleName} key ${key}`);
+        this.logger.debug(
+            `Deleted multilingual text for module ${moduleName} key ${key}${lang ? ` language ${lang}` : ""}`,
+        );
     }
 }
