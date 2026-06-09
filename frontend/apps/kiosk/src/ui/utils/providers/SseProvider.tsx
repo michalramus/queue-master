@@ -80,7 +80,7 @@ export function SseProvider({ children }: { children: ReactNode }) {
                 );
                 reconnectAttemptsRef.current++;
 
-                console.log(
+                console.debug(
                     `SSE reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})...`,
                 );
                 reconnectTimeoutRef.current = setTimeout(connect, delay);
