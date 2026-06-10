@@ -147,6 +147,21 @@ function createWindow(zoomFactor: number = 1) {
         },
     });
 
+    //Output devtools logs to main process console output
+    mainWindow.webContents.on("console-message", (_event, level, message, line, sourceId) => {
+        // level: 0=verbose/debug, 1=info, 2=warning, 3=error
+        const origin = sourceId ? `${sourceId}:${line}` : "renderer";
+        if (level === 3) {
+            console.error(`[renderer] ${message} (${origin})`);
+        } else if (level === 2) {
+            console.warn(`[renderer] ${message} (${origin})`);
+        } else if (level === 1) {
+            console.log(`[renderer] ${message} (${origin})`);
+        } else if (isDevelopment) {
+            console.debug(`[renderer] ${message} (${origin})`);
+        }
+    });
+
     if (zoomFactor && zoomFactor > 0) {
         console.log("Setting zoom factor to", zoomFactor);
         mainWindow.webContents.on("did-finish-load", () => {
