@@ -11,7 +11,7 @@ interface AppConfigInterface {
 
     configError?: boolean; //If true, config is invalid
 
-    openingHoursEnableBanner: boolean;
+    openingHoursEnableBanner: boolean; //If true, banner with opening hours will be shown when the kiosk is closed
     openingHoursEnableScripts: boolean;
     openingHoursOpenScript?: string;
     openingHoursCloseScript?: string;

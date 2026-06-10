@@ -1,7 +1,7 @@
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import CategoriesForm from "./CategoriesForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { Header, SmallHeader, StartupScreen } from "shared-components";
+import { Button, Header, SmallHeader, StartupScreen } from "shared-components";
 import {
     LogoID,
     OpeningHoursDto,
@@ -12,6 +12,10 @@ import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
+import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+const OPENING_HOURS_SHOW_DURATION = 60_000;
 
 export default function KioskPage({
     openingHours,
@@ -21,6 +25,23 @@ export default function KioskPage({
     kioskOpen: boolean;
 }) {
     const { data: appConfig } = useAppConfig();
+    const { t } = useTranslation();
+    const [showOpeningHours, setShowOpeningHours] = useState(false);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleShowOpeningHours = () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        setShowOpeningHours(true);
+        timerRef.current = setTimeout(
+            () => setShowOpeningHours(false),
+            OPENING_HOURS_SHOW_DURATION,
+        );
+    };
+
+    const handleCloseOpeningHours = () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        setShowOpeningHours(false);
+    };
 
     const { data: logoAvailability, isLoading: logoAvailabilityLoading } =
         useLogoAvailability(axiosPureInstance);
@@ -63,7 +84,18 @@ export default function KioskPage({
                         />
                     )}
                 </div>
-                <LanguageSwitcher />
+                <div className="flex w-36 flex-col gap-2">
+                    <LanguageSwitcher />
+                    {kioskOpen && (
+                        <Button
+                            onClick={handleShowOpeningHours}
+                            className="border-primary-1 relative! m-0! flex! w-full! items-center! justify-center! rounded-3xl! border-2! text-sm!"
+                            color="secondary"
+                        >
+                            {t("show_opening_hours")}
+                        </Button>
+                    )}
+                </div>
             </div>
             {logoAvailability?.includes(LogoID.logo_kiosk_main) && (
                 <div className="relative mb-2 flex h-72 w-2xl items-center justify-center">
@@ -77,7 +109,18 @@ export default function KioskPage({
 
             {!logoAvailability!.includes(LogoID.logo_kiosk_main) && <Header />}
 
-            {kioskOpen || !appConfig?.openingHoursEnableBanner ? (
+            {showOpeningHours && kioskOpen ? (
+                <div className="mx-auto flex w-full max-w-md flex-col items-center">
+                    <OpeningHoursWidget openingHours={openingHours || []} className="mt-10" />
+                    <Button
+                        onClick={handleCloseOpeningHours}
+                        className="border-primary-1 relative! m-3! flex! w-full! items-center! justify-center! rounded-3xl! border-2! p-6! text-3xl!"
+                        color="secondary"
+                    >
+                        {t("close")}
+                    </Button>
+                </div>
+            ) : kioskOpen || !appConfig?.openingHoursEnableBanner ? (
                 <CategoriesForm categories={categories!} />
             ) : (
                 <OpeningHoursWidget openingHours={openingHours || []} className="mt-10" />
