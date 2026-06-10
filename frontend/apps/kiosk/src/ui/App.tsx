@@ -1,5 +1,6 @@
 import RefreshOnSseEvents from "./components/RefreshOnSseEvents";
 import KioskPage from "./pages/kiosk/page";
+import { StartupScreen } from "shared-components";
 
 import TVPage from "@/pages/tv/page";
 
@@ -15,7 +16,16 @@ export default function App() {
     const { data: globalSettings, isError: globalSettingsError } =
         useGlobalSettings(axiosPureInstance);
 
-    const { data: appConfig, isError: appConfigError } = useAppConfig();
+    const {
+        data: appConfig,
+        isError: appConfigError,
+        isLoading: appConfigLoading,
+    } = useAppConfig();
+
+    const [localIpAddress, setLocalIpAddress] = useState<string>("");
+    useEffect(() => {
+        window.electronAPI.getLocalIpAddress().then(setLocalIpAddress);
+    }, []);
 
     //TODO add error handling for opening hours
     const {
@@ -85,18 +95,48 @@ export default function App() {
         }
     }, [globalSettings?.locale]);
 
-    //TODO move errors rendering to a separate component
+    if (appConfigLoading) {
+        return <StartupScreen status="loading" title="Starting up…" />;
+    }
 
     if (appConfig?.configError) {
-        return <div>Invalid config or config path</div>;
+        return (
+            <StartupScreen
+                status="info"
+                title="Invalid configuration"
+                details="Config file is invalid or the path is incorrect."
+            />
+        );
+    }
+
+    if (appConfig && !appConfig.backendUrl) {
+        return (
+            <StartupScreen
+                status="info"
+                title="Backend URL not provided"
+                details="Backend URL is required. Please provide it in the config file."
+            />
+        );
     }
 
     if (globalSettingsError || appConfigError || !globalSettings || !appConfig) {
-        return <div>Error when connecting to the server</div>;
+        return (
+            <StartupScreen
+                status="connecting"
+                title="Connecting to the server..."
+                details={`Backend: ${appConfig?.backendUrl ?? "unknown"}\nKiosk IP: ${localIpAddress || "unknown"}`}
+            />
+        );
     }
 
     if (appConfig.mode !== "tv" && appConfig.mode !== "kiosk") {
-        return <div>Invalid mode</div>;
+        return (
+            <StartupScreen
+                status="error"
+                title="Invalid mode"
+                details={`Current: "${appConfig.mode}". Valid values: "kiosk", "tv". Check config file.`}
+            />
+        );
     }
 
     //TODO config and auth

@@ -25,3 +25,5 @@ export { default as TopLoadingBar } from "./TopLoadingBar";
 export { default as NumericStepper } from "./NumericStepper";
 export { default as InfoTooltip } from "./InfoTooltip";
 export { default as SanitizedHtml } from "./SanitizedHtml";
+export { default as LoadingBar } from "./LoadingBar";
+export { default as StartupScreen } from "./StartupScreen";

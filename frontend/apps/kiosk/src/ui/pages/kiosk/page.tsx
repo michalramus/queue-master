@@ -1,8 +1,13 @@
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import CategoriesForm from "./CategoriesForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { Header, SmallHeader } from "shared-components";
-import { LogoID, OpeningHoursDto, useCategories, useLogoAvailabilities as useLogoAvailability } from "shared-utils";
+import { Header, SmallHeader, StartupScreen } from "shared-components";
+import {
+    LogoID,
+    OpeningHoursDto,
+    useCategories,
+    useLogoAvailabilities as useLogoAvailability,
+} from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
@@ -17,7 +22,8 @@ export default function KioskPage({
 }) {
     const { data: appConfig } = useAppConfig();
 
-    const { data: logoAvailability, isLoading: logoAvailabilityLoading } = useLogoAvailability(axiosPureInstance);
+    const { data: logoAvailability, isLoading: logoAvailabilityLoading } =
+        useLogoAvailability(axiosPureInstance);
 
     const {
         data: categories,
@@ -26,15 +32,22 @@ export default function KioskPage({
     } = useCategories(axiosAuthInstance);
 
     if (logoAvailabilityLoading || categoriesLoading) {
-        return <div>Loading...</div>;
+        return (
+            <StartupScreen
+                status="loading"
+                title="Loading…"
+                details="Fetching categories, please wait."
+            />
+        );
     }
 
     if (categoriesError) {
         return (
-            <div>
-                Error when fetching categories or opening hours. Check again jwt token. Check
-                console for more details.
-            </div>
+            <StartupScreen
+                status="error"
+                title="Failed to load categories"
+                details="Check the JWT token in config. See console for more details."
+            />
         );
     }
 

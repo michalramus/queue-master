@@ -1,5 +1,6 @@
 import { spawnSync, spawn } from "child_process";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
+import { networkInterfaces } from "os";
 import path from "path";
 import { ClientInterface } from "shared-utils";
 
@@ -130,6 +131,19 @@ async function handleGetAppConfig(): Promise<AppConfigInterface> {
     return config;
 }
 
+function handleGetLocalIpAddress(): string {
+    const nets = networkInterfaces();
+    for (const iface of Object.values(nets)) {
+        if (!iface) continue;
+        for (const net of iface) {
+            if (net.family === "IPv4" && !net.internal) {
+                return net.address;
+            }
+        }
+    }
+    return "Unknown";
+}
+
 // -----------------------------------
 function createWindow(zoomFactor: number = 1) {
     const isDevelopment = process.env.NODE_ENV == "development";
@@ -206,6 +220,7 @@ app.on("ready", async () => {
     //TODO: refactor to use invoke with handle name convention
     ipcMain.handle("getTranslation", handleGetTranslation);
     ipcMain.handle("getAppConfig", handleGetAppConfig);
+    ipcMain.handle("getLocalIpAddress", handleGetLocalIpAddress);
 
     createWindow(config.zoomFactor);
 

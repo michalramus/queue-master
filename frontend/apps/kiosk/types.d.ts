@@ -26,6 +26,7 @@ interface ElectronAPIInterface {
 
     getTranslation: (lang: string) => Promise<{ [key: string]: any }>;
     getAppConfig: () => Promise<AppConfigInterface>;
+    getLocalIpAddress: () => Promise<string>;
 }
 
 interface Window {

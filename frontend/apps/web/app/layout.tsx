@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from "next-intl";
 import RefreshOnSseEvents from "@/components/RefreshOnSseEvents";
 import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import { getGlobalSettings, GlobalSettingsInterface } from "shared-utils";
+import { StartupScreen } from "shared-components";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { SseProvider } from "@/utils/providers/SseProvider";
 import GlobalStylesProvider from "@/components/GlobalStylesProvider";
@@ -35,7 +36,11 @@ export default async function RootLayout({
         return (
             <html>
                 <body>
-                    <div>Failed to load global settings. Check backend connection</div>
+                    <StartupScreen
+                        status="error"
+                        title="Cannot connect to backend"
+                        details="Failed to load global settings. Check backend connection."
+                    />
                 </body>
             </html>
         );
