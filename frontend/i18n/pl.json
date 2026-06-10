@@ -60,6 +60,7 @@
     "are_you_sure_choose_ticket": "Czy na pewno chcesz wybrać ten bilet?",
     "edit": "Edytuj",
     "edit_category": "Edytuj kategorię",
+    "edit_device": "Edytuj urządzenie",
     "edit_user": "Edytuj użytkownika",
     "enable_opening_hours": "Włącz godziny otwarcia",
     "english": "Angielski",
@@ -158,6 +159,11 @@
     "server_error_occurred": "Wystąpił błąd serwera. Spróbuj odświeżyć stronę.",
     "desk": "Stanowisko",
     "desk_setting_description": "Numer stanowiska dla tego użytkownika (0-999)",
+    "notifications_on": "Powiadomienia przeglądarki",
+    "notifications_on_description": "Powiadamiaj gdy w pustej kolejce pojawi się nowy klient",
+    "notifications_on_how_it_works": "Jak to działa? Gdy w kolejce nie ma klientów, a następnie pojawi się nowy klient, otrzymasz powiadomienie. Jeśli jednak w kolejce są już klienci oczekujący, nie będziesz otrzymywać powiadomień o nowych klientach, dopóki kolejka nie będzie ponownie pusta.",
+    "request_notification_permission": "Zezwól na powiadomienia",
+    "notification_permission_denied": "Odmówiono dostępu — włącz powiadomienia w ustawieniach przeglądarki",
     "settings": "Ustawienia",
     "settings_updated_successfully": "Ustawienia zostały pomyślnie zaktualizowane",
     "short_name": "Krótka nazwa",
@@ -278,5 +284,6 @@
     "preview_description": "Opis",
     "preview_title": "Tytuł",
     "text_shown_on_kiosk": "Tekst wyświetlany w kiosku",
-    "use_mdx_editor": "Użyj edytora MDX"
+    "use_mdx_editor": "Użyj edytora MDX",
+    "active_categories": "Aktywne kategorie:"
 }

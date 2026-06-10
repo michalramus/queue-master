@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button, Card } from "shared-components";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { logout } from "shared-utils";
 import { useTopLoadingBar } from "@/utils/providers/TopLoadingBarProvider";
+import UserSettingsModal from "./UserSettingsModal";
 
 export default function UserPanel({
     username,
@@ -17,6 +18,7 @@ export default function UserPanel({
     const router = useRouter();
     const t = useTranslations();
     const { show: showLoadingBar } = useTopLoadingBar();
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
     const handleLogout = async () => {
         showLoadingBar();
@@ -30,7 +32,6 @@ export default function UserPanel({
     };
 
     return (
-        //TODO Add buttons onClick functionality
         <Card className="flex flex-nowrap items-center py-0!">
             <p className="mr-2">
                 {t("user")}: {username}
@@ -40,12 +41,16 @@ export default function UserPanel({
                     {t("admin_dashboard")}
                 </Button>
             )}
-            <Button onClick={() => {}} color="primary">
+            <Button onClick={() => setIsSettingsModalOpen(true)} color="primary">
                 {t("settings")}
             </Button>
             <Button color="red" onClick={handleLogout}>
                 {t("logout")}
             </Button>
+            <UserSettingsModal
+                isOpen={isSettingsModalOpen}
+                onClose={() => setIsSettingsModalOpen(false)}
+            />
         </Card>
     );
 }

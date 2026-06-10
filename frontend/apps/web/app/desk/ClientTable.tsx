@@ -13,16 +13,13 @@ import gbFlag from "flag-icons/flags/4x3/gb.svg";
 
 /**
  * Table with clients waiting for service
- * @param categoryIds - clients with these categories will be displayed
  * @component
  */
 export default function ClientTable({
-    clientNumbers,
-    categoryIds,
+    filteredClientNumbers,
     desk,
 }: {
-    clientNumbers: ClientInterface[] | undefined;
-    categoryIds: number[];
+    filteredClientNumbers: ClientInterface[] | undefined;
     desk: number;
 }) {
     const t = useTranslations();
@@ -48,11 +45,6 @@ export default function ClientTable({
             removeClient(clientNumber, axiosAuthInstance),
     });
     //----------------------------------------
-
-    //Prepare table content
-    const filteredClientNumbers = clientNumbers?.filter(
-        (client) => categoryIds.indexOf(client.category_id) != -1,
-    );
 
     const handleDeleteClick = (client: ClientInterface) => {
         setClientToDelete(client);

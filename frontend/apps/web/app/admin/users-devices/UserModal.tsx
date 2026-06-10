@@ -22,6 +22,7 @@ import {
     Modal,
     Spinner,
     Button,
+    Checkbox,
     Input,
     Select,
     TabNav,
@@ -178,6 +179,19 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
                                         hint={t("desk_setting_description")}
                                     />
                                 </div>
+                                <Checkbox
+                                    id="notifications_on_create"
+                                    label={t("notifications_on")}
+                                    checked={settings.notifications_on ?? true}
+                                    onChange={(e) => {
+                                        setSettings({
+                                            ...settings,
+                                            notifications_on: e.target.checked,
+                                        });
+                                        setSettingsModified(true);
+                                    }}
+                                    hint={t("notifications_on_description")}
+                                />
                             </>
                         )}
                         <div>
@@ -241,19 +255,34 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
                                 <span className="text-text-2 ml-3">{t("loading")}</span>
                             </div>
                         ) : (
-                            <div>
-                                <label className="text-text-2 mb-1 block text-sm font-medium">
-                                    {t("desk")}
-                                </label>
-                                <NumericStepper
-                                    value={settings.desk ?? MIN_DESK}
-                                    min={MIN_DESK}
-                                    max={MAX_DESK}
-                                    onChange={(v) => {
-                                        setSettings({ ...settings, desk: v });
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-text-2 mb-1 block text-sm font-medium">
+                                        {t("desk")}
+                                    </label>
+                                    <NumericStepper
+                                        value={settings.desk ?? MIN_DESK}
+                                        min={MIN_DESK}
+                                        max={MAX_DESK}
+                                        onChange={(v) => {
+                                            setSettings({ ...settings, desk: v });
+                                            setSettingsModified(true);
+                                        }}
+                                        hint={t("desk_setting_description")}
+                                    />
+                                </div>
+                                <Checkbox
+                                    id="notifications_on"
+                                    label={t("notifications_on")}
+                                    checked={settings.notifications_on ?? true}
+                                    onChange={(e) => {
+                                        setSettings({
+                                            ...settings,
+                                            notifications_on: e.target.checked,
+                                        });
                                         setSettingsModified(true);
                                     }}
-                                    hint={t("desk_setting_description")}
+                                    hint={t("notifications_on_description")}
                                 />
                             </div>
                         )}

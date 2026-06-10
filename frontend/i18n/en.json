@@ -60,6 +60,7 @@
     "are_you_sure_choose_ticket": "Are you sure you want to choose this ticket?",
     "edit": "Edit",
     "edit_category": "Edit Category",
+    "edit_device": "Edit Device",
     "edit_user": "Edit User",
     "enable_opening_hours": "Enable Opening Hours",
     "english": "English",
@@ -158,6 +159,11 @@
     "server_error_occurred": "Server error occurred. Try to refresh site.",
     "desk": "Desk",
     "desk_setting_description": "Desk number for this user (0-999)",
+    "notifications_on": "Browser notifications",
+    "notifications_on_description": "Notify when clients appear after queue was empty (does not send notifications when there are already waiting clients)",
+    "notifications_on_how_it_works": "How it works? When there are no clients in the queue and a new client appears, you will receive a notification. However, if there are already waiting clients in the queue, you will not receive notifications about new clients until the queue is empty again.",
+    "request_notification_permission": "Grant notification permission",
+    "notification_permission_denied": "Permission denied — enable notifications in browser settings",
     "settings": "Settings",
     "settings_updated_successfully": "Settings updated successfully",
     "short_name": "Short Name",
@@ -277,5 +283,6 @@
     "preview_description": "Description",
     "preview_title": "Title",
     "text_shown_on_kiosk": "Text shown on kiosk",
-    "use_mdx_editor": "Use MDX Editor"
+    "use_mdx_editor": "Use MDX Editor",
+    "active_categories": "Active Categories:"
 }

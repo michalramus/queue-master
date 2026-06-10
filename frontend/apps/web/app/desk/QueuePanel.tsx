@@ -2,35 +2,38 @@
 
 import ClientTable from "./ClientTable";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
 import {
     ClientInterface,
-    UserSettingsInterface,
     sseEvents,
     useWaitingClients,
     useInServiceClients,
+    useUserSettings,
+    useCategories,
 } from "shared-utils";
+import { Badge } from "shared-components";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { useSse } from "@/utils/hooks/useSse";
+import { useTranslations } from "next-intl";
+import { sendDesktopNotification } from "@/utils/sendDesktopNotification";
 
-export default function QueuePanel({
-    clients,
-    userSettings,
-}: {
-    clients: ClientInterface[];
-    userSettings: UserSettingsInterface;
-}) {
-    let desk = userSettings.desk;
-    let categoryIds = [1, 2, 3, 4, 5, 6]; //TODO: get categoryIds from context | What if category will be removed after user settings are saved?
+export default function QueuePanel({ clients }: { clients: ClientInterface[] }) {
+    const categoryIds = [1, 2, 3, 4, 5, 6]; //TODO: get categoryIds from context | What if category will be removed after user settings are saved?
 
-    //React query clients fetch
+    const t = useTranslations();
+
     const queryClient = useQueryClient();
     const { addEventListener, removeEventListener } = useSse();
 
-    //TODO: Don't fetch twice - fetch once and filter within the hooks
-    //Api data fetch
+    const { data: userSettings } = useUserSettings(axiosAuthInstance, undefined, {
+        enabled: true,
+    });
+
+    const desk = userSettings?.desk;
+    const notifications_on = userSettings?.notifications_on ?? true;
+
     const { data: waitingClients } = useWaitingClients(axiosAuthInstance, {
         initialData: clients.filter((client) => client.status === "Waiting"),
     });
@@ -40,6 +43,20 @@ export default function QueuePanel({
             (client) => client.status === "InService" && client.desk === desk,
         ),
     });
+
+    const { data: categories } = useCategories(axiosAuthInstance);
+
+    const waitingClientsFiltered = useMemo(
+        () => waitingClients?.filter((client) => categoryIds.includes(client.category_id)),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [waitingClients],
+    );
+
+    const activeCategoryBadges = useMemo(
+        () => categories?.filter((cat) => categoryIds.includes(cat.id)) ?? [],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [categories],
+    );
 
     //SSE update clients when clients changed
     useEffect(() => {
@@ -59,13 +76,47 @@ export default function QueuePanel({
         };
     }, [queryClient, desk, addEventListener, removeEventListener]);
 
+    // Request notification permission on component mount
+    useEffect(() => {
+        if (typeof Notification !== "undefined" && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+    }, []);
+
+    // True when there were 0 waiting clients after last update, used to determine when to send notification about new client in empty queue
+    const [wasZeroWaitingClients, setWasZeroWaitingClients] = useState(false);
+
+    useEffect(() => {
+        const count = waitingClientsFiltered?.length ?? 0;
+        if (count === 0) {
+            setWasZeroWaitingClients(true);
+            return;
+        }
+        if (wasZeroWaitingClients && notifications_on) {
+            setWasZeroWaitingClients(false);
+            sendDesktopNotification("New client waiting", ``);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [waitingClientsFiltered]);
+
     return (
         <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">
             <div className="w-full lg:w-6/12">
-                {waitingClients && (
+                {activeCategoryBadges.length > 0 && (
+                    <div className="border-primary-1 mb-5 w-fit rounded-lg border-2 px-2">
+                        <p>{t("active_categories")}</p>
+                        <div className="mb-3 flex flex-wrap gap-2">
+                            {activeCategoryBadges.map((cat) => (
+                                <Badge key={cat.id} color="primary">
+                                    {cat.short_name}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {waitingClientsFiltered && (
                     <ClientTable
-                        clientNumbers={waitingClients}
-                        categoryIds={categoryIds}
+                        filteredClientNumbers={waitingClientsFiltered}
                         desk={desk ? desk : 1}
                     />
                 )}
@@ -74,7 +125,7 @@ export default function QueuePanel({
                 <div className="mb-5 flex w-full justify-center lg:w-6/12">
                     <InServicePanel
                         clientNumber={inServiceClients[0]}
-                        nextClientNumber={waitingClients ? waitingClients[0] : undefined}
+                        nextClientNumber={waitingClientsFiltered?.[0]}
                         desk={desk ? desk : 1}
                     />
                 </div>
