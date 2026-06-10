@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
+import { IsBoolean, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class DeviceCreateDto {
     @ApiProperty({
@@ -14,10 +14,20 @@ export class DeviceCreateDto {
 }
 
 export class DevicePatchDto {
-    @ApiProperty({ description: "Device acceptance status", example: true })
-    @IsNotEmpty()
+    @ApiProperty({ description: "Device acceptance status", example: true, required: false })
+    @IsOptional()
     @IsBoolean()
-    accepted: boolean;
+    accepted?: boolean;
+
+    @ApiProperty({
+        description: "Optional comment about the device",
+        example: "Kiosk in reception area",
+        required: false,
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    comment?: string;
 }
 
 export class DeviceResponseDto {

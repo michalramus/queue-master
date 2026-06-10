@@ -11,6 +11,7 @@ import {
     useDevices,
     useAllUsersSettings,
     type UserResponseDto,
+    type DeviceResponseDto,
 } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { ConfirmModal, Button, TabNav } from "shared-components";
@@ -19,7 +20,8 @@ import { PageHeader } from "@/components/admin";
 import UsersTable from "./UsersTable";
 import DevicesTable from "./DevicesTable";
 import UserModal from "./UserModal";
-import DeviceModal from "./DeviceModal";
+import DeviceCreateModal from "./DeviceCreateModal";
+import DeviceEditModal from "./DeviceEditModal";
 
 export default function UsersDevicesClient() {
     const t = useTranslations();
@@ -32,7 +34,9 @@ export default function UsersDevicesClient() {
     const [activeTab, setActiveTab] = useState<"users" | "devices">("users");
     const [userModalOpen, setUserModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<UserResponseDto | null>(null);
-    const [deviceModalOpen, setDeviceModalOpen] = useState(false);
+    const [createDeviceModalOpen, setCreateDeviceModalOpen] = useState(false);
+    const [editDeviceModalOpen, setEditDeviceModalOpen] = useState(false);
+    const [editingDevice, setEditingDevice] = useState<DeviceResponseDto | null>(null);
 
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -117,6 +121,11 @@ export default function UsersDevicesClient() {
         toggleDeviceMutation.mutate({ deviceId, accepted });
     }
 
+    function handleEditDevice(device: DeviceResponseDto) {
+        setEditingDevice(device);
+        setEditDeviceModalOpen(true);
+    }
+
     function handleDeleteDevice(deviceId: number) {
         setConfirmModal({
             isOpen: true,
@@ -141,7 +150,7 @@ export default function UsersDevicesClient() {
                         </Button>
                     ) : (
                         <Button
-                            onClick={() => setDeviceModalOpen(true)}
+                            onClick={() => setCreateDeviceModalOpen(true)}
                             color="primary"
                             className="m-0!"
                         >
@@ -176,6 +185,7 @@ export default function UsersDevicesClient() {
                     devices={devices}
                     deleting={deleteDeviceMutation.isPending}
                     onToggle={handleToggleDevice}
+                    onEdit={handleEditDevice}
                     onDelete={handleDeleteDevice}
                 />
             )}
@@ -187,11 +197,23 @@ export default function UsersDevicesClient() {
                 onSuccess={handleUserSuccess}
             />
 
-            <DeviceModal
-                isOpen={deviceModalOpen}
-                onClose={() => setDeviceModalOpen(false)}
+            <DeviceCreateModal
+                isOpen={createDeviceModalOpen}
+                onClose={() => setCreateDeviceModalOpen(false)}
                 onSuccess={() => queryClient.invalidateQueries({ queryKey: ["devices"] })}
             />
+
+            {editingDevice && (
+                <DeviceEditModal
+                    isOpen={editDeviceModalOpen}
+                    device={editingDevice}
+                    onClose={() => {
+                        setEditDeviceModalOpen(false);
+                        setEditingDevice(null);
+                    }}
+                    onSuccess={() => queryClient.invalidateQueries({ queryKey: ["devices"] })}
+                />
+            )}
 
             <ConfirmModal
                 isOpen={confirmModal.isOpen}

@@ -7,7 +7,8 @@ export interface DeviceResponseDto {
 }
 
 export interface DevicePatchDto {
-    accepted: boolean;
+    accepted?: boolean;
+    comment?: string;
 }
 
 export interface DeviceCreateDto {
