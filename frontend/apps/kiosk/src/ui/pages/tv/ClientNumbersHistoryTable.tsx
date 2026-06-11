@@ -1,7 +1,8 @@
-import { ReactNode, useMemo, useRef, useEffect, useState } from "react";
-import { Table } from "shared-components";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { ClientInterface } from "shared-utils";
 import { useTranslation } from "react-i18next";
+
+const ANIMATION_DURATION_MS = 400;
 
 export default function ClientNumbersHistory({
     clientNumbers,
@@ -9,92 +10,159 @@ export default function ClientNumbersHistory({
     clientNumbers: ClientInterface[];
 }) {
     const { t } = useTranslation();
-    const tableContainerRef = useRef<HTMLDivElement>(null);
-    const [containerHeight, setContainerHeight] = useState<number>(0);
-    const [rowHeight, setRowHeight] = useState<number>(80); // Default fallback
+    const outerRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLTableElement>(null);
+    const [rowHeight, setRowHeight] = useState<number>(80);
+    const [bodyHeight, setBodyHeight] = useState<number>(0);
+    const rowHeightRef = useRef<number>(80);
 
-    // Dynamically measure container and row heights
+    const [tableOffset, setTableOffset] = useState<number>(0);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [displayClients, setDisplayClients] = useState<ClientInterface[]>([]);
+    const [exitingClientId, setExitingClientId] = useState<number | null>(null);
+
+    const prevVisibleClientsRef = useRef<ClientInterface[]>([]);
+    const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        rowHeightRef.current = rowHeight;
+    }, [rowHeight]);
+
     useEffect(() => {
         const measureHeights = () => {
-            if (tableContainerRef.current) {
-                const containerRect = tableContainerRef.current.getBoundingClientRect();
-                setContainerHeight(containerRect.height);
+            if (outerRef.current && headerRef.current) {
+                const outerHeight = outerRef.current.getBoundingClientRect().height;
+                const headerHeight = headerRef.current.getBoundingClientRect().height;
+                setBodyHeight(outerHeight - headerHeight);
 
-                // Measure actual row height if rows exist
-                const firstRow = tableContainerRef.current.querySelector("tbody tr");
+                const firstRow = outerRef.current.querySelector("tbody tr");
                 if (firstRow) {
-                    const rowRect = firstRow.getBoundingClientRect();
-                    setRowHeight(rowRect.height);
+                    setRowHeight(firstRow.getBoundingClientRect().height);
                 }
             }
         };
 
-        // Initial measurement
         measureHeights();
-
-        // Re-measure on window resize
         window.addEventListener("resize", measureHeights);
-
-        // Use ResizeObserver for more accurate container size tracking
-        const resizeObserver = new ResizeObserver(measureHeights);
-        if (tableContainerRef.current) {
-            resizeObserver.observe(tableContainerRef.current);
-        }
+        const ro = new ResizeObserver(measureHeights);
+        if (outerRef.current) ro.observe(outerRef.current);
 
         return () => {
             window.removeEventListener("resize", measureHeights);
-            resizeObserver.disconnect();
+            ro.disconnect();
         };
-    }, [clientNumbers.length]); // Re-run when client numbers change
+    }, [clientNumbers.length]);
 
-    // Calculate max visible rows based on actual measurements
     const maxVisibleRows = useMemo(() => {
-        if (containerHeight === 0 || rowHeight === 0) {
-            return 10; // Default fallback
-        }
-
-        // Account for header height (measured from table)
-        const tableHeader = tableContainerRef.current?.querySelector("thead");
-        const headerHeight = tableHeader ? tableHeader.getBoundingClientRect().height : 60;
-
-        const availableHeight = containerHeight - headerHeight;
-        const calculatedRows = Math.floor(availableHeight / rowHeight);
-
-        // Ensure we show at least 1 row and don't exceed a reasonable maximum
+        if (bodyHeight === 0 || rowHeight === 0) return 10;
+        const calculatedRows = Math.floor(bodyHeight / rowHeight);
         return Math.max(1, Math.min(calculatedRows - 1, 20));
-    }, [containerHeight, rowHeight]);
+    }, [bodyHeight, rowHeight]);
 
-    // Trim client numbers to fit screen
     const visibleClientNumbers = useMemo(() => {
         return clientNumbers.slice(0, maxVisibleRows);
     }, [clientNumbers, maxVisibleRows]);
 
-    const rows: (string | number | ReactNode | null)[][] = [];
-    visibleClientNumbers.map((clientNumber) =>
-        rows.push([
-            (clientNumber.category?.short_name ? clientNumber.category.short_name : "") +
-                clientNumber.number,
-            clientNumber.desk,
-        ]),
-    );
+    useEffect(() => {
+        const prevVisible = prevVisibleClientsRef.current;
+
+        if (prevVisible.length === 0) {
+            setDisplayClients(visibleClientNumbers);
+            prevVisibleClientsRef.current = visibleClientNumbers;
+            return;
+        }
+
+        const newFirstId = visibleClientNumbers[0]?.id ?? null;
+        const prevFirstId = prevVisible[0]?.id ?? null;
+
+        if (newFirstId === null || newFirstId === prevFirstId) {
+            setDisplayClients(visibleClientNumbers);
+            prevVisibleClientsRef.current = visibleClientNumbers;
+            return;
+        }
+
+        const newVisibleIds = new Set(visibleClientNumbers.map((c) => c.id));
+        const exiting = prevVisible.find((c) => !newVisibleIds.has(c.id));
+
+        if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
+
+        setDisplayClients(exiting ? [...visibleClientNumbers, exiting] : [...visibleClientNumbers]);
+        setExitingClientId(exiting?.id ?? null);
+        setIsAnimating(false);
+        setTableOffset(-rowHeightRef.current);
+
+        requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+                setIsAnimating(true);
+                setTableOffset(0);
+            }),
+        );
+
+        animationTimerRef.current = setTimeout(() => {
+            setIsAnimating(false);
+            setExitingClientId(null);
+            setDisplayClients(visibleClientNumbers);
+        }, ANIMATION_DURATION_MS + 50);
+
+        prevVisibleClientsRef.current = visibleClientNumbers;
+    }, [visibleClientNumbers]);
+
+    useEffect(() => {
+        return () => {
+            if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
+        };
+    }, []);
 
     return (
-        <div ref={tableContainerRef} className="h-full w-6/12">
-            <Table
-                columns={[
-                    <span key={"Number"} className="font-light">
-                        {t("number")}
-                    </span>,
-                    <span key={"Desk"} className="font-light">
-                        {t("desk")}
-                    </span>,
-                ]}
-                rows={rows}
-                theadClassName="text-4xl"
-                tbodyClassName=" text-5xl font-medium"
-                tdBodyClassName="py-3"
-                className="w-full"
-            />
+        <div ref={outerRef} className="flex h-full w-6/12 flex-col overflow-hidden">
+            {/* Header sits outside the clipped body area so rows never overlap it */}
+            <table ref={headerRef} className="mx-2 w-full flex-none text-center">
+                <thead className="text-text-2 border-gray-1 text-md border-b-2 text-4xl">
+                    <tr>
+                        <th scope="col" className="px-6 py-1 font-light">
+                            {t("number")}
+                        </th>
+                        <th scope="col" className="px-6 py-1 font-light">
+                            {t("desk")}
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            {/* overflow-hidden here is what clips rows above row-0 and below the last visible row */}
+            <div className="flex-1 overflow-hidden">
+                <table className="mx-2 w-full text-center">
+                    <tbody
+                        style={{
+                            transform: `translateY(${tableOffset}px)`,
+                            transition: isAnimating
+                                ? `transform ${ANIMATION_DURATION_MS}ms ease-out`
+                                : "none",
+                        }}
+                        className="text-xl font-medium"
+                    >
+                        {displayClients.map((client) => {
+                            const isExiting = client.id === exitingClientId;
+                            return (
+                                <tr
+                                    key={client.id}
+                                    style={{
+                                        opacity: isExiting && isAnimating ? 0 : 1,
+                                        transition: isAnimating
+                                            ? `opacity ${ANIMATION_DURATION_MS}ms ease-out`
+                                            : "none",
+                                    }}
+                                    className="border-gray-1 border-opacity-50 border-b-2 text-5xl font-medium"
+                                >
+                                    <td className="px-6 py-3">
+                                        {(client.category?.short_name ?? "") + client.number}
+                                    </td>
+                                    <td className="px-6 py-3">{client.desk}</td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

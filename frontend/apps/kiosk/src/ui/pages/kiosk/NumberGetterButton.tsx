@@ -52,7 +52,10 @@ export default function NumberGetterButton({
                 console.log("Client", data);
 
                 setLoadingPage(true);
-                setLastTicketString(data.category.short_name + data.number.toString());
+                setLastTicketString(
+                    (showCategoryShortName ? data.category.short_name : "") +
+                        data.number.toString(),
+                );
 
                 // Get the ticket template for the current language
                 const ticketTemplate =
