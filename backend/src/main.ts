@@ -2,7 +2,8 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ConfigModule } from "@nestjs/config";
 import { LoggingInterceptor } from "./middleware/logging.interceptor";
-import * as cookieParser from "cookie-parser";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import cookieParser = require("cookie-parser");
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";

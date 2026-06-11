@@ -18,4 +18,32 @@ export class MultilingualSettingsDto {
     @IsObject()
     @IsOptional()
     printing_ticket_template?: { [lang in LangCode]: string | null };
+
+    @IsObject()
+    @IsOptional()
+    monday_label?: { [lang in LangCode]: string | null };
+
+    @IsObject()
+    @IsOptional()
+    tuesday_label?: { [lang in LangCode]: string | null };
+
+    @IsObject()
+    @IsOptional()
+    wednesday_label?: { [lang in LangCode]: string | null };
+
+    @IsObject()
+    @IsOptional()
+    thursday_label?: { [lang in LangCode]: string | null };
+
+    @IsObject()
+    @IsOptional()
+    friday_label?: { [lang in LangCode]: string | null };
+
+    @IsObject()
+    @IsOptional()
+    saturday_label?: { [lang in LangCode]: string | null };
+
+    @IsObject()
+    @IsOptional()
+    sunday_label?: { [lang in LangCode]: string | null };
 }

@@ -26,7 +26,7 @@ export default function TextButton({
         <button
             onClick={onClick}
             disabled={disabled}
-            className={`${colorClasses} cursor-pointer text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+            className={`${colorClasses} w-fit cursor-pointer text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
         >
             {children}
         </button>

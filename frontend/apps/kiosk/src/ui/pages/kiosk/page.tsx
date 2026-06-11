@@ -4,6 +4,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Button, Header, SmallHeader, StartupScreen } from "shared-components";
 import {
     LogoID,
+    MultilingualSettingsInterface,
     OpeningHoursDto,
     useCategories,
     useLogoAvailabilities as useLogoAvailability,
@@ -20,9 +21,11 @@ const OPENING_HOURS_SHOW_DURATION = 60_000;
 export default function KioskPage({
     openingHours,
     kioskOpen,
+    multilingualSettings,
 }: {
     openingHours: OpeningHoursDto[];
     kioskOpen: boolean;
+    multilingualSettings?: MultilingualSettingsInterface;
 }) {
     const { data: appConfig } = useAppConfig();
     const { t } = useTranslation();
@@ -111,7 +114,11 @@ export default function KioskPage({
 
             {showOpeningHours && kioskOpen ? (
                 <div className="mx-auto flex w-full max-w-md flex-col items-center">
-                    <OpeningHoursWidget openingHours={openingHours || []} className="mt-10" />
+                    <OpeningHoursWidget
+                        openingHours={openingHours || []}
+                        multilingualSettings={multilingualSettings}
+                        className="mt-10"
+                    />
                     <Button
                         onClick={handleCloseOpeningHours}
                         className="border-primary-1 relative! m-3! flex! w-full! items-center! justify-center! rounded-3xl! border-2! p-6! text-3xl!"
@@ -123,7 +130,11 @@ export default function KioskPage({
             ) : kioskOpen || !appConfig?.openingHoursEnableBanner ? (
                 <CategoriesForm categories={categories!} />
             ) : (
-                <OpeningHoursWidget openingHours={openingHours || []} className="mt-10" />
+                <OpeningHoursWidget
+                    openingHours={openingHours || []}
+                    multilingualSettings={multilingualSettings}
+                    className="mt-10"
+                />
             )}
 
             <div className="fixed right-0 bottom-0 m-7">

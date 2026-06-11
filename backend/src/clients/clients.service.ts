@@ -18,18 +18,23 @@ export class ClientsService {
     private logger = new Logger(ClientsService.name);
 
     private maxClientsCounter = 999;
-    private minClientsCounterToReset = 50; // if clients with number lower than this exist, counter cannot be reset
-    private timeBetweenCounterResets = 1000 * 60 * 60 * 10; // in seconds - 8 hours
+    private minClientsCounterToReset = 30; // if clients with number lower than this exist, counter cannot be reset
+    private timeBetweenCounterResets = 1000 * 60 * 60 * 10; // in ms - 10 hours
 
     async create(createClientDto: ClientCreateDto, entity: Entity): Promise<ClientResponseDto> {
         // Check if category exists
-        const category = await this.databaseService.category.findUnique({ where: { id: createClientDto.categoryId } });
+        const category = await this.databaseService.category.findUnique({
+            where: { id: createClientDto.categoryId },
+        });
         if (!category) {
             this.logger.warn(
                 `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
             );
             throw new NotFoundException("Category not found");
         }
+
+        // Reset counter if conditions are met, then re-fetch category to get updated counter
+        await this.resetCounterAfterTime(createClientDto.categoryId);
 
         // Prepare client number
         let counter = category.counter + 1;
@@ -73,7 +78,6 @@ export class ClientsService {
         this.logger.log(
             `[${entity.name}] Client created with number ${client.category.short_name}${client.number} and status 'Waiting'`,
         );
-        this.resetCounterAfterTime(createClientDto.categoryId);
         return client;
     }
 

@@ -7,6 +7,7 @@ import {
     ClientInterface,
     sseEvents,
     LogoID,
+    MultilingualSettingsInterface,
     OpeningHoursDto,
     useLogoAvailabilities,
     useGlobalSettings,
@@ -19,9 +20,10 @@ import { useSse } from "@/utils/hooks/useSse";
 interface TVPageProps {
     kioskOpen: boolean;
     openingHours: OpeningHoursDto[];
+    multilingualSettings?: MultilingualSettingsInterface;
 }
 
-export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
+export default function TVPage({ kioskOpen, openingHours, multilingualSettings }: TVPageProps) {
     const { i18n } = useTranslation();
     const { data: appConfig } = useAppConfig();
     const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
@@ -148,6 +150,7 @@ export default function TVPage({ kioskOpen, openingHours }: TVPageProps) {
                         <div className="flex w-full items-center justify-center">
                             <OpeningHoursWidget
                                 openingHours={openingHours || []}
+                                multilingualSettings={multilingualSettings}
                                 className="w-full max-w-3xl"
                                 large={true}
                             />

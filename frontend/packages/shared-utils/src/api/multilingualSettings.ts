@@ -1,7 +1,18 @@
 import { AxiosAuthInstance, AxiosPureInstance } from "../axiosInstances.interface";
+import { LangCode } from "../types/LangCode";
+
+export type RequiredMultilingualValue = { [lang in LangCode]?: string };
+export type MultilingualValue = { [lang in LangCode]?: string | null };
 
 export interface MultilingualSettingsInterface {
-    printing_ticket_template?: { [lang: string]: string };
+    printing_ticket_template?: RequiredMultilingualValue;
+    monday_label?: MultilingualValue;
+    tuesday_label?: MultilingualValue;
+    wednesday_label?: MultilingualValue;
+    thursday_label?: MultilingualValue;
+    friday_label?: MultilingualValue;
+    saturday_label?: MultilingualValue;
+    sunday_label?: MultilingualValue;
 }
 
 const apiPathMultilingualSettings = "/settings/multilingual";

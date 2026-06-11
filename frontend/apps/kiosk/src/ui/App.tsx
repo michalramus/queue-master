@@ -4,7 +4,7 @@ import { StartupScreen } from "shared-components";
 
 import TVPage from "@/pages/tv/page";
 
-import { useGlobalSettings, useOpeningHours } from "shared-utils";
+import { useGlobalSettings, useMultilingualSettings, useOpeningHours } from "shared-utils";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
 import { useCallback, useEffect, useState } from "react";
 import i18n from "./i18n";
@@ -33,6 +33,8 @@ export default function App() {
         // isLoading: openingHoursLoading,
         // isError: openingHoursError,
     } = useOpeningHours(axiosAuthInstance, { retry: true });
+
+    const { data: multilingualSettings } = useMultilingualSettings(axiosPureInstance);
 
     //TODO: Fix multi calls to scripts when app starts
     const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet"); //TODO: use openingHoursLoading instead of "notSet"
@@ -169,12 +171,14 @@ export default function App() {
                 <TVPage
                     kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
                     openingHours={openingHours || []}
+                    multilingualSettings={multilingualSettings}
                 />
             )}
             {appConfig.mode === "kiosk" && (
                 <KioskPage
                     kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
                     openingHours={openingHours || []}
+                    multilingualSettings={multilingualSettings}
                 />
             )}
         </>

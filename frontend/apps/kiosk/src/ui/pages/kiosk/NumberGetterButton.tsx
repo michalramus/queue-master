@@ -25,7 +25,7 @@ export default function NumberGetterButton({
     const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
     const { data: multilingualSettings } = useMultilingualSettings(axiosPureInstance);
     const { data: appConfig } = useAppConfig();
-    const locale = i18n.language;
+    const locale: LangCode = i18n.language as LangCode;
 
     const printingTime = appConfig?.printingDialogueShowTime || 5000;
 
