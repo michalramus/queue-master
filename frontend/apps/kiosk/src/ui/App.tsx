@@ -38,6 +38,7 @@ export default function App() {
 
     //TODO: Fix multi calls to scripts when app starts
     const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet"); //TODO: use openingHoursLoading instead of "notSet"
+    const [tvOpen, setTvOpen] = useState<boolean | "notSet">("notSet");
 
     const executeOpeningHoursScripts = useCallback(
         (isOpen: boolean) => {
@@ -58,13 +59,14 @@ export default function App() {
         executeOpeningHoursScripts(kioskOpen);
     }, [kioskOpen, executeOpeningHoursScripts]);
 
-    // Set initial kioskOpen state
+    // Set initial kioskOpen and tvOpen states
     useEffect(() => {
         if (!openingHours || !globalSettings) return;
-        setKioskOpen(isKioskOpen(openingHours, globalSettings));
+        setKioskOpen(isKioskOpen(openingHours, globalSettings, globalSettings.kiosk_open_offset));
+        setTvOpen(isKioskOpen(openingHours, globalSettings, 0, globalSettings.tv_close_offset));
     }, [openingHours, globalSettings]);
 
-    // Set up periodic checks for kiosk state changes
+    // Set up periodic checks for kiosk/tv state changes
     useEffect(() => {
         // Calculate ms until next full minute
         const now = new Date();
@@ -72,15 +74,41 @@ export default function App() {
         let interval: ReturnType<typeof setInterval>;
 
         const timeout = setTimeout(() => {
-            const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
+            const newKioskOpen = isKioskOpen(
+                openingHours || [],
+                globalSettings,
+                globalSettings?.kiosk_open_offset ?? 0,
+            );
             if (newKioskOpen !== kioskOpen) {
                 setKioskOpen(newKioskOpen);
             }
+            const newTvOpen = isKioskOpen(
+                openingHours || [],
+                globalSettings,
+                0,
+                globalSettings?.tv_close_offset ?? 0,
+            );
+            if (newTvOpen !== tvOpen) {
+                setTvOpen(newTvOpen);
+            }
 
             interval = setInterval(() => {
-                const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
+                const newKioskOpen = isKioskOpen(
+                    openingHours || [],
+                    globalSettings,
+                    globalSettings?.kiosk_open_offset ?? 0,
+                );
                 if (newKioskOpen !== kioskOpen) {
                     setKioskOpen(newKioskOpen);
+                }
+                const newTvOpen = isKioskOpen(
+                    openingHours || [],
+                    globalSettings,
+                    0,
+                    globalSettings?.tv_close_offset ?? 0,
+                );
+                if (newTvOpen !== tvOpen) {
+                    setTvOpen(newTvOpen);
                 }
             }, 60000);
         }, msToNextMinute);
@@ -169,7 +197,7 @@ export default function App() {
             <RefreshOnSseEvents />
             {appConfig.mode === "tv" && (
                 <TVPage
-                    kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
+                    tvOpen={tvOpen === "notSet" ? true : tvOpen}
                     openingHours={openingHours || []}
                     multilingualSettings={multilingualSettings}
                 />

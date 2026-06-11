@@ -20,7 +20,7 @@ import {
 } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
-import { Button, Checkbox, Select, Spinner } from "shared-components";
+import { Button, Checkbox, Input, Select, Spinner } from "shared-components";
 import { showToast } from "@/utils/toast";
 import { PageHeader } from "@/components/admin";
 import DayRow from "./DayRow";
@@ -75,11 +75,17 @@ export default function OpeningHoursClient() {
     const [dayLabels, setDayLabels] = useState<AllDayLabels>(
         labelsFromMultilingual(serverMultilingualSettings),
     );
+    const [kioskOpenOffset, setKioskOpenOffset] = useState(
+        serverGlobalSettings?.kiosk_open_offset ?? 0,
+    );
+    const [tvCloseOffset, setTvCloseOffset] = useState(serverGlobalSettings?.tv_close_offset ?? 0);
     const hasChanges = (() => {
         if (!serverHours || !serverGlobalSettings || !serverMultilingualSettings) return false;
         if (
             enabled !== serverGlobalSettings.enable_opening_hours ||
-            override !== serverGlobalSettings.opening_hours_override
+            override !== serverGlobalSettings.opening_hours_override ||
+            kioskOpenOffset !== serverGlobalSettings.kiosk_open_offset ||
+            tvCloseOffset !== serverGlobalSettings.tv_close_offset
         )
             return true;
         if (openingHours.length !== serverHours.length) return true;
@@ -118,7 +124,12 @@ export default function OpeningHoursClient() {
 
             await setOpeningHours({ opening_hours: sanitizedHours }, axiosAuthInstance);
             await setGlobalSettings(
-                { enable_opening_hours: enabled, opening_hours_override: override },
+                {
+                    enable_opening_hours: enabled,
+                    opening_hours_override: override,
+                    kiosk_open_offset: kioskOpenOffset,
+                    tv_close_offset: tvCloseOffset,
+                },
                 axiosAuthInstance,
             );
             await setMultilingualSettings(labelsToMultilingual(dayLabels), axiosAuthInstance);
@@ -146,6 +157,8 @@ export default function OpeningHoursClient() {
         if (serverGlobalSettings) {
             setEnabled(serverGlobalSettings.enable_opening_hours);
             setOverride(serverGlobalSettings.opening_hours_override);
+            setKioskOpenOffset(serverGlobalSettings.kiosk_open_offset);
+            setTvCloseOffset(serverGlobalSettings.tv_close_offset);
         }
         if (serverMultilingualSettings) {
             setDayLabels(labelsFromMultilingual(serverMultilingualSettings));
@@ -176,6 +189,28 @@ export default function OpeningHoursClient() {
                         <option value="override_to_open">{t("force_open_description")}</option>
                         <option value="override_to_close">{t("force_closed_description")}</option>
                     </Select>
+                    <Input
+                        type="number"
+                        label={t("kiosk_open_offset")}
+                        hint={t("kiosk_open_offset_description")}
+                        value={String(kioskOpenOffset)}
+                        onChange={(e) => {
+                            const val = Math.min(59, Math.max(0, parseInt(e.target.value) || 0));
+                            setKioskOpenOffset(val);
+                        }}
+                        disabled={!enabled}
+                    />
+                    <Input
+                        type="number"
+                        label={t("tv_close_offset")}
+                        hint={t("tv_close_offset_description")}
+                        value={String(tvCloseOffset)}
+                        onChange={(e) => {
+                            const val = Math.min(59, Math.max(0, parseInt(e.target.value) || 0));
+                            setTvCloseOffset(val);
+                        }}
+                        disabled={!enabled}
+                    />
                 </div>
             </div>
 

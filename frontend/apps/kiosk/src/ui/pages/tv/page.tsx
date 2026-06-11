@@ -18,12 +18,12 @@ import { useLogoManagement } from "@/utils/hooks/useLogoManagement";
 import { useSse } from "@/utils/hooks/useSse";
 
 interface TVPageProps {
-    kioskOpen: boolean;
+    tvOpen: boolean;
     openingHours: OpeningHoursDto[];
     multilingualSettings?: MultilingualSettingsInterface;
 }
 
-export default function TVPage({ kioskOpen, openingHours, multilingualSettings }: TVPageProps) {
+export default function TVPage({ tvOpen, openingHours, multilingualSettings }: TVPageProps) {
     const { i18n } = useTranslation();
     const { data: appConfig } = useAppConfig();
     const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
@@ -136,7 +136,7 @@ export default function TVPage({ kioskOpen, openingHours, multilingualSettings }
                     )}
                 </div>
                 <div className="flex h-11/12 flex-row flex-nowrap px-24 pt-9 pb-28">
-                    {kioskOpen || !appConfig?.openingHoursEnableBanner ? (
+                    {tvOpen || !appConfig?.openingHoursEnableBanner ? (
                         <>
                             <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
                                 <CurrentNumberWidget

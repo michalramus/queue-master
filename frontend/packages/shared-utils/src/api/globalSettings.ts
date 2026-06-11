@@ -27,6 +27,9 @@ export interface GlobalSettingsInterface {
     enable_opening_hours: boolean;
     opening_hours_override: "override_to_open" | "override_to_close" | "off";
     tv_auto_switch_language: boolean;
+
+    kiosk_open_offset: number; //How many minutes to open kiosk before opening hour
+    tv_close_offset: number; //How many minutes to delay tv close after closing hour
 }
 
 export type GlobalSettingsSetDTO = Partial<GlobalSettingsInterface>;
