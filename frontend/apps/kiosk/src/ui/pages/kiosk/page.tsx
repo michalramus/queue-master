@@ -1,4 +1,3 @@
-import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import CategoriesForm from "./CategoriesForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Button, Header, SmallHeader, StartupScreen } from "shared-components";
@@ -7,12 +6,12 @@ import {
     MultilingualSettingsInterface,
     OpeningHoursDto,
     useCategories,
-    useLogoAvailabilities as useLogoAvailability,
 } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
+import { useLogoManagement } from "@/utils/hooks/useLogoManagement";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -46,8 +45,11 @@ export default function KioskPage({
         setShowOpeningHours(false);
     };
 
-    const { data: logoAvailability, isLoading: logoAvailabilityLoading } =
-        useLogoAvailability(axiosPureInstance);
+    const {
+        mainLogoUrl,
+        secondaryLogoUrl,
+        isLoading: logoAvailabilityLoading,
+    } = useLogoManagement(LogoID.logo_kiosk_main, LogoID.logo_kiosk_secondary);
 
     const {
         data: categories,
@@ -79,9 +81,9 @@ export default function KioskPage({
         <main className="flex min-h-screen flex-col items-center px-10">
             <div className="flex w-full items-center justify-between">
                 <div className="relative flex h-48 w-md items-center justify-start pt-4">
-                    {logoAvailability?.includes(LogoID.logo_kiosk_secondary) && (
+                    {secondaryLogoUrl !== null && (
                         <img
-                            src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_kiosk_secondary}`}
+                            src={secondaryLogoUrl}
                             alt="External Logo"
                             className="max-h-48 w-auto object-contain"
                         />
@@ -100,17 +102,13 @@ export default function KioskPage({
                     )}
                 </div>
             </div>
-            {logoAvailability?.includes(LogoID.logo_kiosk_main) && (
+            {mainLogoUrl !== null && (
                 <div className="relative mb-2 flex h-72 w-2xl items-center justify-center">
-                    <img
-                        src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_kiosk_main}`}
-                        alt="External Logo"
-                        className="max-h-72"
-                    />
+                    <img src={mainLogoUrl} alt="External Logo" className="max-h-72" />
                 </div>
             )}
 
-            {!logoAvailability!.includes(LogoID.logo_kiosk_main) && <Header />}
+            {mainLogoUrl === null && <Header />}
 
             {showOpeningHours && kioskOpen ? (
                 <div className="mx-auto flex w-full max-w-md flex-col items-center">

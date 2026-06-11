@@ -1,18 +1,20 @@
 import Image from "next/image";
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { type LogoID } from "shared-utils";
+import { LangCode, type LogoID } from "shared-utils";
 import { Button, InfoTooltip, Spinner } from "shared-components";
 
 interface LogoCardProps {
+    lang: LangCode;
     logoId: LogoID;
     isAvailable: boolean;
     isUploading: boolean;
-    onUpload: (logoId: LogoID, file: File) => void;
-    onDelete: (logoId: LogoID) => void;
+    onUpload: (lang: LangCode, logoId: LogoID, file: File) => void;
+    onDelete: (lang: LangCode, logoId: LogoID) => void;
 }
 
 export default function LogoCard({
+    lang,
     logoId,
     isAvailable,
     isUploading,
@@ -26,7 +28,7 @@ export default function LogoCard({
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>): void {
         const file = e.target.files?.[0];
         if (file) {
-            onUpload(logoId, file);
+            onUpload(lang, logoId, file);
             e.target.value = "";
         }
     }
@@ -52,7 +54,7 @@ export default function LogoCard({
                 <div className="space-y-3">
                     <div className="relative flex h-40 w-full items-center justify-center overflow-hidden rounded bg-gray-100">
                         <Image
-                            src={`/api/file/logo/${logoId}`}
+                            src={`/api/file/logo/${lang}/${logoId}`}
                             alt={logoId}
                             fill
                             className="object-contain"
@@ -74,7 +76,11 @@ export default function LogoCard({
                                 t("replace_logo")
                             )}
                         </Button>
-                        <Button color="red" onClick={() => onDelete(logoId)} disabled={isUploading}>
+                        <Button
+                            color="red"
+                            onClick={() => onDelete(lang, logoId)}
+                            disabled={isUploading}
+                        >
                             {t("delete_logo")}
                         </Button>
                     </div>

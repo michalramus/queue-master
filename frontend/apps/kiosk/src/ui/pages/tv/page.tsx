@@ -9,12 +9,12 @@ import {
     LogoID,
     MultilingualSettingsInterface,
     OpeningHoursDto,
-    useLogoAvailabilities,
     useGlobalSettings,
 } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import OpeningHoursWidget from "@/components/OpeningHoursWidget";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
+import { useLogoManagement } from "@/utils/hooks/useLogoManagement";
 import { useSse } from "@/utils/hooks/useSse";
 
 interface TVPageProps {
@@ -39,8 +39,10 @@ export default function TVPage({ kioskOpen, openingHours, multilingualSettings }
 
     const maxHistory = 20; // max stored history of clients. Clients are automatically trimmed to match screen size in ClientNumbersHistoryTable component
 
-    // Logo availability query
-    const { data: logoAvailabilities } = useLogoAvailabilities(axiosPureInstance);
+    const { mainLogoUrl, secondaryLogoUrl } = useLogoManagement(
+        LogoID.logo_tv_main,
+        LogoID.logo_tv_secondary,
+    );
 
     const { addEventListener, removeEventListener } = useSse();
 
@@ -118,16 +120,16 @@ export default function TVPage({ kioskOpen, openingHours, multilingualSettings }
             </div>
             <div className="h-screen">
                 <div className="ml-7 flex max-h-16 max-w-md items-center gap-8 pt-7">
-                    {logoAvailabilities?.includes(LogoID.logo_tv_main) && (
+                    {mainLogoUrl !== null && (
                         <img
-                            src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_tv_main}`}
+                            src={mainLogoUrl}
                             alt="TV Main Logo"
                             className="max-h-16 w-auto object-contain"
                         />
                     )}
-                    {logoAvailabilities?.includes(LogoID.logo_tv_secondary) && (
+                    {secondaryLogoUrl !== null && (
                         <img
-                            src={`${appConfig?.backendUrl}/file/logo/${LogoID.logo_tv_secondary}`}
+                            src={secondaryLogoUrl}
                             alt="TV Secondary Logo"
                             className="max-h-16 w-auto object-contain"
                         />

@@ -103,6 +103,7 @@
     "logo_management": "Logo Management",
     "logo_uploaded_successfully": "Logo uploaded successfully!",
     "logout": "Logout",
+    "return_to_desk": "Return",
     "markdown_template_placeholder": "# Template\n\nNumber: {{number}}\nDate: {{date}}",
     "next": "Next",
     "no_logo_uploaded": "No logo uploaded",

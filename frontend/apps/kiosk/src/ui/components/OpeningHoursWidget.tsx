@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { MultilingualSettingsInterface, OpeningHoursDto } from "shared-utils";
+import { LangCode, MultilingualSettingsInterface, OpeningHoursDto } from "shared-utils";
 
 interface OpeningHoursWidgetProps {
     openingHours: OpeningHoursDto[];
@@ -44,7 +44,10 @@ export default function OpeningHoursWidget({
                                 {(() => {
                                     const labelKey =
                                         `${entry.day_of_week.toLowerCase()}_label` as keyof MultilingualSettingsInterface;
-                                    const label = multilingualSettings?.[labelKey]?.[i18n.language];
+                                    const label =
+                                        multilingualSettings?.[labelKey]?.[
+                                            i18n.language as LangCode
+                                        ];
                                     if (label) {
                                         return <span className="text-text-2">{label}</span>;
                                     }

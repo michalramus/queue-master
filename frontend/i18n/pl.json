@@ -103,6 +103,7 @@
     "logo_management": "Zarządzanie logo",
     "logo_uploaded_successfully": "Logo zostało pomyślnie przesłane!",
     "logout": "Wyloguj się",
+    "return_to_desk": "Wróć",
     "markdown_template_placeholder": "# Szablon\n\nNumer: {{number}}\nData: {{date}}",
     "next": "Następny",
     "no_logo_uploaded": "Nie przesłano logo",
