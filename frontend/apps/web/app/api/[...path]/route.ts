@@ -17,7 +17,7 @@ const agent = new Agent({
 
 async function proxyRequest(req: Request, path: string, method: string) {
     const url = new URL(req.url);
-    const backendUrl = `${BACKEND_URL}/${path}${url.search}`;
+    const backendUrl = `${BACKEND_URL}/api/${path}${url.search}`;
 
     const headers = new Headers(req.headers);
     headers.delete("host");

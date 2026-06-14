@@ -202,6 +202,7 @@ async function fetchConfig() {
         const _config = await import(configPath, { with: { type: "json" } });
         //TODO: validate config
         config = _config.default;
+        config.backendUrl = config.backendUrl.replace(/\/$/, "") + "/api"; //Add /api backend prefix
     } catch (e) {
         console.error(e);
         config = { configError: true } as AppConfigInterface;
