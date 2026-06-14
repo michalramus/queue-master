@@ -1,10 +1,11 @@
-import { spawnSync, spawn } from "child_process";
+import { spawn } from "child_process";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import { networkInterfaces } from "os";
 import path from "path";
 import { ClientInterface } from "shared-utils";
 
 let config: AppConfigInterface;
+let mainWindow: BrowserWindow;
 
 /**
  * Execute external script asynchronously
@@ -77,13 +78,11 @@ async function onExecuteCloseKioskScript(_event: IpcMainInvokeEvent): Promise<vo
     executeScript(config.openingHoursCloseScript, "openingHoursCloseScript");
 }
 
-async function handleInvokeAudioSynthesizer(
-    _event: IpcMainInvokeEvent,
-    client: ClientInterface,
-): Promise<void> {
+function handleInvokeAudioSynthesizer(_event: IpcMainInvokeEvent, client: ClientInterface): void {
     console.log("Invoking audio synthesizer");
     if (!config.audioSynthesizerScript) {
         console.log("No audio synthesizer script configured");
+        mainWindow.webContents.send("audioSynthesizerComplete");
         return;
     }
 
@@ -94,18 +93,24 @@ async function handleInvokeAudioSynthesizer(
         language: client.language,
     })}`;
 
-    const audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);
+    const proc = spawn(config.audioSynthesizerScript, [callParameters]);
 
-    if (process.env.NODE_ENV == "development") {
-        if (audioSynthesizer.stdout) {
-            console.log(audioSynthesizer.stdout.toString());
+    proc.stdout?.on("data", (data: Buffer) => {
+        if (process.env.NODE_ENV == "development" && data.length > 0) {
+            console.log(data.toString());
         }
+    });
 
-        if (audioSynthesizer.stderr) {
-            console.error(audioSynthesizer.stderr.toString());
+    proc.stderr?.on("data", (data: Buffer) => {
+        if (data.length > 0) {
+            console.error(data.toString());
         }
-    }
-    console.log(`Audio synthesizer script ended with ${audioSynthesizer.status}`);
+    });
+
+    proc.on("close", (code: number | null) => {
+        console.log(`Audio synthesizer script ended with ${code}`);
+        mainWindow.webContents.send("audioSynthesizerComplete");
+    });
 }
 
 async function handleGetTranslation(
@@ -147,7 +152,7 @@ function handleGetLocalIpAddress(): string {
 // -----------------------------------
 function createWindow(zoomFactor: number = 1) {
     const isDevelopment = process.env.NODE_ENV == "development";
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         width: 800,
         height: 600,

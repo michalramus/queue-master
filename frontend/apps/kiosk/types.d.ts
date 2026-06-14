@@ -23,6 +23,7 @@ interface ElectronAPIInterface {
     executeCloseKioskScript: () => Promise<void>;
 
     invokeAudioSynthesizer: (client: ClientInterface) => Promise<void>;
+    onAudioSynthesizerComplete: (callback: () => void) => () => void;
 
     getTranslation: (lang: string) => Promise<{ [key: string]: any }>;
     getAppConfig: () => Promise<AppConfigInterface>;
