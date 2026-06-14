@@ -41,7 +41,7 @@ describe("SeedingService", () => {
 
         await service.onApplicationBootstrap();
 
-        expect(mockUsersService.create).toHaveBeenCalledOnce();
+        expect(mockUsersService.create).toHaveBeenCalledTimes(1);
         const [dto, entity] = mockUsersService.create.mock.calls[0];
         expect(dto.username).toBe("admin");
         expect(dto.password).toBe("admin");

@@ -8,8 +8,7 @@
         "module": "ESNext",
         "skipLibCheck": true,
 
-        "baseUrl": "./src",
-        "paths": {"@/*": ["ui/*"]},
+        "paths": {"@/*": ["./src/ui/*"]},
 
 
         /* Bundler mode */
