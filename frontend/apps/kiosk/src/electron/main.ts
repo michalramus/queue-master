@@ -167,14 +167,14 @@ function createWindow(zoomFactor: number = 1) {
     });
 
     //Output devtools logs to main process console output
-    mainWindow.webContents.on("console-message", (_event, level, message, line, sourceId) => {
-        // level: 0=verbose/debug, 1=info, 2=warning, 3=error
-        const origin = sourceId ? `${sourceId}:${line}` : "renderer";
-        if (level === 3) {
+    mainWindow.webContents.on("console-message", (event) => {
+        const { level, message, lineNumber, sourceId } = event;
+        const origin = sourceId ? `${sourceId}:${lineNumber}` : "renderer";
+        if (level === "error") {
             console.error(`[renderer] ${message} (${origin})`);
-        } else if (level === 2) {
+        } else if (level === "warning") {
             console.warn(`[renderer] ${message} (${origin})`);
-        } else if (level === 1) {
+        } else if (level === "info") {
             console.log(`[renderer] ${message} (${origin})`);
         } else if (isDevelopment) {
             console.debug(`[renderer] ${message} (${origin})`);
