@@ -120,14 +120,19 @@ export class ClientsService {
             where: { status: "InService", desk: updateClientDto.desk },
         });
 
+        //IMPORTANT: This query updates only clients that state is changing - protection against concurrency calls
         // Update client
         const dbClient = await this.databaseService.client.update({
-            where: { id: id },
+            where: { id: id, NOT: { status: updateClientDto.status } },
             data: { status: updateClientDto.status, desk: updateClientDto.desk },
             include: {
                 category: true,
             },
         });
+
+        if (dbClient == null) {
+            throw new NotFoundException("Client not found or already in the desired status");
+        }
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
