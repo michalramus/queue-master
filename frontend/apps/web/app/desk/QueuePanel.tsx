@@ -25,7 +25,8 @@ export default function QueuePanel({ clients }: { clients: ClientInterface[] }) 
     const t = useTranslations();
 
     const queryClient = useQueryClient();
-    const { addEventListener, removeEventListener } = useSse();
+    const { addEventListener, removeEventListener, isConnected, backoffMs } = useSse();
+    const showWarning = !isConnected && backoffMs >= 2000;
 
     const { data: userSettings } = useUserSettings(axiosAuthInstance, undefined, {
         enabled: true,
@@ -121,15 +122,24 @@ export default function QueuePanel({ clients }: { clients: ClientInterface[] }) 
                     />
                 )}
             </div>
-            {inServiceClients && (
-                <div className="mb-5 flex w-full justify-center lg:w-6/12">
+            <div className="mb-5 flex w-full flex-col items-center lg:w-6/12">
+                <div
+                    className={`grid w-full transition-[grid-template-rows] duration-300 ease-in-out ${showWarning ? "mb-4 grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+                >
+                    <div className="overflow-hidden">
+                        <div className="border-yellow-1 rounded-lg border-2 px-4 py-3 text-center">
+                            {t("sse_disconnected_warning")}
+                        </div>
+                    </div>
+                </div>
+                {inServiceClients && (
                     <InServicePanel
                         clientNumber={inServiceClients[0]}
                         nextClientNumber={waitingClientsFiltered?.[0]}
                         desk={desk ? desk : 1}
                     />
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

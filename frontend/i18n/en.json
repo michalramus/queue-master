@@ -294,5 +294,6 @@
     "preview_title": "Title",
     "text_shown_on_kiosk": "Text shown on kiosk",
     "use_mdx_editor": "Use MDX Editor",
-    "active_categories": "Active Categories:"
+    "active_categories": "Active Categories:",
+    "sse_disconnected_warning": "Connection to server lost. Data may be outdated."
 }

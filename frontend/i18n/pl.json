@@ -295,5 +295,6 @@
     "preview_title": "Tytuł",
     "text_shown_on_kiosk": "Tekst wyświetlany w kiosku",
     "use_mdx_editor": "Użyj edytora MDX",
-    "active_categories": "Aktywne kategorie:"
+    "active_categories": "Aktywne kategorie:",
+    "sse_disconnected_warning": "Utracono połączenie z serwerem. Dane mogą być nieaktualne."
 }

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import CurrentNumberWidget from "./CurrentNumberWidget";
 import ClientNumbersHistory from "./ClientNumbersHistoryTable";
-import { SmallHeader, Card } from "shared-components";
+import { SmallHeader, Card, StartupScreen } from "shared-components";
 import {
     ClientInterface,
     sseEvents,
@@ -45,7 +45,8 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
         LogoID.logo_tv_secondary,
     );
 
-    const { addEventListener, removeEventListener } = useSse();
+    const { addEventListener, removeEventListener, isConnected, backoffMs } = useSse();
+    const showSSEDisconnectScreen = !isConnected && backoffMs >= 2000;
 
     //SSE
     useEffect(() => {
@@ -122,6 +123,12 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
             showNextClient();
         }
     }, [newClientsQueue, showNextClient]);
+
+    if (showSSEDisconnectScreen) {
+        return (
+            <StartupScreen status="connecting" title="SSE not connected. Connecting to server..." />
+        );
+    }
 
     return (
         <main className="overflow-hidden">
