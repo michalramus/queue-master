@@ -89,9 +89,9 @@ export default function KioskPage({
                         />
                     )}
                 </div>
-                <div className="flex w-36 flex-col gap-2">
+                <div className="flex w-36 flex-col gap-2 self-start pt-4">
                     <LanguageSwitcher />
-                    {kioskOpen && (
+                    {kioskOpen && !showOpeningHours && (
                         <Button
                             onClick={handleShowOpeningHours}
                             className="border-primary-1 relative! m-0! flex! w-full! items-center! justify-center! rounded-3xl! border-2! text-sm!"
