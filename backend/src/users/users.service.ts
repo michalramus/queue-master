@@ -97,7 +97,8 @@ export class UsersService {
                     `[${entity.name}] Set initial settings for user "${user.username}": ${JSON.stringify(userCreateDto.settings)}`,
                 );
             } catch (error) {
-                this.logger.warn(`Failed to set initial settings for user "${user.username}": ${error.message}`);
+                const message = error instanceof Error ? error.message : String(error);
+                this.logger.warn(`Failed to set initial settings for user "${user.username}": ${message}`);
             }
         }
 

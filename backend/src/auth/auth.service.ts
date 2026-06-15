@@ -138,7 +138,7 @@ export class AuthService {
         const { ip, method, url } = request;
 
         switch (entity.type) {
-            case "User":
+            case "User": {
                 const user = await this.usersService.findOneById(entity.id);
 
                 if (!user) {
@@ -153,7 +153,8 @@ export class AuthService {
                 }
 
                 break;
-            case "Device":
+            }
+            case "Device": {
                 const device = await this.devicesService.findOne(entity.id);
 
                 if (!device) {
@@ -175,6 +176,7 @@ export class AuthService {
                 }
 
                 break;
+            }
         }
 
         this.logger.warn(

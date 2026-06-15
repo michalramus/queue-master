@@ -23,7 +23,7 @@ const pages: Page[] = [
     },
 ];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     for (let page of pages) {
         if (request.nextUrl.pathname.startsWith(page.matcher)) {
             try {

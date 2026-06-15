@@ -38,7 +38,7 @@ export class GlobalSettingsService {
         this.logger.log(`[${entity.name}] Updating settings: ${JSON.stringify(settings)}`);
         //find setting in globalSettings, convert to string and save to database
         for (const [key, setting] of Object.entries(settings)) {
-            if (!globalSettingsList.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(globalSettingsList, key)) {
                 this.logger.warn(`Setting with key '${key}' and value '${setting}' not found in globalSettings.`);
                 continue;
             }

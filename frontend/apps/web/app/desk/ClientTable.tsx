@@ -88,6 +88,7 @@ export default function ClientTable({
                 <Image
                     src={client.language === LangCode.pl ? plFlag : gbFlag}
                     alt={client.language.toUpperCase()}
+                    width={64}
                     height={48}
                     className="rounded border border-gray-300"
                 />
