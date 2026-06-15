@@ -30,8 +30,7 @@
         "react-toastify": "^11.1.0",
         "shared-components": "1.0.0",
         "shared-utils": "1.0.0",
-        "tailwindcss": "^4.3.1",
-        "undici": "^8.4.1"
+        "tailwindcss": "^4.3.1"
     },
     "devDependencies": {
         "@eslint/compat": "^2.1.0",
