@@ -45,9 +45,9 @@ function ErrorBoundaryFallback({ error, resetErrorBoundary }: FallbackProps) {
                 An unexpected error occurred. Please try refreshing the kiosk or contact support.
             </p>
             <pre className="mx-auto mb-4 max-w-xl overflow-x-auto rounded-lg bg-red-100 p-4 text-sm whitespace-pre-wrap text-red-800">
-                {error.message}
+                {error instanceof Error ? error.message : String(error)}
             </pre>
-            {error.stack && (
+            {error instanceof Error && error.stack && (
                 <details className="mx-auto mb-4 max-w-xl text-gray-800">
                     <summary className="cursor-pointer">Show technical details</summary>
                     <pre className="text-xs whitespace-pre-wrap">{error.stack}</pre>
@@ -79,7 +79,7 @@ export default function ErrorBoundary({ children, onReset }: ErrorBoundaryProps)
         }
     };
 
-    const handleError = (error: Error, errorInfo: any) => {
+    const handleError = (error: unknown, errorInfo: React.ErrorInfo) => {
         console.log("ErrorBoundary: Error caught!", error, errorInfo);
     };
 
