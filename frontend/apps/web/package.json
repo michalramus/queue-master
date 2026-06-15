@@ -6,7 +6,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint \"{app,components,i18n,utils,types}/**/*.{ts,tsx}\" middleware.ts --fix",
+        "lint": "eslint \"{app,components,i18n,utils,types}/**/*.{ts,tsx}\" proxy.ts --fix",
         "pre-push": "tsc --noEmit"
     },
     "dependencies": {
@@ -20,7 +20,7 @@
         "cookies-next": "^6.1.1",
         "dompurify": "^3.4.10",
         "flag-icons": "^7.5.0",
-        "next": "15.5.19",
+        "next": "16.2.9",
         "next-intl": "^4.13.0",
         "prettier-plugin-tailwindcss": "^0.8.0",
         "react": "^19.2.7",
