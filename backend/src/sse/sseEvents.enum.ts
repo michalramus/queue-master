@@ -13,9 +13,13 @@ export enum sseEvents {
 
     // frontend cache-invalidation events
     CategoriesChanged = "CategoriesChanged",
+    CategoriesDesksChanged = "CategoriesDesksChanged",
+    DesksChanged = "DesksChanged",
     OpeningHoursChanged = "OpeningHoursChanged",
     LogoAvailabilityChanged = "LogoAvailabilityChanged",
     UserSettingsChanged = "UserSettingsChanged",
+
+    UserChanged = "UserChanged",
 
     ReloadFrontend = "ReloadFrontend",
 }

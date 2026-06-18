@@ -114,7 +114,12 @@ export class AuthService {
             return { id: device.id, role: "Device" } as AuthInfoResponseDto;
         } else if (entity.type == "User") {
             const user = await this.usersService.findOneById(entity.id);
-            return { id: user.id, username: user.username, role: user.role } as AuthInfoResponseDto;
+            return {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                default_desk: user.default_desk,
+            } as AuthInfoResponseDto;
         }
 
         return;

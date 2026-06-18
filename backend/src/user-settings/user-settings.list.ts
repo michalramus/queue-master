@@ -1,10 +1,8 @@
-import { NumRangeValue } from "src/settings/types/numRangeValue.class";
 import { BooleanSettingValue } from "src/settings/types/booleanSettingValue.class";
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
 
 //Remember to keep name of setting and 'key' argument the same
 export const userSettingsList: { [key: string]: Setting<SettingSupportedTypes> } = {
-    desk: new Setting<NumRangeValue>("desk", new NumRangeValue(1, 1, 999)),
     notifications_on: new Setting<BooleanSettingValue>("notifications_on", new BooleanSettingValue(true)),
 };
 

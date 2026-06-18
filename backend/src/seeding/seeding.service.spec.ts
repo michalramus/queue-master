@@ -28,7 +28,9 @@ describe("SeedingService", () => {
     });
 
     it("skips seeding when users exist", async () => {
-        mockUsersService.findAll.mockResolvedValue([{ id: 1, username: "existing", role: UserRole.Admin }]);
+        mockUsersService.findAll.mockResolvedValue([
+            { id: 1, username: "existing", role: UserRole.Admin, default_desk: null },
+        ]);
 
         await service.onApplicationBootstrap();
 
@@ -37,7 +39,12 @@ describe("SeedingService", () => {
 
     it("creates admin user when no users exist", async () => {
         mockUsersService.findAll.mockResolvedValue([]);
-        mockUsersService.create.mockResolvedValue({ id: 1, username: "admin", role: UserRole.Admin });
+        mockUsersService.create.mockResolvedValue({
+            id: 1,
+            username: "admin",
+            role: UserRole.Admin,
+            default_desk: null,
+        });
 
         await service.onApplicationBootstrap();
 
@@ -53,7 +60,12 @@ describe("SeedingService", () => {
         process.env.SEED_ADMIN_USERNAME = "superadmin";
         process.env.SEED_ADMIN_PASSWORD = "supersecret";
         mockUsersService.findAll.mockResolvedValue([]);
-        mockUsersService.create.mockResolvedValue({ id: 1, username: "superadmin", role: UserRole.Admin });
+        mockUsersService.create.mockResolvedValue({
+            id: 1,
+            username: "superadmin",
+            role: UserRole.Admin,
+            default_desk: null,
+        });
 
         await service.onApplicationBootstrap();
 

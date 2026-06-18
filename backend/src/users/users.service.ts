@@ -5,6 +5,8 @@ import { UserCreateDto, UserUpdateDto, UserPasswordUpdateDto, UserResponseDto } 
 import { Entity } from "../auth/types/entity.class";
 import { MessageResponseDto } from "../dto/messageResponse.dto";
 import { UserSettingsService } from "../user-settings/user-settings.service";
+import { SseService } from "../sse/sse.service";
+import { sseEvents } from "../sse/sseEvents.enum";
 import * as bcrypt from "bcrypt";
 
 @Injectable()
@@ -15,6 +17,7 @@ export class UsersService {
         private readonly databaseService: DatabaseService,
         @Inject(forwardRef(() => UserSettingsService))
         private readonly userSettingsService: UserSettingsService,
+        private readonly sseService: SseService,
     ) {}
 
     /**
@@ -25,6 +28,7 @@ export class UsersService {
     async findOneById(userId: number): Promise<User | null> {
         const user = await this.databaseService.user.findUnique({
             where: { id: userId },
+            include: { default_desk: { select: { id: true, desk_number: true, desk_name: true } } },
         });
         return user;
     }
@@ -41,17 +45,20 @@ export class UsersService {
         return user;
     }
 
+    private readonly userSelect = {
+        id: true,
+        username: true,
+        role: true,
+        default_desk: { select: { id: true, desk_number: true, desk_name: true } },
+    } as const;
+
     /**
      * Get all users (without password)
      * @returns List of users
      */
     async findAll(): Promise<UserResponseDto[]> {
         const users = await this.databaseService.user.findMany({
-            select: {
-                id: true,
-                username: true,
-                role: true,
-            },
+            select: this.userSelect,
             orderBy: { id: "asc" },
         });
         return users;
@@ -79,12 +86,9 @@ export class UsersService {
                 username: userCreateDto.username,
                 password: hashedPassword,
                 role: userCreateDto.role,
+                default_desk_id: userCreateDto.default_desk_id ?? null,
             },
-            select: {
-                id: true,
-                username: true,
-                role: true,
-            },
+            select: this.userSelect,
         });
 
         this.logger.log(`[${entity.name}] Created user "${user.username}" with role "${user.role}"`);
@@ -135,25 +139,25 @@ export class UsersService {
         }
 
         // Prepare update data
-        const updateData: any = {};
+        const updateData: Record<string, unknown> = {};
         if (userUpdateDto.role !== undefined) {
             updateData.role = userUpdateDto.role;
         }
         if (userUpdateDto.username !== undefined) {
             updateData.username = userUpdateDto.username;
         }
+        if ("default_desk_id" in userUpdateDto) {
+            updateData.default_desk_id = userUpdateDto.default_desk_id ?? null;
+        }
 
         const updatedUser = await this.databaseService.user.update({
             where: { id: userId },
             data: updateData,
-            select: {
-                id: true,
-                username: true,
-                role: true,
-            },
+            select: this.userSelect,
         });
 
         this.logger.log(`[${entity.name}] Updated user "${updatedUser.username}" (role: "${updatedUser.role}")`);
+        this.sseService.emit(sseEvents.UserChanged, { userId: updatedUser.id });
         return updatedUser;
     }
 
@@ -208,14 +212,11 @@ export class UsersService {
 
         const deletedUser = await this.databaseService.user.delete({
             where: { id: userId },
-            select: {
-                id: true,
-                username: true,
-                role: true,
-            },
+            select: this.userSelect,
         });
 
         this.logger.log(`[${entity.name}] Deleted user "${deletedUser.username}"`);
+        this.sseService.emit(sseEvents.ReloadFrontend, null);
         return deletedUser;
     }
 }

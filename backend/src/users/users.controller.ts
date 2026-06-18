@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Delete, Patch, Param, Body, UseGuards, Request, ParseIntPipe } from "@nestjs/common";
+import {
+    Controller,
+    Get,
+    Post,
+    Delete,
+    Patch,
+    Param,
+    Body,
+    UseGuards,
+    Request,
+    ParseIntPipe,
+    NotFoundException,
+} from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { UserCreateDto, UserUpdateDto, UserPasswordUpdateDto, UserResponseDto } from "./dto/user.dto";
 import { Roles } from "../auth/roles.decorator";
@@ -18,6 +30,7 @@ import {
     ApiNotFoundResponse,
 } from "@nestjs/swagger";
 import { MessageResponseDto } from "src/dto/messageResponse.dto";
+import { AuthInfoResponseDto } from "src/auth/dto/auth.dto";
 
 @ApiTags("users")
 @Controller("users")
@@ -52,6 +65,23 @@ export class UsersController {
     // @ApiBearerAuth("JWT-auth")
     async findAll(): Promise<UserResponseDto[]> {
         return this.usersService.findAll();
+    }
+
+    @Get(":id")
+    @Roles(["Admin"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Get user by ID" })
+    @ApiParam({ name: "id", description: "User ID", type: "number" })
+    @ApiResponse({ status: 200, description: "User details", type: AuthInfoResponseDto })
+    @ApiNotFoundResponse({ description: "User not found" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    async findOne(@Param("id", ParseIntPipe) id: number): Promise<AuthInfoResponseDto> {
+        const user = await this.usersService.findOneById(id);
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+        return { id: user.id, username: user.username, role: user.role, default_desk: user.default_desk ?? null };
     }
 
     @Patch(":id")

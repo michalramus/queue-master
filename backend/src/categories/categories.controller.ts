@@ -4,6 +4,8 @@ import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Roles } from "../auth/roles.decorator";
 import { CategoryResponseDto, CategoryCreateDto, CategoryUpdateDto } from "./dto/category.dto";
+import { DeskResponseDto } from "src/desks/dto/desk.dto";
+
 import {
     ApiTags,
     ApiOperation,
@@ -13,6 +15,8 @@ import {
     ApiNotFoundResponse,
     ApiConflictResponse,
     ApiBadRequestResponse,
+    ApiParam,
+    ApiBody,
 } from "@nestjs/swagger";
 import { Entity } from "src/auth/types/entity.class";
 
@@ -84,5 +88,55 @@ export class CategoriesController {
     @ApiForbiddenResponse({ description: "Admin access required" })
     async remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<void> {
         return this.categoriesService.remove(id, Entity.convertFromReq(req));
+    }
+
+    @Get(":id/desks")
+    @Roles(["Device", "User", "Admin"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Get desks assigned to a category" })
+    @ApiParam({ name: "id", type: "number", description: "Category ID" })
+    @ApiResponse({ status: 200, description: "List of desks assigned to category", type: [DeskResponseDto] })
+    @ApiNotFoundResponse({ description: "Category not found" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Insufficient permissions" })
+    getDesks(@Param("id", ParseIntPipe) id: number): Promise<DeskResponseDto[]> {
+        return this.categoriesService.getDesks(id);
+    }
+
+    @Post(":id/desks")
+    @Roles(["Admin"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Assign a desk to a category" })
+    @ApiParam({ name: "id", type: "number", description: "Category ID" })
+    @ApiBody({ schema: { type: "object", properties: { desk_id: { type: "number" } }, required: ["desk_id"] } })
+    @ApiResponse({ status: 201, description: "Desk assigned to category", type: CategoryResponseDto })
+    @ApiNotFoundResponse({ description: "Category or desk not found" })
+    @ApiConflictResponse({ description: "Desk already assigned to this category" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Admin access required" })
+    assignDesk(
+        @Param("id", ParseIntPipe) id: number,
+        @Body("desk_id", ParseIntPipe) deskId: number,
+        @Request() req,
+    ): Promise<CategoryResponseDto> {
+        return this.categoriesService.assignDesk(id, deskId, Entity.convertFromReq(req));
+    }
+
+    @Delete(":id/desks/:deskId")
+    @Roles(["Admin"])
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiOperation({ summary: "Remove a desk from a category" })
+    @ApiParam({ name: "id", type: "number", description: "Category ID" })
+    @ApiParam({ name: "deskId", type: "number", description: "Desk ID" })
+    @ApiResponse({ status: 200, description: "Desk removed from category", type: CategoryResponseDto })
+    @ApiNotFoundResponse({ description: "Category not found or desk not assigned" })
+    @ApiUnauthorizedResponse({ description: "Unauthorized" })
+    @ApiForbiddenResponse({ description: "Admin access required" })
+    removeDesk(
+        @Param("id", ParseIntPipe) id: number,
+        @Param("deskId", ParseIntPipe) deskId: number,
+        @Request() req,
+    ): Promise<CategoryResponseDto> {
+        return this.categoriesService.removeDesk(id, deskId, Entity.convertFromReq(req));
     }
 }
