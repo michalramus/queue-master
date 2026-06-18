@@ -152,10 +152,10 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
                         />
                     )}
                 </div>
-                <div className="flex h-11/12 flex-row flex-nowrap px-24 pt-9 pb-28">
+                <div className="flex h-11/12 flex-row flex-nowrap gap-10 px-24 pt-9 pb-28">
                     {tvOpen || !appConfig?.openingHoursEnableBanner ? (
                         <>
-                            <Card className="mb-10 ml-10 flex w-6/12 items-center justify-center">
+                            <Card className="mb-10 ml-10 flex h-fit w-6/12 items-center justify-center self-center">
                                 <CurrentNumberWidget
                                     category_short_name={currentClient?.category?.short_name ?? ""}
                                     number={currentClient?.number ?? ""}

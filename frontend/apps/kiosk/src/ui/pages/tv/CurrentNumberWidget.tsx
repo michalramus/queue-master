@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Table } from "shared-components";
 import { useTranslation } from "react-i18next";
 
@@ -23,24 +23,36 @@ export default function CurrentNumberWidget({
     const [displayedDesk, setDisplayedDesk] = useState(desk);
     const [displayedCategory, setDisplayedCategory] = useState(category_short_name);
 
+    // Refs mirror displayed state so the effect doesn't depend on it,
+    // preventing cascading re-runs when displayed values update.
+    const displayedNumberRef = useRef(number);
+    const displayedDeskRef = useRef(desk);
+    const displayedCategoryRef = useRef(category_short_name);
+
     useEffect(() => {
         const hasChanged =
-            number !== displayedNumber ||
-            desk !== displayedDesk ||
-            category_short_name !== displayedCategory;
+            number !== displayedNumberRef.current ||
+            desk !== displayedDeskRef.current ||
+            category_short_name !== displayedCategoryRef.current;
 
         if (!hasChanged) return;
 
-        setIsAnimating(true);
-        const timer = setTimeout(() => {
+        const fadeOutTimer = setTimeout(() => setIsAnimating(true), 0);
+        const updateTimer = setTimeout(() => {
+            displayedNumberRef.current = number;
+            displayedDeskRef.current = desk;
+            displayedCategoryRef.current = category_short_name;
             setDisplayedNumber(number);
             setDisplayedDesk(desk);
             setDisplayedCategory(category_short_name);
             setIsAnimating(false);
         }, TRANSITION_MS);
 
-        return () => clearTimeout(timer);
-    }, [number, desk, category_short_name, displayedNumber, displayedDesk, displayedCategory]);
+        return () => {
+            clearTimeout(fadeOutTimer);
+            clearTimeout(updateTimer);
+        };
+    }, [number, desk, category_short_name]);
 
     const numberText =
         displayedNumber !== ""
