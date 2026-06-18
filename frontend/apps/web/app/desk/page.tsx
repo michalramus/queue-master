@@ -20,6 +20,22 @@ export default async function DeskPage() {
         }),
     ]);
 
+    const deskId = user?.default_desk?.id;
+
+    if (user) {
+        queryClient.setQueryData(["authInfo"], user);
+    }
+    queryClient.setQueryData(
+        ["waitingClients"],
+        clients.filter((c) => c.status === "Waiting"),
+    );
+    if (deskId !== undefined) {
+        queryClient.setQueryData(
+            ["inServiceClients", deskId],
+            clients.filter((c) => c.status === "InService" && c.desk?.id === deskId),
+        );
+    }
+
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
             <main className="min-h-screen px-8 pt-10 pb-24 lg:px-10">

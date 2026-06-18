@@ -4,42 +4,43 @@ import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import {
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    assignDeskToCategory,
-    removeDeskFromCategory,
+    createDesk,
+    updateDesk,
+    deleteDesk,
+    assignCategoryToDesk,
+    removeCategoryFromDesk,
+    useDesks,
     useCategories,
     useGlobalSettings,
     sseEvents,
     LangCode,
-    type CategoryInterface,
-    type CategoryCreateDto,
-    type CategoryUpdateDto,
+    type DeskInterface,
+    type DeskCreateDto,
+    type DeskUpdateDto,
 } from "shared-utils";
+import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { useSse } from "@/utils/hooks/useSse";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
-import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { Button, ConfirmModal } from "shared-components";
 import { showToast } from "@/utils/toast";
 import { PageHeader } from "@/components/admin";
-import CategoriesTable from "./CategoriesTable";
-import CategoryModal from "./CategoryModal";
+import DesksTable from "./DesksTable";
+import DeskModal from "./DeskModal";
 
-export default function CategoriesClient() {
+export default function DesksClient() {
     const t = useTranslations();
     const queryClient = useQueryClient();
     const { addEventListener, removeEventListener } = useSse();
 
-    const { data: categories = [] } = useCategories(axiosAuthInstance);
+    const { data: desks = [] } = useDesks(axiosAuthInstance);
+    const { data: allCategories = [] } = useCategories(axiosAuthInstance);
     const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
     const defaultLocale: LangCode = (globalSettings?.locale as LangCode) ?? LangCode.en;
 
-    //SSE: invalidate categories and desks queries when categories are changed
     useEffect(() => {
         function onCategoriesChanged() {
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
             queryClient.invalidateQueries({ queryKey: ["desks"] });
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
         }
         addEventListener(sseEvents.CategoriesChanged, onCategoriesChanged);
         return () => removeEventListener(sseEvents.CategoriesChanged, onCategoriesChanged);
@@ -47,11 +48,9 @@ export default function CategoriesClient() {
 
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
-    const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
-    const editingCategory =
-        editingCategoryId !== null
-            ? (categories.find((c) => c.id === editingCategoryId) ?? null)
-            : null;
+    const [editingDeskId, setEditingDeskId] = useState<number | null>(null);
+    const editingDesk =
+        editingDeskId !== null ? (desks.find((d) => d.id === editingDeskId) ?? null) : null;
 
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -68,22 +67,22 @@ export default function CategoriesClient() {
     });
 
     const createMutation = useMutation({
-        mutationFn: async ({ dto, deskIds }: { dto: CategoryCreateDto; deskIds: number[] }) => {
-            const category = await createCategory(axiosAuthInstance, dto);
+        mutationFn: async ({ dto, categoryIds }: { dto: DeskCreateDto; categoryIds: number[] }) => {
+            const desk = await createDesk(axiosAuthInstance, dto);
             await Promise.all(
-                deskIds.map((deskId) =>
-                    assignDeskToCategory(axiosAuthInstance, category.id, deskId),
+                categoryIds.map((categoryId) =>
+                    assignCategoryToDesk(axiosAuthInstance, desk.id, categoryId),
                 ),
             );
         },
         onSuccess: () => {
-            showToast.success(t("category_created_successfully"));
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
+            showToast.success(t("desk_created_successfully"));
+            queryClient.invalidateQueries({ queryKey: ["desks"] });
             setModalOpen(false);
         },
         onError: (error: unknown) => {
             const err = error as { response?: { data?: { message?: string } } };
-            showToast.error(err.response?.data?.message || t("failed_save_category"));
+            showToast.error(err.response?.data?.message ?? t("failed_save_desk"));
         },
     });
 
@@ -91,113 +90,109 @@ export default function CategoriesClient() {
         mutationFn: async ({
             id,
             dto,
-            addedDeskIds,
-            removedDeskIds,
+            addedCategoryIds,
+            removedCategoryIds,
         }: {
             id: number;
-            dto: CategoryUpdateDto;
-            addedDeskIds: number[];
-            removedDeskIds: number[];
+            dto: DeskUpdateDto;
+            addedCategoryIds: number[];
+            removedCategoryIds: number[];
         }) => {
-            await updateCategory(axiosAuthInstance, id, dto);
+            await updateDesk(axiosAuthInstance, id, dto);
             await Promise.all([
-                ...addedDeskIds.map((deskId) =>
-                    assignDeskToCategory(axiosAuthInstance, id, deskId),
+                ...addedCategoryIds.map((catId) =>
+                    assignCategoryToDesk(axiosAuthInstance, id, catId),
                 ),
-                ...removedDeskIds.map((deskId) =>
-                    removeDeskFromCategory(axiosAuthInstance, id, deskId),
+                ...removedCategoryIds.map((catId) =>
+                    removeCategoryFromDesk(axiosAuthInstance, id, catId),
                 ),
             ]);
         },
         onSuccess: () => {
-            showToast.success(t("category_updated_successfully"));
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
+            showToast.success(t("desk_updated_successfully"));
+            queryClient.invalidateQueries({ queryKey: ["desks"] });
             setModalOpen(false);
         },
         onError: (error: unknown) => {
             const err = error as { response?: { data?: { message?: string } } };
-            showToast.error(err.response?.data?.message || t("failed_save_category"));
+            showToast.error(err.response?.data?.message ?? t("failed_save_desk"));
         },
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (categoryId: number) => deleteCategory(axiosAuthInstance, categoryId),
-        onMutate: (categoryId: number) => setDeletingId(categoryId),
+        mutationFn: (deskId: number) => deleteDesk(axiosAuthInstance, deskId),
+        onMutate: (deskId: number) => setDeletingId(deskId),
         onSuccess: () => {
-            showToast.success(t("category_deleted_successfully"));
-            queryClient.invalidateQueries({ queryKey: ["categories"] });
+            showToast.success(t("desk_deleted_successfully"));
+            queryClient.invalidateQueries({ queryKey: ["desks"] });
         },
         onError: (error: unknown) => {
             const err = error as { response?: { data?: { message?: string } } };
-            showToast.error(err.response?.data?.message || t("failed_delete_category"));
+            showToast.error(err.response?.data?.message ?? t("failed_delete_desk"));
         },
         onSettled: () => setDeletingId(null),
     });
 
     function handleCreate() {
-        setEditingCategoryId(null);
+        setEditingDeskId(null);
         setModalOpen(true);
     }
 
-    function handleEdit(category: CategoryInterface) {
-        setEditingCategoryId(category.id);
+    function handleEdit(desk: DeskInterface) {
+        setEditingDeskId(desk.id);
         setModalOpen(true);
     }
 
-    function handleDelete(categoryId: number) {
+    function handleDelete(deskId: number) {
+        const desk = desks.find((d) => d.id === deskId);
         setConfirmModal({
             isOpen: true,
             title: t("are_you_sure"),
-            message: t("are_you_sure_delete_category") + " " + t("action_cannot_be_undone"),
+            message: t("are_you_sure_delete_desk") + " " + t("action_cannot_be_undone"),
             type: "danger",
             onConfirm: () => {
                 setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-                deleteMutation.mutate(categoryId);
+                deleteMutation.mutate(deskId);
             },
         });
+        void desk;
     }
-
-    const usedLetters = new Set(categories.map((c) => c.short_name.toUpperCase()));
-    const availableLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        .split("")
-        .filter((letter) => !usedLetters.has(letter));
 
     const isSaving = createMutation.isPending || updateMutation.isPending;
 
     return (
         <div>
             <PageHeader
-                title={t("categories_management")}
+                title={t("desks_management")}
                 action={
                     <Button onClick={handleCreate} color="primary" className="m-0!">
-                        + {t("add_category")}
+                        + {t("add_desk")}
                     </Button>
                 }
             />
 
-            <CategoriesTable
-                categories={categories}
+            <DesksTable
+                desks={desks}
+                allCategories={allCategories}
                 defaultLocale={defaultLocale}
                 deletingId={deletingId}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
             />
 
-            <CategoryModal
+            <DeskModal
                 isOpen={modalOpen}
-                editingCategory={editingCategory}
-                defaultLocale={defaultLocale}
+                editingDesk={editingDesk}
                 saving={isSaving}
-                availableLetters={availableLetters}
                 onClose={() => setModalOpen(false)}
-                onCreate={(dto, deskIds) => createMutation.mutate({ dto, deskIds })}
-                onUpdate={(dto, addedDeskIds, removedDeskIds) =>
-                    editingCategory &&
+                onCreate={(dto, categoryIds) => createMutation.mutate({ dto, categoryIds })}
+                onUpdate={(dto, addedCategoryIds, removedCategoryIds) =>
+                    editingDesk &&
                     updateMutation.mutate({
-                        id: editingCategory.id,
+                        id: editingDesk.id,
                         dto,
-                        addedDeskIds,
-                        removedDeskIds,
+                        addedCategoryIds,
+                        removedCategoryIds,
                     })
                 }
             />

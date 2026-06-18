@@ -89,7 +89,7 @@ function handleInvokeAudioSynthesizer(_event: IpcMainInvokeEvent, client: Client
     const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
-        desk: client.desk,
+        desk: client.desk?.desk_number || "",
         language: client.language,
     })}`;
 

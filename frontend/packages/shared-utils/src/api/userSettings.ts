@@ -1,7 +1,6 @@
 import { AxiosAuthInstance } from "../axiosInstances.interface";
 
 export interface UserSettingsInterface {
-    desk?: number;
     notifications_on?: boolean;
 }
 

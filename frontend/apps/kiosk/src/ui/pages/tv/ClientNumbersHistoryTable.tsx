@@ -156,7 +156,7 @@ export default function ClientNumbersHistory({
                                     <td className="px-6 py-3">
                                         {(client.category?.short_name ?? "") + client.number}
                                     </td>
-                                    <td className="px-6 py-3">{client.desk}</td>
+                                    <td className="px-6 py-3">{client.desk?.desk_number ?? ""}</td>
                                 </tr>
                             );
                         })}

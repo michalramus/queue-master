@@ -20,16 +20,16 @@ export function useWaitingClients(
 
 export function useInServiceClients(
     axiosAuthInstance: AxiosAuthInstance,
-    desk: number | undefined,
+    deskId: number | undefined,
     options?: Omit<UseQueryOptions<ClientInterface[], Error>, "queryKey" | "queryFn">,
 ): UseQueryResult<ClientInterface[], Error> {
     return useQuery({
-        queryKey: ["inServiceClients", desk],
+        queryKey: ["inServiceClients", deskId],
         queryFn: () =>
             getClients(axiosAuthInstance).then((res) =>
-                res.filter((client) => client.status === "InService" && client.desk === desk),
+                res.filter((client) => client.status === "InService" && client.desk?.id === deskId),
             ),
-        enabled: desk !== undefined,
+        enabled: deskId !== undefined,
         ...options,
     });
 }

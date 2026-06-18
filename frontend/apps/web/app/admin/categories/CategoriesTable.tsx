@@ -26,6 +26,7 @@ export default function CategoriesTable({
     const columns: AdminTableColumn[] = [
         { header: t("short_name") },
         { header: t("default_language_name") },
+        { header: t("desks") },
         { header: t("actions"), align: "right" },
     ];
 
@@ -33,7 +34,7 @@ export default function CategoriesTable({
         <AdminTable columns={columns}>
             {categories.length === 0 ? (
                 <tr>
-                    <td colSpan={3} className="text-text-2 px-6 py-8 text-center text-sm">
+                    <td colSpan={4} className="text-text-2 px-6 py-8 text-center text-sm">
                         {t("category_list_is_empty")}
                     </td>
                 </tr>
@@ -49,6 +50,19 @@ export default function CategoriesTable({
                             {(category.name as Record<string, string>)[defaultLocale] ||
                                 category.name.en ||
                                 "-"}
+                        </td>
+                        <td className="px-6 py-4">
+                            <div className="flex flex-wrap gap-1">
+                                {category.desks && category.desks.length > 0 ? (
+                                    category.desks.map((desk) => (
+                                        <Badge key={desk.id} color="primary">
+                                            {desk.desk_name}
+                                        </Badge>
+                                    ))
+                                ) : (
+                                    <span className="text-text-2 text-sm">—</span>
+                                )}
+                            </div>
                         </td>
                         <td className="px-6 py-4 text-right text-sm whitespace-nowrap">
                             <TextButton onClick={() => onEdit(category)} className="mr-3">

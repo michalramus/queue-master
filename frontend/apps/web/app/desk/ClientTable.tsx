@@ -17,10 +17,10 @@ import gbFlag from "flag-icons/flags/4x3/gb.svg";
  */
 export default function ClientTable({
     filteredClientNumbers,
-    desk,
+    deskId,
 }: {
     filteredClientNumbers: ClientInterface[] | undefined;
-    desk: number;
+    deskId: number;
 }) {
     const t = useTranslations();
     const locale = useLocale();
@@ -36,7 +36,7 @@ export default function ClientTable({
     // set client as in service
     const clientInService = useMutation({
         mutationFn: (clientNumber: ClientInterface) =>
-            setClientAsInService(clientNumber, desk, axiosAuthInstance),
+            setClientAsInService(clientNumber, deskId, axiosAuthInstance),
     });
 
     // remove client

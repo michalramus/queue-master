@@ -173,7 +173,6 @@ export default function UsersDevicesClient() {
             {activeTab === "users" && (
                 <UsersTable
                     users={users}
-                    allUsersSettings={allUsersSettings}
                     deleting={deleteUserMutation.isPending}
                     onEdit={handleEditUser}
                     onDelete={handleDeleteUser}

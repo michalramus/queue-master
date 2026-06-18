@@ -12,11 +12,11 @@ import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 export default function InServicePanel({
     clientNumber,
     nextClientNumber,
-    desk,
+    deskId,
 }: {
     clientNumber?: ClientInterface;
     nextClientNumber?: ClientInterface;
-    desk: number;
+    deskId: number;
 }) {
     const [lockNextClientButton, setLockNextClientButton] = useState(false); //Lock the next button to avoid miss clicks
     const [isCallAgainLoading, setIsCallAgainLoading] = useState(false); //Loading state for call again button
@@ -59,7 +59,7 @@ export default function InServicePanel({
     async function nextClientHandler() {
         setLockNextClientButton(true);
         if (nextClientNumber) {
-            setClientAsInService(nextClientNumber, desk, axiosAuthInstance);
+            setClientAsInService(nextClientNumber, deskId, axiosAuthInstance);
         }
         setTimeout(() => {
             setLockNextClientButton(false);

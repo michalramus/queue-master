@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Modal, Button, Spinner, Input, Select } from "shared-components";
+import { Modal, Button, Spinner, Input, Select, Badge, RejectIcon } from "shared-components";
 import { showToast } from "@/utils/toast";
-import { LangCode } from "shared-utils";
+import { LangCode, useDesks } from "shared-utils";
 import type { CategoryInterface, CategoryCreateDto, CategoryUpdateDto } from "shared-utils";
 import { langLabelKey, initLangRecord } from "@/i18n/langLabels";
+import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 
 interface CategoryModalProps {
     isOpen: boolean;
@@ -15,8 +16,8 @@ interface CategoryModalProps {
     saving: boolean;
     availableLetters: string[];
     onClose: () => void;
-    onCreate: (dto: CategoryCreateDto) => void;
-    onUpdate: (dto: CategoryUpdateDto) => void;
+    onCreate: (dto: CategoryCreateDto, deskIds: number[]) => void;
+    onUpdate: (dto: CategoryUpdateDto, addedDeskIds: number[], removedDeskIds: number[]) => void;
 }
 
 export default function CategoryModal({
@@ -37,13 +38,23 @@ export default function CategoryModal({
 
     const [shortName, setShortName] = useState<string>("");
     const [name, setName] = useState<Record<LangCode, string>>(() => initLangRecord(() => ""));
+    const [selectedDeskId, setSelectedDeskId] = useState<string>("");
+    const [localDeskIds, setLocalDeskIds] = useState<number[]>([]);
+
+    const { data: desks = [] } = useDesks(axiosAuthInstance);
 
     useEffect(() => {
         if (!isOpen) return;
         setShortName(editingCategory?.short_name ?? "");
         setName(initLangRecord((lang) => editingCategory?.name[lang] ?? ""));
+        setLocalDeskIds(editingCategory?.desks?.map((d) => d.id) ?? []);
+        setSelectedDeskId("");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
+
+    const localSet = new Set(localDeskIds);
+    const unassignedDesks = desks.filter((d) => !localSet.has(d.id));
+    const assignedDesks = desks.filter((d) => localSet.has(d.id));
 
     const handleSave = () => {
         const filteredName: CategoryCreateDto["name"] = {};
@@ -61,9 +72,12 @@ export default function CategoryModal({
         }
 
         if (editingCategory) {
-            onUpdate({ short_name: shortName, name: filteredName });
+            const originalIds = new Set(editingCategory.desks?.map((d) => d.id) ?? []);
+            const addedDeskIds = localDeskIds.filter((id) => !originalIds.has(id));
+            const removedDeskIds = [...originalIds].filter((id) => !localSet.has(id));
+            onUpdate({ short_name: shortName, name: filteredName }, addedDeskIds, removedDeskIds);
         } else {
-            onCreate({ short_name: shortName, name: filteredName });
+            onCreate({ short_name: shortName, name: filteredName }, localDeskIds);
         }
     };
 
@@ -118,6 +132,74 @@ export default function CategoryModal({
                             }
                         />
                     ))}
+
+                    <div>
+                        <label className="text-text-1 mb-2 block text-sm font-medium">
+                            {t("assigned_desks")}
+                        </label>
+
+                        <div className="mb-3 flex flex-wrap gap-2">
+                            {assignedDesks.length > 0 ? (
+                                assignedDesks.map((desk) => (
+                                    <Badge
+                                        key={desk.id}
+                                        color="primary"
+                                        className="flex items-center gap-1"
+                                    >
+                                        {desk.desk_name}
+                                        <button
+                                            onClick={() =>
+                                                setLocalDeskIds((prev) =>
+                                                    prev.filter((id) => id !== desk.id),
+                                                )
+                                            }
+                                            className="text-red-1 leading-none font-bold hover:text-red-700"
+                                            aria-label={t("remove")}
+                                        >
+                                            <RejectIcon />
+                                        </button>
+                                    </Badge>
+                                ))
+                            ) : (
+                                <span className="text-text-2 text-sm">
+                                    {t("no_desks_assigned")}
+                                </span>
+                            )}
+                        </div>
+
+                        {unassignedDesks.length > 0 && (
+                            <div className="flex gap-2">
+                                <Select
+                                    value={selectedDeskId}
+                                    onChange={(val) => setSelectedDeskId(val)}
+                                    className="flex-1"
+                                >
+                                    <option value="">{t("choose_desk")}</option>
+                                    {unassignedDesks.map((desk) => (
+                                        <option key={desk.id} value={String(desk.id)}>
+                                            {desk.desk_name} (#{desk.desk_number})
+                                        </option>
+                                    ))}
+                                </Select>
+                                <Button
+                                    color="primary"
+                                    className="m-0! shrink-0"
+                                    disabled={!selectedDeskId}
+                                    onClick={() => {
+                                        if (selectedDeskId) {
+                                            setLocalDeskIds((prev) => [
+                                                ...prev,
+                                                Number(selectedDeskId),
+                                            ]);
+                                            setSelectedDeskId("");
+                                        }
+                                    }}
+                                >
+                                    {t("add")}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <div className="mt-6 flex justify-end gap-3">
                     <Button onClick={onClose} disabled={saving} color="gray" className="m-0!">

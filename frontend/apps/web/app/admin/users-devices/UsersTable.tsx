@@ -4,23 +4,16 @@ import { useTranslations } from "next-intl";
 import { Badge, TextButton } from "shared-components";
 import { AdminTable } from "@/components/admin";
 import type { AdminTableColumn } from "@/components/admin/AdminTable";
-import type { UserResponseDto, UserSettingsInterface } from "shared-utils";
+import type { UserResponseDto } from "shared-utils";
 
 interface UsersTableProps {
     users: UserResponseDto[];
-    allUsersSettings: { [userId: number]: UserSettingsInterface };
     deleting: boolean;
     onEdit: (user: UserResponseDto) => void;
     onDelete: (userId: number) => void;
 }
 
-export default function UsersTable({
-    users,
-    allUsersSettings,
-    deleting,
-    onEdit,
-    onDelete,
-}: UsersTableProps) {
+export default function UsersTable({ users, deleting, onEdit, onDelete }: UsersTableProps) {
     const t = useTranslations();
 
     const columns: AdminTableColumn[] = [
@@ -45,7 +38,7 @@ export default function UsersTable({
                         </Badge>
                     </td>
                     <td className="text-text-1 px-6 py-4 text-sm whitespace-nowrap">
-                        {allUsersSettings[user.id]?.desk ?? "-"}
+                        {user.default_desk?.desk_name ?? "-"}
                     </td>
                     <td className="px-6 py-4 text-right text-sm whitespace-nowrap">
                         <TextButton onClick={() => onEdit(user)} className="mr-3">

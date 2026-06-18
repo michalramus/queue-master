@@ -159,7 +159,7 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
                                 <CurrentNumberWidget
                                     category_short_name={currentClient?.category?.short_name ?? ""}
                                     number={currentClient?.number ?? ""}
-                                    desk={currentClient?.desk ?? ""}
+                                    desk={currentClient?.desk?.desk_number?.toString() ?? ""}
                                     className="w-full"
                                 />
                             </Card>

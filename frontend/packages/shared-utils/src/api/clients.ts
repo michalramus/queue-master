@@ -1,4 +1,5 @@
 import { CategoryInterface } from "./categories";
+import { DeskInterface } from "./desks";
 import { AxiosAuthInstance } from "../axiosInstances.interface";
 import { LangCode } from "../types/LangCode";
 
@@ -8,7 +9,7 @@ export interface ClientInterface {
     category_id: number;
     category: CategoryInterface;
     status: "Waiting" | "InService";
-    desk: number | null;
+    desk: DeskInterface | null;
     language: LangCode;
     creation_date: Date;
     queue_length?: number;
@@ -30,17 +31,14 @@ export async function addClient(
 }
 
 export async function setClientAsInService(
-    clientNumber: ClientInterface,
-    desk: number,
+    client: ClientInterface,
+    deskId: number,
     axiosAuthInstance: AxiosAuthInstance,
 ): Promise<ClientInterface | null> {
-    clientNumber.desk = desk;
-    clientNumber.status = "InService";
-
-    const response = await axiosAuthInstance.auth.patch(
-        apiPath + "/" + clientNumber.id,
-        clientNumber,
-    );
+    const response = await axiosAuthInstance.auth.patch(apiPath + "/" + client.id, {
+        status: "InService",
+        desk_id: deskId,
+    });
 
     return response.data;
 }

@@ -1,9 +1,11 @@
 import { AxiosAuthInstance, AxiosPureInstance } from "shared-utils";
+import { DeskInterface } from "./desks";
 
 export interface AuthInfoInterface {
     id: number;
     role: "Device" | "User" | "Admin";
     username?: string;
+    default_desk?: DeskInterface | null;
 }
 
 const apiPath = "/auth";

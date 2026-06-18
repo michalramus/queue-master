@@ -23,12 +23,13 @@ export default function Sidebar({ username, onLogout }: SidebarProps) {
     }
 
     return (
-        <aside className="sticky top-0 flex h-screen w-64 flex-shrink-0 flex-col bg-white shadow-lg">
+        <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col bg-white shadow-lg">
             <AdminHeader username={username} />
 
             <nav className="flex-1 overflow-y-auto">
                 <SidebarItem href="/admin" label={t("dashboard")} />
                 <SidebarItem href="/admin/users-devices" label={t("users_and_devices")} />
+                <SidebarItem href="/admin/desks" label={t("desks")} />
                 <SidebarItem href="/admin/categories" label={t("categories")} />
                 <SidebarItem
                     href="/admin/settings"

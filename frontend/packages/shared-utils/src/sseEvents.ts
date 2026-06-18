@@ -9,9 +9,13 @@ export enum sseEvents {
     GlobalSettingsChanged = "GlobalSettingsChanged",
     MultilingualSettingsChanged = "MultilingualSettingsChanged",
     CategoriesChanged = "CategoriesChanged",
+    CategoriesDesksChanged = "CategoriesDesksChanged", //changes in categories to desks assignment
+    DesksChanged = "DesksChanged",
     OpeningHoursChanged = "OpeningHoursChanged",
     LogoAvailabilityChanged = "LogoAvailabilityChanged",
     UserSettingsChanged = "UserSettingsChanged",
+
+    UserChanged = "UserChanged",
 
     ReloadFrontend = "ReloadFrontend",
 }
