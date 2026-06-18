@@ -20,7 +20,7 @@ import {
 } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
-import { Button, Checkbox, Input, Select, Spinner } from "shared-components";
+import { Button, Checkbox, NumericStepper, Select, Spinner } from "shared-components";
 import { showToast } from "@/utils/toast";
 import { PageHeader } from "@/components/admin";
 import DayRow from "./DayRow";
@@ -189,28 +189,34 @@ export default function OpeningHoursClient() {
                         <option value="override_to_open">{t("force_open_description")}</option>
                         <option value="override_to_close">{t("force_closed_description")}</option>
                     </Select>
-                    <Input
-                        type="number"
-                        label={t("kiosk_open_offset")}
-                        hint={t("kiosk_open_offset_description")}
-                        value={String(kioskOpenOffset)}
-                        onChange={(e) => {
-                            const val = Math.min(59, Math.max(0, parseInt(e.target.value) || 0));
-                            setKioskOpenOffset(val);
-                        }}
-                        disabled={!enabled}
-                    />
-                    <Input
-                        type="number"
-                        label={t("tv_close_offset")}
-                        hint={t("tv_close_offset_description")}
-                        value={String(tvCloseOffset)}
-                        onChange={(e) => {
-                            const val = Math.min(59, Math.max(0, parseInt(e.target.value) || 0));
-                            setTvCloseOffset(val);
-                        }}
-                        disabled={!enabled}
-                    />
+                    <div>
+                        <label className="text-text-1 mb-1 block text-sm font-medium">
+                            {t("kiosk_open_offset")}
+                        </label>
+                        <NumericStepper
+                            value={kioskOpenOffset}
+                            onChange={setKioskOpenOffset}
+                            min={0}
+                            max={59}
+                            hint={t("kiosk_open_offset_description")}
+                            disabled={!enabled}
+                            className="w-fit"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-text-1 mb-1 block text-sm font-medium">
+                            {t("tv_close_offset")}
+                        </label>
+                        <NumericStepper
+                            value={tvCloseOffset}
+                            onChange={setTvCloseOffset}
+                            min={0}
+                            max={59}
+                            hint={t("tv_close_offset_description")}
+                            disabled={!enabled}
+                            className="w-fit"
+                        />
+                    </div>
                 </div>
             </div>
 
