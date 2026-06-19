@@ -59,6 +59,12 @@ export class OpeningHoursService {
 
                 // Only update times if not closing the day or if providing new times
                 if (!dayHours.is_closed) {
+                    if (!dayHours.open_time || !dayHours.close_time) {
+                        this.logger.warn(
+                            `[${entity.name}] Missing times for ${dayHours.day_of_week} when not closed. Skipping.`,
+                        );
+                        continue;
+                    }
                     updateData.open_time = dayHours.open_time;
                     updateData.close_time = dayHours.close_time;
                 } else if (dayHours.open_time && dayHours.close_time) {
