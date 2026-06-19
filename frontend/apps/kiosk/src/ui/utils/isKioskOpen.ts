@@ -26,7 +26,7 @@ export function isKioskOpen(
     const today = openingHours.find((entry) => entry.day_of_week === dayOfWeek);
     if (!today) return true; // No hours set for today, assume open
     if (today.is_closed) return false;
-    if (!today.open_time || !today.close_time) return false;
+    if (!today.open_time || !today.close_time) return true; // Missing times, assume open
 
     // Compare current time to open/close with offsets applied
     const [openHour, openMinute] = today.open_time.split(":").map(Number);
