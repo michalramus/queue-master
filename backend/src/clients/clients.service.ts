@@ -118,6 +118,17 @@ export class ClientsService {
             throw new NotFoundException("Client not found");
         }
 
+        // Check if desk exists
+        if (updateClientDto.desk_id !== null && updateClientDto.desk_id !== undefined) {
+            const desk = await this.databaseService.desk.findUnique({ where: { id: updateClientDto.desk_id } });
+            if (!desk) {
+                this.logger.warn(
+                    `Cannot update client with id ${id}. Desk with id ${updateClientDto.desk_id} not found`,
+                );
+                throw new NotFoundException("Desk not found");
+            }
+        }
+
         // Delete any other client in service from the same desk
         await this.databaseService.client.deleteMany({
             where: { status: "InService", desk_id: updateClientDto.desk_id },
