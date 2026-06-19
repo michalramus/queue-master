@@ -118,7 +118,7 @@ export default function InServicePanel({
                     >
                         {isCallAgainLoading ? (
                             <div className="flex items-center justify-center gap-1 px-1">
-                                <div className="h-3 w-3 flex-shrink-0 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                <div className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-white border-t-transparent" />
                                 <span className="text-lg">{t("calling")}...</span>
                             </div>
                         ) : (
