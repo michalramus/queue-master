@@ -37,7 +37,9 @@ axiosPureInstance.pure.interceptors.response.use(
             console.error("Error Response:", error.response.data);
         } else if (error.request) {
             // Request was made but no response received
-            console.error("No response received:", error.request);
+            console.error(
+                `No response received: ${error.config?.method?.toUpperCase()} ${error.config?.url} (${error.code})`,
+            );
         } else {
             // Something happened in setting up the request
             console.error("Request error:", error.message);
