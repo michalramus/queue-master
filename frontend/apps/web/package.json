@@ -1,6 +1,15 @@
 {
     "name": "queue-master-frontend-web",
     "version": "0.1.0",
+    "description": "Queue Master — ticket queue management system web frontend",
+    "author": {
+        "name": "Michal Ramus",
+        "email": "ramus.michal21@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michalramus/queue-master"
+    },
     "private": true,
     "scripts": {
         "dev": "next dev",

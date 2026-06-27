@@ -2,9 +2,14 @@
     "name": "queue-master-kiosk",
     "private": true,
     "version": "0.0.0",
+    "description": "Queue Master — ticket queue management system kiosk app",
     "author": {
         "name": "Michal Ramus",
         "email": "ramus.michal21@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michalramus/queue-master"
     },
     "homepage": "https://github.com/michalramus/queue-master",
     "type": "module",

@@ -1,8 +1,15 @@
 {
   "name": "queue-master-backend",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Queue Master — ticket queue management system backend",
+  "author": {
+    "name": "Michal Ramus",
+    "email": "ramus.michal21@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michalramus/queue-master"
+  },
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

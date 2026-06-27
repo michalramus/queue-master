@@ -1,6 +1,15 @@
 {
     "name": "shared-utils",
     "version": "1.0.0",
+    "description": "Queue Master — shared API functions and React Query hooks",
+    "author": {
+        "name": "Michal Ramus",
+        "email": "ramus.michal21@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michalramus/queue-master"
+    },
     "main": "src/index.ts",
     "scripts": {
         "pre-push": ""
