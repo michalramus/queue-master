@@ -3,8 +3,7 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 // Regex at the end to remove trailing slash if any
-const BACKEND_URL =
-    process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") || "http://localhost:3001";
+const BACKEND_URL = process.env.BACKEND_URL?.replace(/\/$/, "") || "http://localhost:3001";
 
 async function proxyRequest(req: Request, path: string, method: string) {
     const url = new URL(req.url);
