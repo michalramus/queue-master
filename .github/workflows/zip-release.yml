@@ -4,6 +4,15 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (e.g. v1.2.3). Defaults to 'manual' if omitted."
+        required: false
+        default: "manual"
+
+env:
+  RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
 
 jobs:
   build-backend:
@@ -22,7 +31,7 @@ jobs:
           cache-dependency-path: backend/yarn.lock
 
       - name: Set version from tag
-        run: npm pkg set version="${GITHUB_REF_NAME#v}"
+        run: npm pkg set version="${RELEASE_VERSION#v}"
         working-directory: backend
 
       - name: Install dependencies
@@ -44,7 +53,7 @@ jobs:
       - name: Create archive
         working-directory: backend
         run: |
-          zip -r "../backend-${{ github.ref_name }}.zip" \
+          zip -r "../backend-${{ env.RELEASE_VERSION }}.zip" \
             dist/ \
             node_modules/ \
             prisma/ \
@@ -54,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-zip
-          path: backend-${{ github.ref_name }}.zip
+          path: backend-${{ env.RELEASE_VERSION }}.zip
 
   build-web:
     name: Build web archive
@@ -72,7 +81,7 @@ jobs:
           cache-dependency-path: frontend/yarn.lock
 
       - name: Set version from tag
-        run: npm pkg set version="${GITHUB_REF_NAME#v}"
+        run: npm pkg set version="${RELEASE_VERSION#v}"
         working-directory: frontend/apps/web
 
       - name: Install dependencies
@@ -90,13 +99,13 @@ jobs:
           cp -r apps/web/.next/standalone/. web-dist/
           cp -r apps/web/.next/static web-dist/apps/web/.next/static
           cp -r apps/web/public web-dist/apps/web/public
-          cd web-dist && zip -r "../../web-${{ github.ref_name }}.zip" .
+          cd web-dist && zip -r "../../web-${{ env.RELEASE_VERSION }}.zip" .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-zip
-          path: web-${{ github.ref_name }}.zip
+          path: web-${{ env.RELEASE_VERSION }}.zip
 
   build-kiosk-linux:
     name: Build kiosk (Linux)
@@ -114,7 +123,7 @@ jobs:
           cache-dependency-path: frontend/yarn.lock
 
       - name: Set version from tag
-        run: npm pkg set version="${GITHUB_REF_NAME#v}"
+        run: npm pkg set version="${RELEASE_VERSION#v}"
         working-directory: frontend/apps/kiosk
 
       - name: Install dependencies
@@ -150,7 +159,7 @@ jobs:
 
       - name: Set version from tag
         shell: bash
-        run: npm pkg set version="${GITHUB_REF_NAME#v}"
+        run: npm pkg set version="${RELEASE_VERSION#v}"
         working-directory: frontend/apps/kiosk
 
       - name: Install dependencies
