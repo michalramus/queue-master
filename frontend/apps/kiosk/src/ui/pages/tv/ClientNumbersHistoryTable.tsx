@@ -116,7 +116,11 @@ export default function ClientNumbersHistory({
     return (
         <div ref={outerRef} className="flex h-full w-6/12 flex-col overflow-hidden">
             {/* Header sits outside the clipped body area so rows never overlap it */}
-            <table ref={headerRef} className="mx-2 w-full flex-none text-center">
+            <table ref={headerRef} className="mx-2 w-full flex-none table-fixed text-center">
+                <colgroup>
+                    <col className="w-1/2" />
+                    <col className="w-1/2" />
+                </colgroup>
                 <thead className="text-text-2 border-gray-1 text-md border-b-2 text-4xl">
                     <tr>
                         <th scope="col" className="px-6 py-1 font-light">
@@ -130,7 +134,11 @@ export default function ClientNumbersHistory({
             </table>
             {/* overflow-hidden here is what clips rows above row-0 and below the last visible row */}
             <div className="flex-1 overflow-hidden">
-                <table className="mx-2 w-full text-center">
+                <table className="mx-2 w-full table-fixed text-center">
+                    <colgroup>
+                        <col className="w-1/2" />
+                        <col className="w-1/2" />
+                    </colgroup>
                     <tbody
                         style={{
                             transform: `translateY(${tableOffset}px)`,
@@ -153,10 +161,12 @@ export default function ClientNumbersHistory({
                                     }}
                                     className="border-gray-1 border-opacity-50 border-b-2 text-5xl font-medium"
                                 >
-                                    <td className="px-6 py-3">
+                                    <td className="px-6 py-3 text-center align-middle">
                                         {(client.category?.short_name ?? "") + client.number}
                                     </td>
-                                    <td className="px-6 py-3">{client.desk?.desk_number ?? ""}</td>
+                                    <td className="px-6 py-3 text-center align-middle">
+                                        {client.desk?.desk_number ?? ""}
+                                    </td>
                                 </tr>
                             );
                         })}
