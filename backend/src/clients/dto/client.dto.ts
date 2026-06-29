@@ -84,7 +84,9 @@ export class ClientResponseDto {
     creation_date: Date;
 
     @ApiProperty({
-        description: "Queue length when client was added (if exists)",
+        description:
+            "Number of tickets waiting in the same category at the moment this ticket was created. " +
+            "Available as the &queueLength placeholder in the printer ticket template.",
         example: 15,
         required: false,
     })

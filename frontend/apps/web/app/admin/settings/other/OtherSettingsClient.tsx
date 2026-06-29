@@ -77,6 +77,7 @@ export default function OtherSettingsClient() {
         return template
             .replace(/&categoryShortName/g, sampleData.categoryShortName)
             .replace(/&number/g, sampleData.number)
+            .replace(/&queueLength/g, "5")
             .replace(/&date/g, sampleData.date)
             .replace(/&time/g, sampleData.time);
     };
@@ -246,6 +247,15 @@ export default function OtherSettingsClient() {
                         </strong>{" "}
                         — {t("placeholder_time_desc")} — {t("example")}:{" "}
                         <em>{t("placeholder_time_example")}</em>
+                    </li>
+                    <li>
+                        <strong>
+                            <u>
+                                <code>&amp;queueLength</code>
+                            </u>
+                        </strong>{" "}
+                        — {t("placeholder_queue_length_desc")} — {t("example")}:{" "}
+                        <em>{t("placeholder_queue_length_example")}</em>
                     </li>
                 </ol>
                 <div className="space-y-4">
