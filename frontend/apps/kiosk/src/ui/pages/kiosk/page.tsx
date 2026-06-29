@@ -15,7 +15,7 @@ import { useLogoManagement } from "@/utils/hooks/useLogoManagement";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const OPENING_HOURS_SHOW_DURATION = 60_000;
+const OPENING_HOURS_SHOW_DURATION = 30_000;
 
 export default function KioskPage({
     openingHours,
