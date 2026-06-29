@@ -25,6 +25,7 @@ export default function LogoManagement() {
     const defaultLang: LangCode = (globalSettings?.locale ?? LangCode.en) as LangCode;
 
     const [selectedLang, setSelectedLang] = useState<LangCode>(defaultLang);
+    const [previewKey, setPreviewKey] = useState<number>(0);
 
     const { data: availableLogos } = useLogoAvailabilities(axiosPureInstance);
 
@@ -41,6 +42,7 @@ export default function LogoManagement() {
             uploadLogo(lang, logoId, file, axiosAuthInstance),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["logoAvailabilities"] });
+            setPreviewKey((prev) => prev + 1);
             showToast.success(t("logo_uploaded_successfully"));
         },
         onError: (error: unknown) => {
@@ -54,6 +56,8 @@ export default function LogoManagement() {
             deleteLogo(lang, logoId, axiosAuthInstance),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["logoAvailabilities"] });
+            setPreviewKey((prev) => prev + 1);
+            setConfirmConfig(null);
             showToast.success(t("logo_deleted_successfully"));
         },
         onError: (error: unknown) => {
@@ -103,6 +107,7 @@ export default function LogoManagement() {
                         logoId={logoId}
                         isAvailable={activeLangLogos.includes(logoId)}
                         isUploading={uploadingLogoId === logoId}
+                        previewKey={previewKey}
                         onUpload={(lang, id, file) =>
                             uploadLogoMutation.mutate({ lang, logoId: id, file })
                         }

@@ -9,6 +9,7 @@ interface LogoCardProps {
     logoId: LogoID;
     isAvailable: boolean;
     isUploading: boolean;
+    previewKey: number;
     onUpload: (lang: LangCode, logoId: LogoID, file: File) => void;
     onDelete: (lang: LangCode, logoId: LogoID) => void;
 }
@@ -18,6 +19,7 @@ export default function LogoCard({
     logoId,
     isAvailable,
     isUploading,
+    previewKey,
     onUpload,
     onDelete,
 }: LogoCardProps) {
@@ -54,7 +56,7 @@ export default function LogoCard({
                 <div className="space-y-3">
                     <div className="relative flex h-40 w-full items-center justify-center overflow-hidden rounded bg-gray-100">
                         <Image
-                            src={`/api/file/logo/${lang}/${logoId}`}
+                            src={`/api/file/logo/${lang}/${logoId}?v=${previewKey}`}
                             alt={logoId}
                             fill
                             className="object-contain"
