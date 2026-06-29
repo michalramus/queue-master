@@ -2,7 +2,8 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ConfigModule } from "@nestjs/config";
 import { LoggingInterceptor } from "./middleware/logging.interceptor";
-import * as cookieParser from "cookie-parser";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import cookieParser = require("cookie-parser");
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
@@ -55,6 +56,8 @@ async function bootstrap() {
     );
     app.use(cookieParser());
 
+    app.setGlobalPrefix("api"); // Set global prefix for all routes, e.g., /api/...
+
     const corsOptions: CorsOptions = {
         origin: true,
         credentials: true,
@@ -101,7 +104,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
             // )
             .build();
         const document = SwaggerModule.createDocument(app, config);
-        SwaggerModule.setup("api", app, document, {
+        const swaggerOptions = {
             swaggerOptions: {
                 tagsSorter: "alpha",
                 operationsSorter: "alpha",
@@ -109,7 +112,9 @@ Token is automatically saved in cookies, so you don't have to do anything more.
                 filter: true,
                 showRequestHeaders: false,
             },
-        });
+        };
+        SwaggerModule.setup("api/swagger", app, document, swaggerOptions);
+        SwaggerModule.setup("api", app, document, swaggerOptions);
     }
 
     await app.listen(process.env.PORT);

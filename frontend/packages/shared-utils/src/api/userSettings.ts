@@ -1,7 +1,7 @@
 import { AxiosAuthInstance } from "../axiosInstances.interface";
 
 export interface UserSettingsInterface {
-    desk?: number;
+    notifications_on?: boolean;
 }
 
 const apiPathUserSettings = "/settings/user";

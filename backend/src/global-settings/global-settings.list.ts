@@ -3,6 +3,7 @@ import { HexColorSettingValue } from "src/settings/types/hexColorSettingValue.cl
 import { Setting, SettingSupportedTypes } from "../settings/setting.class";
 import { EnumSettingValue } from "src/settings/types/enumSettingValue.class";
 import { BooleanSettingValue } from "src/settings/types/booleanSettingValue.class";
+import { NumRangeValue } from "src/settings/types/numRangeValue.class";
 
 //Remember to keep name of setting and 'key' argument the same
 export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes> } = {
@@ -38,6 +39,9 @@ export const globalSettingsList: { [key: string]: Setting<SettingSupportedTypes>
         "tv_auto_switch_language",
         new BooleanSettingValue(false),
     ),
+
+    kiosk_open_offset: new Setting<NumRangeValue>("kiosk_open_offset", new NumRangeValue(0, 0, 59)),
+    tv_close_offset: new Setting<NumRangeValue>("tv_close_offset", new NumRangeValue(0, 0, 59)),
 };
 
 export const globalSettingsListKeys = Object.keys(globalSettingsList) as Array<keyof typeof globalSettingsList>;

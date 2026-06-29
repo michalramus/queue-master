@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { OpeningHoursDto } from "shared-utils";
+import { LangCode, MultilingualSettingsInterface, OpeningHoursDto } from "shared-utils";
 
 interface OpeningHoursWidgetProps {
     openingHours: OpeningHoursDto[];
+    multilingualSettings?: MultilingualSettingsInterface;
     className?: string;
     large?: boolean;
 }
@@ -10,10 +11,11 @@ interface OpeningHoursWidgetProps {
 //TODO: Correct sizes
 export default function OpeningHoursWidget({
     openingHours,
+    multilingualSettings,
     className = "",
     large = false,
 }: OpeningHoursWidgetProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     return (
         <div
             className={`border-primary-1 mx-auto w-full ${
@@ -39,13 +41,26 @@ export default function OpeningHoursWidget({
                                 {t(`days.${entry.day_of_week.toLowerCase()}`)}
                             </td>
                             <td className={`w-1/2 text-right ${large ? "py-4" : "py-2"}`}>
-                                {entry.is_closed ? (
-                                    <span className="font-medium text-red-500">{t("closed")}</span>
-                                ) : (
-                                    <span className="text-text-2">
-                                        {entry.open_time} - {entry.close_time}
-                                    </span>
-                                )}
+                                {(() => {
+                                    const labelKey =
+                                        `${entry.day_of_week.toLowerCase()}_label` as keyof MultilingualSettingsInterface;
+                                    const label =
+                                        multilingualSettings?.[labelKey]?.[
+                                            i18n.language as LangCode
+                                        ];
+                                    if (label) {
+                                        return <span className="text-text-2">{label}</span>;
+                                    }
+                                    return entry.is_closed ? (
+                                        <span className="font-medium text-red-500">
+                                            {t("closed")}
+                                        </span>
+                                    ) : (
+                                        <span className="text-text-2">
+                                            {entry.open_time} - {entry.close_time}
+                                        </span>
+                                    );
+                                })()}
                             </td>
                         </tr>
                     ))}

@@ -19,17 +19,23 @@ model Client {
     category_id   Int
     category      Category @relation(fields: [category_id], references: [id])
     status        Status
-    desk          Int?
+    desk_id       Int?
+    desk          Desk?    @relation(fields: [desk_id], references: [id])
     language      LangCode @default(en)
     creation_date DateTime @default(now())
 
     @@unique([number, category_id])
 }
 
-enum Status {
-    Waiting
-    InService
+model Desk {
+    id          Int             @id @default(autoincrement())
+    desk_number Int             @unique
+    desk_name   String
+    clients     Client[]
+    users       User[]
+    categories_desks  Category_Desk[]
 }
+
 
 model Category {
     id                 Int                 @id @default(autoincrement())
@@ -37,6 +43,17 @@ model Category {
     counter            Int
     last_counter_reset DateTime
     clients            Client[]
+    categories_desks              Category_Desk[]
+}
+
+model Category_Desk {
+    id          Int      @id @default(autoincrement())
+    category_id Int
+    desk_id     Int
+    category    Category @relation(fields: [category_id], references: [id])
+    desk        Desk     @relation(fields: [desk_id], references: [id])
+
+    @@unique([category_id, desk_id])
 }
 
 enum Category_Short_Name {
@@ -73,12 +90,10 @@ model User {
     username String   @unique
     password String
     role     UserRole
+    default_desk_id Int?
+    default_desk Desk? @relation(fields: [default_desk_id], references: [id])
 }
 
-enum UserRole {
-    User
-    Admin
-}
 
 model Device {
     id       Int     @id @default(autoincrement())
@@ -133,4 +148,14 @@ enum DayOfWeek {
 enum LangCode {
     en
     pl
+}
+
+enum UserRole {
+    User
+    Admin
+}
+
+enum Status {
+    Waiting
+    InService
 }

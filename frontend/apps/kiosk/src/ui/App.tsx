@@ -1,9 +1,10 @@
 import RefreshOnSseEvents from "./components/RefreshOnSseEvents";
 import KioskPage from "./pages/kiosk/page";
+import { StartupScreen } from "shared-components";
 
 import TVPage from "@/pages/tv/page";
 
-import { useGlobalSettings, useOpeningHours } from "shared-utils";
+import { useGlobalSettings, useMultilingualSettings, useOpeningHours } from "shared-utils";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
 import { useCallback, useEffect, useState } from "react";
 import i18n from "./i18n";
@@ -15,7 +16,16 @@ export default function App() {
     const { data: globalSettings, isError: globalSettingsError } =
         useGlobalSettings(axiosPureInstance);
 
-    const { data: appConfig, isError: appConfigError } = useAppConfig();
+    const {
+        data: appConfig,
+        isError: appConfigError,
+        isLoading: appConfigLoading,
+    } = useAppConfig();
+
+    const [localIpAddress, setLocalIpAddress] = useState<string>("");
+    useEffect(() => {
+        window.electronAPI.getLocalIpAddress().then(setLocalIpAddress);
+    }, []);
 
     //TODO add error handling for opening hours
     const {
@@ -24,8 +34,11 @@ export default function App() {
         // isError: openingHoursError,
     } = useOpeningHours(axiosAuthInstance, { retry: true });
 
+    const { data: multilingualSettings } = useMultilingualSettings(axiosPureInstance);
+
     //TODO: Fix multi calls to scripts when app starts
     const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet"); //TODO: use openingHoursLoading instead of "notSet"
+    const [tvOpen, setTvOpen] = useState<boolean | "notSet">("notSet");
 
     const executeOpeningHoursScripts = useCallback(
         (isOpen: boolean) => {
@@ -46,13 +59,14 @@ export default function App() {
         executeOpeningHoursScripts(kioskOpen);
     }, [kioskOpen, executeOpeningHoursScripts]);
 
-    // Set initial kioskOpen state
+    // Set initial kioskOpen and tvOpen states
     useEffect(() => {
         if (!openingHours || !globalSettings) return;
-        setKioskOpen(isKioskOpen(openingHours, globalSettings));
+        setKioskOpen(isKioskOpen(openingHours, globalSettings, globalSettings.kiosk_open_offset));
+        setTvOpen(isKioskOpen(openingHours, globalSettings, 0, globalSettings.tv_close_offset));
     }, [openingHours, globalSettings]);
 
-    // Set up periodic checks for kiosk state changes
+    // Set up periodic checks for kiosk/tv state changes
     useEffect(() => {
         // Calculate ms until next full minute
         const now = new Date();
@@ -60,15 +74,41 @@ export default function App() {
         let interval: ReturnType<typeof setInterval>;
 
         const timeout = setTimeout(() => {
-            const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
+            const newKioskOpen = isKioskOpen(
+                openingHours || [],
+                globalSettings,
+                globalSettings?.kiosk_open_offset ?? 0,
+            );
             if (newKioskOpen !== kioskOpen) {
                 setKioskOpen(newKioskOpen);
             }
+            const newTvOpen = isKioskOpen(
+                openingHours || [],
+                globalSettings,
+                0,
+                globalSettings?.tv_close_offset ?? 0,
+            );
+            if (newTvOpen !== tvOpen) {
+                setTvOpen(newTvOpen);
+            }
 
             interval = setInterval(() => {
-                const newKioskOpen = isKioskOpen(openingHours || [], globalSettings);
+                const newKioskOpen = isKioskOpen(
+                    openingHours || [],
+                    globalSettings,
+                    globalSettings?.kiosk_open_offset ?? 0,
+                );
                 if (newKioskOpen !== kioskOpen) {
                     setKioskOpen(newKioskOpen);
+                }
+                const newTvOpen = isKioskOpen(
+                    openingHours || [],
+                    globalSettings,
+                    0,
+                    globalSettings?.tv_close_offset ?? 0,
+                );
+                if (newTvOpen !== tvOpen) {
+                    setTvOpen(newTvOpen);
                 }
             }, 60000);
         }, msToNextMinute);
@@ -85,18 +125,48 @@ export default function App() {
         }
     }, [globalSettings?.locale]);
 
-    //TODO move errors rendering to a separate component
+    if (appConfigLoading) {
+        return <StartupScreen status="loading" title="Starting up…" />;
+    }
 
     if (appConfig?.configError) {
-        return <div>Invalid config or config path</div>;
+        return (
+            <StartupScreen
+                status="info"
+                title="Invalid configuration"
+                details="Config file is invalid or the path is incorrect."
+            />
+        );
+    }
+
+    if (appConfig && !appConfig.backendUrl) {
+        return (
+            <StartupScreen
+                status="info"
+                title="Backend URL not provided"
+                details="Backend URL is required. Please provide it in the config file."
+            />
+        );
     }
 
     if (globalSettingsError || appConfigError || !globalSettings || !appConfig) {
-        return <div>Error when connecting to the server</div>;
+        return (
+            <StartupScreen
+                status="connecting"
+                title="Connecting to the server..."
+                details={`Backend: ${appConfig?.backendUrl ?? "unknown"}\nKiosk IP: ${localIpAddress || "unknown"}`}
+            />
+        );
     }
 
     if (appConfig.mode !== "tv" && appConfig.mode !== "kiosk") {
-        return <div>Invalid mode</div>;
+        return (
+            <StartupScreen
+                status="error"
+                title="Invalid mode"
+                details={`Current: "${appConfig.mode}". Valid values: "kiosk", "tv". Check config file.`}
+            />
+        );
     }
 
     //TODO config and auth
@@ -127,14 +197,16 @@ export default function App() {
             <RefreshOnSseEvents />
             {appConfig.mode === "tv" && (
                 <TVPage
-                    kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
+                    tvOpen={tvOpen === "notSet" ? true : tvOpen}
                     openingHours={openingHours || []}
+                    multilingualSettings={multilingualSettings}
                 />
             )}
             {appConfig.mode === "kiosk" && (
                 <KioskPage
                     kioskOpen={kioskOpen === "notSet" ? true : kioskOpen}
                     openingHours={openingHours || []}
+                    multilingualSettings={multilingualSettings}
                 />
             )}
         </>

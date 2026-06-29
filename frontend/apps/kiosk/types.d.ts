@@ -11,7 +11,7 @@ interface AppConfigInterface {
 
     configError?: boolean; //If true, config is invalid
 
-    openingHoursEnableBanner: boolean;
+    openingHoursEnableBanner: boolean; //If true, banner with opening hours will be shown when the kiosk is closed
     openingHoursEnableScripts: boolean;
     openingHoursOpenScript?: string;
     openingHoursCloseScript?: string;
@@ -23,9 +23,11 @@ interface ElectronAPIInterface {
     executeCloseKioskScript: () => Promise<void>;
 
     invokeAudioSynthesizer: (client: ClientInterface) => Promise<void>;
+    onAudioSynthesizerComplete: (callback: () => void) => () => void;
 
     getTranslation: (lang: string) => Promise<{ [key: string]: any }>;
     getAppConfig: () => Promise<AppConfigInterface>;
+    getLocalIpAddress: () => Promise<string>;
 }
 
 interface Window {

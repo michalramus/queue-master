@@ -29,7 +29,10 @@
         "target": "dmg"
     },
     "linux": {
-        "target": "deb",
+        "target": [
+            "zip",
+            "deb"
+        ],
         "category": "Utility"
     },
     "win": {

@@ -63,7 +63,7 @@ export default function Button({
             type={type}
             onClick={onClick}
             style={style}
-            className={`m-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md transition-colors ${colorClass} ${className}`}
+            className={`m-2 rounded-lg px-5 py-2.5 text-sm font-medium shadow-md transition-colors ${!disabled && "cursor-pointer"} ${colorClass} ${className}`}
             disabled={disabled}
         >
             {children}

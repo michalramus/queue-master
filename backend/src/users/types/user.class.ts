@@ -1,4 +1,5 @@
 import { UserRole } from "@prisma/client";
+import { DeskResponseDto } from "src/desks/dto/desk.dto";
 
 export class User {
     id: number;
@@ -8,4 +9,6 @@ export class User {
     password: string;
 
     role: UserRole;
+
+    default_desk?: DeskResponseDto | null;
 }

@@ -1,10 +1,12 @@
 import { AxiosAuthInstance } from "shared-utils";
+import { DeskInterface } from "./desks";
 import { LangCode } from "../types/LangCode";
 
 export interface CategoryInterface {
     id: number;
     short_name: string;
     name: { [lang in LangCode]: string };
+    desks?: DeskInterface[];
 }
 
 export interface CategoryCreateDto {
@@ -48,4 +50,26 @@ export async function deleteCategory(
     categoryId: number,
 ): Promise<void> {
     await axiosAuthInstance.auth.delete(`${apiPath}/${categoryId}`);
+}
+
+export async function assignDeskToCategory(
+    axiosAuthInstance: AxiosAuthInstance,
+    categoryId: number,
+    deskId: number,
+): Promise<CategoryInterface> {
+    const response = await axiosAuthInstance.auth.post(`${apiPath}/${categoryId}/desks`, {
+        desk_id: deskId,
+    });
+    return response.data;
+}
+
+export async function removeDeskFromCategory(
+    axiosAuthInstance: AxiosAuthInstance,
+    categoryId: number,
+    deskId: number,
+): Promise<CategoryInterface> {
+    const response = await axiosAuthInstance.auth.delete(
+        `${apiPath}/${categoryId}/desks/${deskId}`,
+    );
+    return response.data;
 }

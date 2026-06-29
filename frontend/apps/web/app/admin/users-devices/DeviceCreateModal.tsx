@@ -8,13 +8,13 @@ import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { Modal, Spinner, Button, Textarea } from "shared-components";
 import { showToast } from "@/utils/toast";
 
-interface DeviceModalProps {
+interface DeviceCreateModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export default function DeviceModal({ isOpen, onClose, onSuccess }: DeviceModalProps) {
+export default function DeviceCreateModal({ isOpen, onClose, onSuccess }: DeviceCreateModalProps) {
     const t = useTranslations();
     const [deviceToken, setDeviceToken] = useState<string | null>(null);
     const [deviceComment, setDeviceComment] = useState("");

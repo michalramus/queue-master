@@ -13,17 +13,14 @@ import gbFlag from "flag-icons/flags/4x3/gb.svg";
 
 /**
  * Table with clients waiting for service
- * @param categoryIds - clients with these categories will be displayed
  * @component
  */
 export default function ClientTable({
-    clientNumbers,
-    categoryIds,
-    desk,
+    filteredClientNumbers,
+    deskId,
 }: {
-    clientNumbers: ClientInterface[] | undefined;
-    categoryIds: number[];
-    desk: number;
+    filteredClientNumbers: ClientInterface[] | undefined;
+    deskId: number;
 }) {
     const t = useTranslations();
     const locale = useLocale();
@@ -39,7 +36,7 @@ export default function ClientTable({
     // set client as in service
     const clientInService = useMutation({
         mutationFn: (clientNumber: ClientInterface) =>
-            setClientAsInService(clientNumber, desk, axiosAuthInstance),
+            setClientAsInService(clientNumber, deskId, axiosAuthInstance),
     });
 
     // remove client
@@ -48,11 +45,6 @@ export default function ClientTable({
             removeClient(clientNumber, axiosAuthInstance),
     });
     //----------------------------------------
-
-    //Prepare table content
-    const filteredClientNumbers = clientNumbers?.filter(
-        (client) => categoryIds.indexOf(client.category_id) != -1,
-    );
 
     const handleDeleteClick = (client: ClientInterface) => {
         setClientToDelete(client);
@@ -96,6 +88,7 @@ export default function ClientTable({
                 <Image
                     src={client.language === LangCode.pl ? plFlag : gbFlag}
                     alt={client.language.toUpperCase()}
+                    width={64}
                     height={48}
                     className="rounded border border-gray-300"
                 />

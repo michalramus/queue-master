@@ -114,7 +114,12 @@ export class AuthService {
             return { id: device.id, role: "Device" } as AuthInfoResponseDto;
         } else if (entity.type == "User") {
             const user = await this.usersService.findOneById(entity.id);
-            return { id: user.id, username: user.username, role: user.role } as AuthInfoResponseDto;
+            return {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                default_desk: user.default_desk,
+            } as AuthInfoResponseDto;
         }
 
         return;
@@ -138,7 +143,7 @@ export class AuthService {
         const { ip, method, url } = request;
 
         switch (entity.type) {
-            case "User":
+            case "User": {
                 const user = await this.usersService.findOneById(entity.id);
 
                 if (!user) {
@@ -153,7 +158,8 @@ export class AuthService {
                 }
 
                 break;
-            case "Device":
+            }
+            case "Device": {
                 const device = await this.devicesService.findOne(entity.id);
 
                 if (!device) {
@@ -175,6 +181,7 @@ export class AuthService {
                 }
 
                 break;
+            }
         }
 
         this.logger.warn(

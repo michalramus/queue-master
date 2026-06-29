@@ -1,36 +1,45 @@
 {
     "name": "shared-components",
     "version": "1.0.0",
+    "description": "Queue Master — shared React UI components",
+    "author": {
+        "name": "Michal Ramus",
+        "email": "ramus.michal21@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michalramus/queue-master"
+    },
     "main": "src/index.ts",
     "scripts": {
         "pre-push": ""
     },
     "devDependencies": {
-        "@eslint/js": "^9.35.0",
+        "@eslint/js": "^10.0.1",
         "@types/dompurify": "^3.2.0",
-        "@types/node": "^24.0.14",
-        "@types/react": "^19.1.8",
-        "@typescript-eslint/eslint-plugin": "^8.37.0",
-        "@typescript-eslint/parser": "^8.37.0",
-        "eslint": "^9.35.0",
+        "@types/node": "^24.13.2",
+        "@types/react": "^19.2.17",
+        "@typescript-eslint/eslint-plugin": "^8.62.0",
+        "@typescript-eslint/parser": "^8.62.0",
+        "eslint": "^10.6.0",
         "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-prettier": "^5.5.4",
-        "globals": "^16.3.0",
-        "lint-staged": "^16.1.2",
-        "prettier": "^3.6.2",
-        "react": "^19.1.0",
-        "typescript": "^5.8.3",
-        "typescript-eslint": "^8.37.0"
+        "eslint-plugin-prettier": "^5.5.6",
+        "globals": "^17.7.0",
+        "lint-staged": "^17.0.8",
+        "prettier": "^3.9.1",
+        "react": "^19.2.7",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.62.0"
     },
     "dependencies": {
-        "@tailwindcss/cli": "^4.1.11",
-        "@tailwindcss/typography": "^0.5.16",
-        "dompurify": "^3.3.3",
-        "react-error-boundary": "^6.0.0",
+        "@tailwindcss/cli": "^4.3.1",
+        "@tailwindcss/typography": "^0.5.20",
+        "dompurify": "^3.4.11",
+        "react-error-boundary": "^6.1.2",
         "react-markdown": "^10.1.0",
         "rehype-raw": "^7.0.0",
         "remark-gfm": "^4.0.1",
-        "tailwindcss": "^4.1.11"
+        "tailwindcss": "^4.3.1"
     },
     "lint-staged": {
         "**/*.{ts,tsx}": [

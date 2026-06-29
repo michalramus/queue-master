@@ -12,6 +12,7 @@ import {
     ParseEnumPipe,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { LangCode } from "@prisma/client";
 import { memoryStorage } from "multer";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
@@ -33,7 +34,6 @@ import {
 import { LogoID } from "./types/logoID.enum";
 import { MessageResponseDto } from "src/dto/messageResponse.dto";
 
-//max sizes
 const maxLogoSize = 1024 * 1024;
 
 @ApiTags("file")
@@ -42,36 +42,39 @@ export class FileController {
     constructor(private readonly logoService: LogoFileService) {}
 
     @Get("logo")
-    @ApiOperation({ summary: "Get logo availability information" })
-    @ApiResponse({ status: 200, description: "Available logo IDs", type: LogoAvailabilityResponseDto })
+    @ApiOperation({ summary: "Get logo availability information per language" })
+    @ApiResponse({ status: 200, description: "Map of lang → available logo IDs", type: LogoAvailabilityResponseDto })
     async getLogoAvailabilityInfo(): Promise<LogoAvailabilityResponseDto> {
-        return this.logoService.getLogoAvailabilityInfo();
+        const { availableLogos } = await this.logoService.getLogoAvailabilityInfo();
+        return { availableLogos };
     }
 
-    @Get("logo/:id")
-    @ApiOperation({ summary: "Download logo file by ID" })
+    @Get("logo/:lang/:id")
+    @ApiOperation({ summary: "Download logo file by language and ID" })
+    @ApiParam({ name: "lang", description: "Language code", enum: LangCode })
     @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
     @ApiResponse({
         status: 200,
         description: "Logo file",
         content: {
             "image/*": {
-                schema: {
-                    type: "string",
-                    format: "binary",
-                },
+                schema: { type: "string", format: "binary" },
             },
         },
     })
-    async getLogo(@Param("id", new ParseEnumPipe(LogoID)) id: LogoID): Promise<StreamableFile> {
-        return this.logoService.getLogo(id);
+    async getLogo(
+        @Param("lang", new ParseEnumPipe(LangCode)) lang: LangCode,
+        @Param("id", new ParseEnumPipe(LogoID)) id: LogoID,
+    ): Promise<StreamableFile> {
+        return this.logoService.getLogo(lang, id);
     }
 
-    @Post("logo/:id")
+    @Post("logo/:lang/:id")
     @UseInterceptors(FileInterceptor("file", { storage: memoryStorage(), limits: { fileSize: maxLogoSize } }))
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @ApiOperation({ summary: "Upload logo file" })
+    @ApiOperation({ summary: "Upload logo file for a specific language" })
+    @ApiParam({ name: "lang", description: "Language code", enum: LangCode })
     @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
     @ApiConsumes("multipart/form-data")
     @ApiBody({
@@ -80,10 +83,7 @@ export class FileController {
         schema: {
             type: "object",
             properties: {
-                file: {
-                    type: "string",
-                    format: "binary",
-                },
+                file: { type: "string", format: "binary" },
             },
         },
     })
@@ -92,24 +92,29 @@ export class FileController {
     @ApiForbiddenResponse({ description: "Admin role required" })
     // @ApiBearerAuth("JWT-auth")
     async uploadLogo(
-        @UploadedFile()
-        file: Express.Multer.File,
+        @UploadedFile() file: Express.Multer.File,
+        @Param("lang", new ParseEnumPipe(LangCode)) lang: LangCode,
         @Param("id", new ParseEnumPipe(LogoID)) id: LogoID,
         @Req() req: any,
     ): Promise<MessageResponseDto> {
-        return this.logoService.uploadLogo(file, id, Entity.convertFromReq(req));
+        return this.logoService.uploadLogo(file, lang, id, Entity.convertFromReq(req));
     }
 
-    @Delete("logo/:id")
+    @Delete("logo/:lang/:id")
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @ApiOperation({ summary: "Delete logo file" })
+    @ApiOperation({ summary: "Delete logo file for a specific language" })
+    @ApiParam({ name: "lang", description: "Language code", enum: LangCode })
     @ApiParam({ name: "id", description: "Logo ID", enum: LogoID })
     @ApiResponse({ status: 200, description: "Logo deleted", type: MessageResponseDto })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Admin role required" })
     // @ApiBearerAuth("JWT-auth")
-    async deleteLogo(@Param("id", new ParseEnumPipe(LogoID)) id: LogoID, @Req() req: any): Promise<MessageResponseDto> {
-        return this.logoService.deleteLogo(id, Entity.convertFromReq(req));
+    async deleteLogo(
+        @Param("lang", new ParseEnumPipe(LangCode)) lang: LangCode,
+        @Param("id", new ParseEnumPipe(LogoID)) id: LogoID,
+        @Req() req: any,
+    ): Promise<MessageResponseDto> {
+        return this.logoService.deleteLogo(lang, id, Entity.convertFromReq(req));
     }
 }

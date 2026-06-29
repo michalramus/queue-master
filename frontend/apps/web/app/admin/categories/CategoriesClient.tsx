@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import {
     createCategory,
     updateCategory,
     deleteCategory,
+    assignDeskToCategory,
+    removeDeskFromCategory,
     useCategories,
     useGlobalSettings,
+    sseEvents,
     LangCode,
     type CategoryInterface,
     type CategoryCreateDto,
     type CategoryUpdateDto,
 } from "shared-utils";
+import { useSse } from "@/utils/hooks/useSse";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { Button, ConfirmModal } from "shared-components";
@@ -25,14 +29,29 @@ import CategoryModal from "./CategoryModal";
 export default function CategoriesClient() {
     const t = useTranslations();
     const queryClient = useQueryClient();
+    const { addEventListener, removeEventListener } = useSse();
 
     const { data: categories = [] } = useCategories(axiosAuthInstance);
     const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
     const defaultLocale: LangCode = (globalSettings?.locale as LangCode) ?? LangCode.en;
 
+    //SSE: invalidate categories and desks queries when categories are changed
+    useEffect(() => {
+        function onCategoriesChanged() {
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
+            queryClient.invalidateQueries({ queryKey: ["desks"] });
+        }
+        addEventListener(sseEvents.CategoriesChanged, onCategoriesChanged);
+        return () => removeEventListener(sseEvents.CategoriesChanged, onCategoriesChanged);
+    }, [queryClient, addEventListener, removeEventListener]);
+
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
-    const [editingCategory, setEditingCategory] = useState<CategoryInterface | null>(null);
+    const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
+    const editingCategory =
+        editingCategoryId !== null
+            ? (categories.find((c) => c.id === editingCategoryId) ?? null)
+            : null;
 
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -49,7 +68,14 @@ export default function CategoriesClient() {
     });
 
     const createMutation = useMutation({
-        mutationFn: (dto: CategoryCreateDto) => createCategory(axiosAuthInstance, dto),
+        mutationFn: async ({ dto, deskIds }: { dto: CategoryCreateDto; deskIds: number[] }) => {
+            const category = await createCategory(axiosAuthInstance, dto);
+            await Promise.all(
+                deskIds.map((deskId) =>
+                    assignDeskToCategory(axiosAuthInstance, category.id, deskId),
+                ),
+            );
+        },
         onSuccess: () => {
             showToast.success(t("category_created_successfully"));
             queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -62,8 +88,27 @@ export default function CategoriesClient() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, dto }: { id: number; dto: CategoryUpdateDto }) =>
-            updateCategory(axiosAuthInstance, id, dto),
+        mutationFn: async ({
+            id,
+            dto,
+            addedDeskIds,
+            removedDeskIds,
+        }: {
+            id: number;
+            dto: CategoryUpdateDto;
+            addedDeskIds: number[];
+            removedDeskIds: number[];
+        }) => {
+            await updateCategory(axiosAuthInstance, id, dto);
+            await Promise.all([
+                ...addedDeskIds.map((deskId) =>
+                    assignDeskToCategory(axiosAuthInstance, id, deskId),
+                ),
+                ...removedDeskIds.map((deskId) =>
+                    removeDeskFromCategory(axiosAuthInstance, id, deskId),
+                ),
+            ]);
+        },
         onSuccess: () => {
             showToast.success(t("category_updated_successfully"));
             queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -90,12 +135,12 @@ export default function CategoriesClient() {
     });
 
     function handleCreate() {
-        setEditingCategory(null);
+        setEditingCategoryId(null);
         setModalOpen(true);
     }
 
     function handleEdit(category: CategoryInterface) {
-        setEditingCategory(category);
+        setEditingCategoryId(category.id);
         setModalOpen(true);
     }
 
@@ -145,9 +190,15 @@ export default function CategoriesClient() {
                 saving={isSaving}
                 availableLetters={availableLetters}
                 onClose={() => setModalOpen(false)}
-                onCreate={(dto) => createMutation.mutate(dto)}
-                onUpdate={(dto) =>
-                    editingCategory && updateMutation.mutate({ id: editingCategory.id, dto })
+                onCreate={(dto, deskIds) => createMutation.mutate({ dto, deskIds })}
+                onUpdate={(dto, addedDeskIds, removedDeskIds) =>
+                    editingCategory &&
+                    updateMutation.mutate({
+                        id: editingCategory.id,
+                        dto,
+                        addedDeskIds,
+                        removedDeskIds,
+                    })
                 }
             />
 

@@ -119,7 +119,7 @@ export class UserSettingsService {
 
         //find setting in globalSettings, convert to string and save to database
         for (const [key, setting] of Object.entries(settings)) {
-            if (!userSettingsList.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(userSettingsList, key)) {
                 this.logger.warn(`Setting with key '${key}' and value '${setting}' not found in userSettings.`);
                 continue;
             }

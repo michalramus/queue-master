@@ -10,6 +10,7 @@ import {
     updateUserSettings,
     useUserSettings,
     useAuthInfo,
+    useDesks,
     type UserResponseDto,
     type UserCreateDto,
     type UserUpdateDto,
@@ -22,10 +23,10 @@ import {
     Modal,
     Spinner,
     Button,
+    Checkbox,
     Input,
     Select,
     TabNav,
-    NumericStepper,
     TextButton,
 } from "shared-components";
 import { showToast } from "@/utils/toast";
@@ -39,9 +40,6 @@ interface UserModalProps {
     onSuccess: () => void;
 }
 
-const MIN_DESK = 0;
-const MAX_DESK = 999;
-
 export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: UserModalProps) {
     const t = useTranslations();
     const queryClient = useQueryClient();
@@ -54,8 +52,10 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
     const [passwordChangeMode, setPasswordChangeMode] = useState(false);
     const [settings, setSettings] = useState<UserSettingsInterface>({});
     const [settingsModified, setSettingsModified] = useState(false);
+    const [defaultDeskId, setDefaultDeskId] = useState<number | null>(null);
 
     const { data: authInfo } = useAuthInfo(axiosAuthInstance, { enabled: true });
+    const { data: desks = [] } = useDesks(axiosAuthInstance);
 
     const { data: serverUserSettings, isLoading: loadingSettings } = useUserSettings(
         axiosAuthInstance,
@@ -74,10 +74,12 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
             setUsername("");
             setPassword("");
             setRole("User");
-            setSettings({ desk: MIN_DESK });
+            setSettings({});
+            setDefaultDeskId(null);
         } else {
             setUsername(editingUser.username);
             setRole(editingUser.role);
+            setDefaultDeskId(editingUser.default_desk?.id ?? null);
         }
     }, [isOpen, editingUser]);
 
@@ -90,7 +92,11 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
     const saveMutation = useMutation({
         mutationFn: async () => {
             if (editingUser) {
-                const updateDto: UserUpdateDto = { username: username, role: role };
+                const updateDto: UserUpdateDto = {
+                    username: username,
+                    role: role,
+                    default_desk_id: defaultDeskId,
+                };
                 await updateUser(axiosAuthInstance, editingUser.id, updateDto);
 
                 if (passwordChangeMode) {
@@ -106,6 +112,7 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
                     username: username,
                     password: password,
                     role: role,
+                    default_desk_id: defaultDeskId ?? undefined,
                 };
                 createDto.settings = settings;
                 await createUser(axiosAuthInstance, createDto);
@@ -115,8 +122,10 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
             if (editingUser) {
                 if (passwordChangeMode) showToast.success(t("password_updated_successfully"));
                 queryClient.invalidateQueries({ queryKey: ["userSettings", editingUser.id] });
+                queryClient.invalidateQueries({ queryKey: ["users"] });
                 showToast.success(t("user_updated_successfully"));
             } else {
+                queryClient.invalidateQueries({ queryKey: ["users"] });
                 showToast.success(t("user_created_successfully"));
             }
             onSuccess();
@@ -163,21 +172,32 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
-                                <div>
-                                    <label className="text-text-1 mb-1 block text-sm font-medium">
-                                        {t("desk")}
-                                    </label>
-                                    <NumericStepper
-                                        value={settings.desk ?? MIN_DESK}
-                                        min={MIN_DESK}
-                                        max={MAX_DESK}
-                                        onChange={(v) => {
-                                            setSettings({ ...settings, desk: v });
-                                            setSettingsModified(true);
-                                        }}
-                                        hint={t("desk_setting_description")}
-                                    />
-                                </div>
+                                <Select
+                                    label={t("desk")}
+                                    value={defaultDeskId !== null ? String(defaultDeskId) : ""}
+                                    onChange={(val) => setDefaultDeskId(val ? Number(val) : null)}
+                                    hint={t("desk_setting_description")}
+                                >
+                                    <option value="">{t("no_desk")}</option>
+                                    {desks.map((desk) => (
+                                        <option key={desk.id} value={String(desk.id)}>
+                                            {desk.desk_name} (#{desk.desk_number})
+                                        </option>
+                                    ))}
+                                </Select>
+                                <Checkbox
+                                    id="notifications_on_create"
+                                    label={t("notifications_on")}
+                                    checked={settings.notifications_on ?? true}
+                                    onChange={(e) => {
+                                        setSettings({
+                                            ...settings,
+                                            notifications_on: e.target.checked,
+                                        });
+                                        setSettingsModified(true);
+                                    }}
+                                    hint={t("notifications_on_description")}
+                                />
                             </>
                         )}
                         <div>
@@ -241,19 +261,32 @@ export default function UserModal({ isOpen, editingUser, onClose, onSuccess }: U
                                 <span className="text-text-2 ml-3">{t("loading")}</span>
                             </div>
                         ) : (
-                            <div>
-                                <label className="text-text-2 mb-1 block text-sm font-medium">
-                                    {t("desk")}
-                                </label>
-                                <NumericStepper
-                                    value={settings.desk ?? MIN_DESK}
-                                    min={MIN_DESK}
-                                    max={MAX_DESK}
-                                    onChange={(v) => {
-                                        setSettings({ ...settings, desk: v });
+                            <div className="space-y-4">
+                                <Select
+                                    label={t("desk")}
+                                    value={defaultDeskId !== null ? String(defaultDeskId) : ""}
+                                    onChange={(val) => setDefaultDeskId(val ? Number(val) : null)}
+                                    hint={t("desk_setting_description")}
+                                >
+                                    <option value="">{t("no_desk")}</option>
+                                    {desks.map((desk) => (
+                                        <option key={desk.id} value={String(desk.id)}>
+                                            {desk.desk_name} (#{desk.desk_number})
+                                        </option>
+                                    ))}
+                                </Select>
+                                <Checkbox
+                                    id="notifications_on"
+                                    label={t("notifications_on")}
+                                    checked={settings.notifications_on ?? true}
+                                    onChange={(e) => {
+                                        setSettings({
+                                            ...settings,
+                                            notifications_on: e.target.checked,
+                                        });
                                         setSettingsModified(true);
                                     }}
-                                    hint={t("desk_setting_description")}
+                                    hint={t("notifications_on_description")}
                                 />
                             </div>
                         )}

@@ -1,5 +1,6 @@
 import { AxiosAuthInstance } from "../axiosInstances.interface";
 import { UserSettingsInterface } from "./userSettings";
+import { DeskInterface } from "./desks";
 
 export type UserRole = "User" | "Admin";
 
@@ -7,18 +8,21 @@ export interface UserResponseDto {
     id: number;
     username: string;
     role: UserRole;
+    default_desk?: DeskInterface | null;
 }
 
 export interface UserCreateDto {
     username: string;
     password: string;
     role: UserRole;
+    default_desk_id?: number;
     settings?: UserSettingsInterface;
 }
 
 export interface UserUpdateDto {
     username?: string;
     role?: UserRole;
+    default_desk_id?: number | null;
 }
 
 export interface UserPasswordUpdateDto {

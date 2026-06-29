@@ -64,13 +64,22 @@ export class DevicesService {
             throw new NotFoundException(`Device with ID ${deviceId} not found`);
         }
 
+        const data: { accepted?: boolean; comment?: string | null } = {};
+        if (devicePatchDto.accepted !== undefined) data.accepted = devicePatchDto.accepted;
+        if (devicePatchDto.comment !== undefined) data.comment = devicePatchDto.comment || null;
+
         const updatedDevice = await this.databaseService.device.update({
             where: { id: deviceId },
-            data: { accepted: devicePatchDto.accepted },
+            data,
         });
 
-        const action = devicePatchDto.accepted ? "Enabled" : "Disabled";
-        this.logger.log(`[${entity.name}] ${action} device ${deviceId}`);
+        if (devicePatchDto.accepted !== undefined) {
+            const action = devicePatchDto.accepted ? "Enabled" : "Disabled";
+            this.logger.log(`[${entity.name}] ${action} device ${deviceId}`);
+        }
+        if (devicePatchDto.comment !== undefined) {
+            this.logger.log(`[${entity.name}] Updated comment for device ${deviceId}`);
+        }
         return updatedDevice;
     }
 

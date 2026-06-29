@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { LangCode } from "@prisma/client";
 import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
+import { DeskResponseDto } from "src/desks/dto/desk.dto";
 import { SseService } from "../sse/sse.service";
 import { Entity } from "src/auth/types/entity.class";
 import { sseEvents } from "src/sse/sseEvents.enum";
@@ -18,18 +19,24 @@ export class ClientsService {
     private logger = new Logger(ClientsService.name);
 
     private maxClientsCounter = 999;
-    private minClientsCounterToReset = 50; // if clients with number lower than this exist, counter cannot be reset
-    private timeBetweenCounterResets = 1000 * 60 * 60 * 10; // in seconds - 8 hours
+    private minClientsCounterToReset = 30; // if clients with number lower than this exist, counter cannot be reset
+    private timeBetweenCounterResets = 1000 * 60 * 60 * 10; // in ms - 10 hours
+    private readonly deskSelect = { id: true, desk_number: true, desk_name: true } as const;
 
     async create(createClientDto: ClientCreateDto, entity: Entity): Promise<ClientResponseDto> {
         // Check if category exists
-        const category = await this.databaseService.category.findUnique({ where: { id: createClientDto.categoryId } });
+        const category = await this.databaseService.category.findUnique({
+            where: { id: createClientDto.categoryId },
+        });
         if (!category) {
             this.logger.warn(
                 `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
             );
             throw new NotFoundException("Category not found");
         }
+
+        // Reset counter if conditions are met, then re-fetch category to get updated counter
+        await this.resetCounterAfterTime(createClientDto.categoryId);
 
         // Prepare client number
         let counter = category.counter + 1;
@@ -59,6 +66,7 @@ export class ClientsService {
             },
             include: {
                 category: true,
+                desk: { select: this.deskSelect },
             },
         });
 
@@ -73,7 +81,6 @@ export class ClientsService {
         this.logger.log(
             `[${entity.name}] Client created with number ${client.category.short_name}${client.number} and status 'Waiting'`,
         );
-        this.resetCounterAfterTime(createClientDto.categoryId);
         return client;
     }
 
@@ -86,7 +93,7 @@ export class ClientsService {
                 category_id: true,
                 category: { select: { id: true, short_name: true } },
                 status: true,
-                desk: true,
+                desk: { select: this.deskSelect },
                 language: true,
                 creation_date: true,
             },
@@ -111,25 +118,42 @@ export class ClientsService {
             throw new NotFoundException("Client not found");
         }
 
+        // Check if desk exists
+        if (updateClientDto.desk_id !== null && updateClientDto.desk_id !== undefined) {
+            const desk = await this.databaseService.desk.findUnique({ where: { id: updateClientDto.desk_id } });
+            if (!desk) {
+                this.logger.warn(
+                    `Cannot update client with id ${id}. Desk with id ${updateClientDto.desk_id} not found`,
+                );
+                throw new NotFoundException("Desk not found");
+            }
+        }
+
         // Delete any other client in service from the same desk
         await this.databaseService.client.deleteMany({
-            where: { status: "InService", desk: updateClientDto.desk },
+            where: { status: "InService", desk_id: updateClientDto.desk_id },
         });
 
+        //IMPORTANT: This query updates only clients that state is changing - protection against concurrency calls
         // Update client
         const dbClient = await this.databaseService.client.update({
-            where: { id: id },
-            data: { status: updateClientDto.status, desk: updateClientDto.desk },
+            where: { id: id, NOT: { status: updateClientDto.status } },
+            data: { status: updateClientDto.status, desk_id: updateClientDto.desk_id },
             include: {
                 category: true,
+                desk: { select: this.deskSelect },
             },
         });
+
+        if (dbClient == null) {
+            throw new NotFoundException("Client not found or already in the desired status");
+        }
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
         this.sseService.emit(sseEvents.ClientInService, client);
         this.logger.log(
-            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and desk ${updateClientDto.desk}`,
+            `[${entity.name}] Client with id ${id}, category id ${dbClient.category_id} and number ${dbClient.category.short_name + dbClient.number} updated with status ${updateClientDto.status} and desk_id ${updateClientDto.desk_id}`,
         );
         return client;
     }
@@ -138,7 +162,7 @@ export class ClientsService {
         // Check if client exists
         const dbClient = await this.databaseService.client.findUnique({
             where: { id: id },
-            include: { category: true },
+            include: { category: true, desk: { select: this.deskSelect } },
         });
         if (!dbClient) {
             this.logger.warn(`NotFoundException: Client with id ${id} not found when calling again`);
@@ -162,7 +186,10 @@ export class ClientsService {
             throw new NotFoundException("Client not found");
         }
 
-        const dbClient = await this.databaseService.client.delete({ where: { id: id }, include: { category: true } });
+        const dbClient = await this.databaseService.client.delete({
+            where: { id: id },
+            include: { category: true, desk: { select: this.deskSelect } },
+        });
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
 
@@ -245,7 +272,7 @@ export class ClientsService {
         number: number;
         category_id: number;
         status: "Waiting" | "InService";
-        desk: number | null;
+        desk: DeskResponseDto | null;
         language: LangCode;
         creation_date: Date;
         queue_length?: number;

@@ -3,7 +3,7 @@ import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
 import { useMutation } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Modal } from "shared-components";
 import {
@@ -25,7 +25,7 @@ export default function NumberGetterButton({
     const { data: globalSettings } = useGlobalSettings(axiosPureInstance);
     const { data: multilingualSettings } = useMultilingualSettings(axiosPureInstance);
     const { data: appConfig } = useAppConfig();
-    const locale = i18n.language;
+    const locale: LangCode = i18n.language as LangCode;
 
     const printingTime = appConfig?.printingDialogueShowTime || 5000;
 
@@ -33,14 +33,6 @@ export default function NumberGetterButton({
     const [lastTicketString, setLastTicketString] = useState(""); //category.shortname+number
 
     const defaultLanguage = globalSettings?.locale || "en";
-
-    // Reset language to default when printing dialog closes
-    useEffect(() => {
-        if (!loadingPage && lastTicketString) {
-            // Dialog just closed, reset language
-            i18n.changeLanguage(defaultLanguage);
-        }
-    }, [loadingPage, lastTicketString, i18n, defaultLanguage]);
 
     //TODO: Add loading when waiting for ticket
     // Create new client
@@ -52,7 +44,10 @@ export default function NumberGetterButton({
                 console.log("Client", data);
 
                 setLoadingPage(true);
-                setLastTicketString(data.category.short_name + data.number.toString());
+                setLastTicketString(
+                    (showCategoryShortName ? data.category.short_name : "") +
+                        data.number.toString(),
+                );
 
                 // Get the ticket template for the current language
                 const ticketTemplate =
@@ -62,6 +57,7 @@ export default function NumberGetterButton({
                 window.electronAPI.executePrintTicket(data, ticketTemplate);
                 await new Promise((resolve) => setTimeout(resolve, printingTime));
                 setLoadingPage(false);
+                i18n.changeLanguage(defaultLanguage);
             }
         },
     });

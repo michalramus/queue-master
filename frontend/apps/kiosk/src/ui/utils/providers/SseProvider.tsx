@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, ReactNode } from "react";
+import { createContext, useEffect, useRef, useState, ReactNode } from "react";
 import { sseEvents } from "shared-utils";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
 
@@ -7,6 +7,8 @@ type SseEventCallback = (event: MessageEvent) => void;
 interface SseContextValue {
     addEventListener: (event: sseEvents, callback: SseEventCallback) => void;
     removeEventListener: (event: sseEvents, callback: SseEventCallback) => void;
+    isConnected: boolean;
+    backoffMs: number;
 }
 
 const SseContext = createContext<SseContextValue | null>(null);
@@ -23,6 +25,8 @@ export function SseProvider({ children }: { children: ReactNode }) {
     const reconnectAttemptsRef = useRef(0);
     const maxReconnectDelay = 30000; // 30 seconds
     const baseReconnectDelay = 1000; // 1 second
+    const [isConnected, setIsConnected] = useState(false);
+    const [backoffMs, setBackoffMs] = useState(0);
 
     const addEventListener = (event: sseEvents, callback: SseEventCallback) => {
         if (!listenersRef.current.has(event)) {
@@ -67,6 +71,8 @@ export function SseProvider({ children }: { children: ReactNode }) {
             eventSourceRef.current.onopen = () => {
                 console.log("SSE connected");
                 reconnectAttemptsRef.current = 0;
+                setIsConnected(true);
+                setBackoffMs(0);
             };
 
             eventSourceRef.current.onerror = (error) => {
@@ -79,8 +85,10 @@ export function SseProvider({ children }: { children: ReactNode }) {
                     maxReconnectDelay,
                 );
                 reconnectAttemptsRef.current++;
+                setIsConnected(false);
+                setBackoffMs(delay);
 
-                console.log(
+                console.debug(
                     `SSE reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})...`,
                 );
                 reconnectTimeoutRef.current = setTimeout(connect, delay);
@@ -107,7 +115,9 @@ export function SseProvider({ children }: { children: ReactNode }) {
     }, [appConfig]);
 
     return (
-        <SseContext.Provider value={{ addEventListener, removeEventListener }}>
+        <SseContext.Provider
+            value={{ addEventListener, removeEventListener, isConnected, backoffMs }}
+        >
             {children}
         </SseContext.Provider>
     );

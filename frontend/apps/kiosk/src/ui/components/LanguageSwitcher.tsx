@@ -57,7 +57,7 @@ export default function LanguageSwitcher() {
     };
 
     return (
-        <div className="flex w-full items-end justify-end">
+        <div className="flex items-end justify-end">
             <a onClick={() => flagClickHandler("pl")} className="cursor-pointer">
                 <img
                     src={plFlag}

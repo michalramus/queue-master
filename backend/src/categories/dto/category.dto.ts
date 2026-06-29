@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Category_Short_Name, LangCode } from "@prisma/client";
+import { DeskResponseDto } from "src/desks/dto/desk.dto";
 import {
     IsNotEmpty,
     IsEnum,
@@ -92,6 +93,13 @@ export class CategoryResponseDto {
     @ApiProperty({
         description: "Multilingual category name dictionary",
         example: { en: "Category A", pl: "Kategoria A" },
+        required: false,
     })
-    name: { [lang: string]: string }; //TODO: replace with LangCode
+    name?: { [lang: string]: string }; //TODO: replace with LangCode
+
+    @ApiProperty({
+        description: "Desks assigned to this category",
+        example: [{ id: 1, desk_number: 1, desk_name: "Desk 1" }],
+    })
+    desks?: DeskResponseDto[];
 }

@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger, NotFoundException, StreamableFile } from "@nestjs/common";
+import { LangCode } from "@prisma/client";
 import { XMLParser, XMLValidator } from "fast-xml-parser";
 import * as fs from "fs/promises";
 import * as fsSync from "fs";
@@ -17,30 +18,36 @@ export class LogoFileService {
 
     private logger = new Logger(LogoFileService.name);
 
-    async getLogoAvailabilityInfo(): Promise<{ availableLogos: LogoID[] }> {
-        const availableLogos: LogoID[] = [];
+    async getLogoAvailabilityInfo(): Promise<{ availableLogos: Record<LangCode, LogoID[]> }> {
+        const availableLogos: Record<LangCode, LogoID[]> = {} as Record<LangCode, LogoID[]>;
 
-        for (const id in LogoID) {
-            const filePath = path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`);
+        for (const lang of Object.values(LangCode)) {
+            const langDir = path.resolve(this.uploadsPath, this.logoFolder, lang);
+            const available: LogoID[] = [];
 
-            if (fsSync.existsSync(filePath)) {
-                availableLogos.push(LogoID[id as keyof typeof LogoID]);
+            for (const id of Object.values(LogoID)) {
+                const filePath = path.resolve(langDir, `${id}.svg`);
+                if (fsSync.existsSync(filePath)) {
+                    available.push(id);
+                }
             }
+
+            availableLogos[lang] = available;
         }
 
-        return { availableLogos: availableLogos };
+        return { availableLogos };
     }
 
-    async getLogo(id: LogoID): Promise<StreamableFile> {
-        const filePath = path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`);
+    async getLogo(lang: LangCode, id: LogoID): Promise<StreamableFile> {
+        const filePath = path.resolve(this.uploadsPath, this.logoFolder, lang, `${id}.svg`);
 
         if (!fsSync.existsSync(filePath)) {
-            this.logger.warn("Cannot fetch logo because it doesn't exist");
+            this.logger.warn(`Cannot fetch logo ${id} for lang ${lang} because it doesn't exist`);
             throw new NotFoundException("Logo doesn't exist");
         }
 
         const file = fsSync.createReadStream(filePath);
-        this.logger.debug(`Fetched logo with id ${id}`);
+        this.logger.debug(`Fetched logo ${id} for lang ${lang}`);
 
         return new StreamableFile(file, {
             type: "image/svg+xml",
@@ -48,7 +55,12 @@ export class LogoFileService {
         });
     }
 
-    async uploadLogo(file: Express.Multer.File, id: LogoID, entity: Entity): Promise<{ message: string }> {
+    async uploadLogo(
+        file: Express.Multer.File,
+        lang: LangCode,
+        id: LogoID,
+        entity: Entity,
+    ): Promise<{ message: string }> {
         if (!file) {
             this.logger.warn("Cannot upload new logo because no file uploaded");
             throw new BadRequestException("No file uploaded");
@@ -59,20 +71,21 @@ export class LogoFileService {
             throw new BadRequestException("Invalid file type - SVG only");
         }
 
-        this.logger.debug(`Saving ${path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`)}`);
-        await fs.mkdir(path.resolve(this.uploadsPath, this.logoFolder), { recursive: true });
-        await fs.writeFile(path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`), file.buffer);
+        const langDir = path.resolve(this.uploadsPath, this.logoFolder, lang);
+        const filePath = path.resolve(langDir, `${id}.svg`);
+        this.logger.debug(`Saving ${filePath}`);
+        await fs.mkdir(langDir, { recursive: true });
+        await fs.writeFile(filePath, file.buffer);
 
         this.sseService.emit(sseEvents.LogoAvailabilityChanged, null);
-        this.logger.log(`[${entity.name}] Uploaded new logo with id ${id}`);
+        this.logger.log(`[${entity.name}] Uploaded logo ${id} for lang ${lang}`);
         return { message: "Logo uploaded successfully" };
     }
 
-    async deleteLogo(id: LogoID, entity: Entity): Promise<{ message: string }> {
-        const filePath = path.resolve(this.uploadsPath, this.logoFolder, `${id}.svg`);
+    async deleteLogo(lang: LangCode, id: LogoID, entity: Entity): Promise<{ message: string }> {
+        const filePath = path.resolve(this.uploadsPath, this.logoFolder, lang, `${id}.svg`);
         this.logger.debug(`Trying to delete ${filePath}`);
 
-        // Check if file exists
         if (!fsSync.existsSync(filePath)) {
             this.logger.warn("Cannot delete logo because it doesn't exist");
             throw new NotFoundException("Logo doesn't exist");
@@ -80,7 +93,7 @@ export class LogoFileService {
 
         await fs.unlink(filePath);
         this.sseService.emit(sseEvents.LogoAvailabilityChanged, null);
-        this.logger.log(`[${entity.name}] Deleted logo with id ${id}`);
+        this.logger.log(`[${entity.name}] Deleted logo ${id} for lang ${lang}`);
         return { message: "Logo deleted successfully" };
     }
 

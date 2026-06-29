@@ -1,9 +1,11 @@
-import { spawnSync, spawn } from "child_process";
+import { spawn } from "child_process";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
+import { networkInterfaces } from "os";
 import path from "path";
 import { ClientInterface } from "shared-utils";
 
 let config: AppConfigInterface;
+let mainWindow: BrowserWindow;
 
 /**
  * Execute external script asynchronously
@@ -76,35 +78,39 @@ async function onExecuteCloseKioskScript(_event: IpcMainInvokeEvent): Promise<vo
     executeScript(config.openingHoursCloseScript, "openingHoursCloseScript");
 }
 
-async function handleInvokeAudioSynthesizer(
-    _event: IpcMainInvokeEvent,
-    client: ClientInterface,
-): Promise<void> {
+function handleInvokeAudioSynthesizer(_event: IpcMainInvokeEvent, client: ClientInterface): void {
     console.log("Invoking audio synthesizer");
     if (!config.audioSynthesizerScript) {
         console.log("No audio synthesizer script configured");
+        mainWindow.webContents.send("audioSynthesizerComplete");
         return;
     }
 
     const callParameters = `${JSON.stringify({
         categoryShortName: client.category.short_name,
         number: client.number,
-        desk: client.desk,
+        desk: client.desk?.desk_number || "",
         language: client.language,
     })}`;
 
-    const audioSynthesizer = spawnSync(config.audioSynthesizerScript, [callParameters]);
+    const proc = spawn(config.audioSynthesizerScript, [callParameters]);
 
-    if (process.env.NODE_ENV == "development") {
-        if (audioSynthesizer.stdout) {
-            console.log(audioSynthesizer.stdout.toString());
+    proc.stdout?.on("data", (data: Buffer) => {
+        if (process.env.NODE_ENV == "development" && data.length > 0) {
+            console.log(data.toString());
         }
+    });
 
-        if (audioSynthesizer.stderr) {
-            console.error(audioSynthesizer.stderr.toString());
+    proc.stderr?.on("data", (data: Buffer) => {
+        if (data.length > 0) {
+            console.error(data.toString());
         }
-    }
-    console.log(`Audio synthesizer script ended with ${audioSynthesizer.status}`);
+    });
+
+    proc.on("close", (code: number | null) => {
+        console.log(`Audio synthesizer script ended with ${code}`);
+        mainWindow.webContents.send("audioSynthesizerComplete");
+    });
 }
 
 async function handleGetTranslation(
@@ -130,10 +136,23 @@ async function handleGetAppConfig(): Promise<AppConfigInterface> {
     return config;
 }
 
+function handleGetLocalIpAddress(): string {
+    const nets = networkInterfaces();
+    for (const iface of Object.values(nets)) {
+        if (!iface) continue;
+        for (const net of iface) {
+            if (net.family === "IPv4" && !net.internal) {
+                return net.address;
+            }
+        }
+    }
+    return "Unknown";
+}
+
 // -----------------------------------
 function createWindow(zoomFactor: number = 1) {
     const isDevelopment = process.env.NODE_ENV == "development";
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         width: 800,
         height: 600,
@@ -145,6 +164,21 @@ function createWindow(zoomFactor: number = 1) {
                 "/dist-electron/preload.cjs",
             ),
         },
+    });
+
+    //Output devtools logs to main process console output
+    mainWindow.webContents.on("console-message", (event) => {
+        const { level, message, lineNumber, sourceId } = event;
+        const origin = sourceId ? `${sourceId}:${lineNumber}` : "renderer";
+        if (level === "error") {
+            console.error(`[renderer] ${message} (${origin})`);
+        } else if (level === "warning") {
+            console.warn(`[renderer] ${message} (${origin})`);
+        } else if (level === "info") {
+            console.log(`[renderer] ${message} (${origin})`);
+        } else if (isDevelopment) {
+            console.debug(`[renderer] ${message} (${origin})`);
+        }
     });
 
     if (zoomFactor && zoomFactor > 0) {
@@ -173,6 +207,7 @@ async function fetchConfig() {
         const _config = await import(configPath, { with: { type: "json" } });
         //TODO: validate config
         config = _config.default;
+        config.backendUrl = config.backendUrl.replace(/\/$/, "") + "/api"; //Add /api backend prefix
     } catch (e) {
         console.error(e);
         config = { configError: true } as AppConfigInterface;
@@ -191,6 +226,7 @@ app.on("ready", async () => {
     //TODO: refactor to use invoke with handle name convention
     ipcMain.handle("getTranslation", handleGetTranslation);
     ipcMain.handle("getAppConfig", handleGetAppConfig);
+    ipcMain.handle("getLocalIpAddress", handleGetLocalIpAddress);
 
     createWindow(config.zoomFactor);
 

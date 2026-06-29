@@ -7,12 +7,16 @@ export default function NumericStepper({
     min,
     max,
     hint,
+    disabled = false,
+    className = "",
 }: {
     value: number;
     onChange: (value: number) => void;
     min: number;
     max: number;
     hint?: string;
+    disabled?: boolean;
+    className?: string;
 }) {
     const [inputValue, setInputValue] = useState(String(value));
 
@@ -22,11 +26,13 @@ export default function NumericStepper({
 
     return (
         <>
-            <div className="flex items-center gap-2">
+            <div
+                className={`flex items-center gap-2${disabled ? "pointer-events-none opacity-50" : ""} ${className}`}
+            >
                 <button
                     type="button"
                     onClick={() => value > min && onChange(value - 1)}
-                    disabled={value <= min}
+                    disabled={disabled || value <= min}
                     className="border-gray-1 bg-background flex h-10 w-10 items-center justify-center rounded border transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +68,7 @@ export default function NumericStepper({
                 <button
                     type="button"
                     onClick={() => value < max && onChange(value + 1)}
-                    disabled={value >= max}
+                    disabled={disabled || value >= max}
                     className="border-gray-1 bg-background flex h-10 w-10 items-center justify-center rounded border transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

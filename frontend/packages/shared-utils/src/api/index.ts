@@ -1,6 +1,7 @@
 export * from "./auth";
 export * from "./categories";
 export * from "./clients";
+export * from "./desks";
 export * from "./devices";
 export * from "./files";
 export * from "./userSettings";

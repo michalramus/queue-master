@@ -10,10 +10,17 @@ interface DevicesTableProps {
     devices: DeviceResponseDto[];
     deleting: boolean;
     onToggle: (deviceId: number, accepted: boolean) => void;
+    onEdit: (device: DeviceResponseDto) => void;
     onDelete: (deviceId: number) => void;
 }
 
-export default function DevicesTable({ devices, deleting, onToggle, onDelete }: DevicesTableProps) {
+export default function DevicesTable({
+    devices,
+    deleting,
+    onToggle,
+    onEdit,
+    onDelete,
+}: DevicesTableProps) {
     const t = useTranslations();
 
     const columns: AdminTableColumn[] = [
@@ -42,6 +49,9 @@ export default function DevicesTable({ devices, deleting, onToggle, onDelete }: 
                             className="mr-3"
                         >
                             {device.accepted ? t("deactivate") : t("activate")}
+                        </TextButton>
+                        <TextButton onClick={() => onEdit(device)} className="mr-3">
+                            {t("edit")}
                         </TextButton>
                         <TextButton
                             onClick={() => onDelete(device.id)}

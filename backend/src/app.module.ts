@@ -15,6 +15,8 @@ import { MultilingualTextModule } from "./multilingual-text/multilingual-text.mo
 import { MultilingualSettingsModule } from "./multilingual-settings/multilingual-settings.module";
 import { FileModule } from "./file/file.module";
 import { OpeningHoursModule } from "./opening-hours/opening-hours.module";
+import { SeedingModule } from "./seeding/seeding.module";
+import { DesksModule } from "./desks/desks.module";
 
 @Module({
     imports: [
@@ -42,6 +44,8 @@ import { OpeningHoursModule } from "./opening-hours/opening-hours.module";
         MultilingualSettingsModule,
         FileModule,
         OpeningHoursModule,
+        SeedingModule,
+        DesksModule,
     ],
     controllers: [AppController],
     providers: [AppService],

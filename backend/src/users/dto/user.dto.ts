@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional, IsObject } from "class-validator";
+import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional, IsObject, IsInt, Min } from "class-validator";
 import { UserRole } from "@prisma/client";
+import { DeskResponseDto } from "src/desks/dto/desk.dto";
 
 export class UserCreateDto {
     @ApiProperty({ description: "Username", example: "john_doe" })
@@ -22,9 +23,15 @@ export class UserCreateDto {
     @IsEnum(UserRole)
     role: UserRole;
 
+    @ApiProperty({ description: "Default desk ID (optional)", example: 1, required: false })
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    default_desk_id?: number;
+
     @ApiProperty({
         description: "Initial user settings (optional)",
-        example: { desk: 1 },
+        example: { notifications_on: true },
         required: false,
     })
     @IsOptional()
@@ -52,6 +59,12 @@ export class UserUpdateDto {
     @IsEnum(UserRole)
     @IsOptional()
     role?: UserRole;
+
+    @ApiProperty({ description: "Default desk ID (null to unset)", example: 1, required: false, nullable: true })
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    default_desk_id?: number | null;
 }
 
 export class UserPasswordUpdateDto {
@@ -75,4 +88,11 @@ export class UserResponseDto {
         example: "User",
     })
     role: UserRole;
+
+    @ApiProperty({
+        description: "Default desk (if assigned)",
+        type: () => DeskResponseDto,
+        nullable: true,
+    })
+    default_desk: DeskResponseDto | null;
 }

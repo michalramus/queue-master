@@ -12,11 +12,11 @@ import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 export default function InServicePanel({
     clientNumber,
     nextClientNumber,
-    desk,
+    deskId,
 }: {
     clientNumber?: ClientInterface;
     nextClientNumber?: ClientInterface;
-    desk: number;
+    deskId: number;
 }) {
     const [lockNextClientButton, setLockNextClientButton] = useState(false); //Lock the next button to avoid miss clicks
     const [isCallAgainLoading, setIsCallAgainLoading] = useState(false); //Loading state for call again button
@@ -59,7 +59,7 @@ export default function InServicePanel({
     async function nextClientHandler() {
         setLockNextClientButton(true);
         if (nextClientNumber) {
-            setClientAsInService(nextClientNumber, desk, axiosAuthInstance);
+            setClientAsInService(nextClientNumber, deskId, axiosAuthInstance);
         }
         setTimeout(() => {
             setLockNextClientButton(false);
@@ -118,7 +118,7 @@ export default function InServicePanel({
                     >
                         {isCallAgainLoading ? (
                             <div className="flex items-center justify-center gap-1 px-1">
-                                <div className="h-3 w-3 flex-shrink-0 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                <div className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-white border-t-transparent" />
                                 <span className="text-lg">{t("calling")}...</span>
                             </div>
                         ) : (

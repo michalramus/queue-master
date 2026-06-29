@@ -3,6 +3,8 @@ import { GlobalSettingsInterface, OpeningHoursDto } from "shared-utils";
 export function isKioskOpen(
     openingHours: OpeningHoursDto[],
     globalSettings: GlobalSettingsInterface | undefined,
+    openOffsetMinutes: number = 0,
+    closeOffsetMinutes: number = 0,
 ): boolean {
     if (!globalSettings) return true;
 
@@ -24,14 +26,14 @@ export function isKioskOpen(
     const today = openingHours.find((entry) => entry.day_of_week === dayOfWeek);
     if (!today) return true; // No hours set for today, assume open
     if (today.is_closed) return false;
-    if (!today.open_time || !today.close_time) return false;
+    if (!today.open_time || !today.close_time) return true; // Missing times, assume open
 
-    // Compare current time to open/close
+    // Compare current time to open/close with offsets applied
     const [openHour, openMinute] = today.open_time.split(":").map(Number);
     const [closeHour, closeMinute] = today.close_time.split(":").map(Number);
     const open = new Date(now);
-    open.setHours(openHour, openMinute, 0, 0);
+    open.setHours(openHour, openMinute - openOffsetMinutes, 0, 0);
     const close = new Date(now);
-    close.setHours(closeHour, closeMinute, 0, 0);
+    close.setHours(closeHour, closeMinute + closeOffsetMinutes, 0, 0);
     return now >= open && now <= close;
 }

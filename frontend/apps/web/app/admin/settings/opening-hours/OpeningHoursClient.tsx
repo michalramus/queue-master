@@ -8,24 +8,55 @@ import {
     setOpeningHours,
     type OpeningHoursDto,
     type GlobalSettingsInterface,
+    type MultilingualSettingsInterface,
+    type MultilingualValue,
     DayOfWeek,
+    LangCode,
     setGlobalSettings,
+    setMultilingualSettings,
     useOpeningHours,
     useGlobalSettings,
+    useMultilingualSettings,
 } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
-import { Button, Checkbox, Select, Spinner } from "shared-components";
+import { Button, Checkbox, NumericStepper, Select, Spinner } from "shared-components";
 import { showToast } from "@/utils/toast";
 import { PageHeader } from "@/components/admin";
 import DayRow from "./DayRow";
 
 type OverrideOption = GlobalSettingsInterface["opening_hours_override"];
+type AllDayLabels = { [day in DayOfWeek]: MultilingualValue };
 
 const daysOfWeek = Object.values(DayOfWeek);
 
 function defaultDayData(day: DayOfWeek): OpeningHoursDto {
     return { day_of_week: day, is_closed: false, open_time: "09:00", close_time: "17:00" };
+}
+
+function labelsFromMultilingual(settings: MultilingualSettingsInterface | undefined): AllDayLabels {
+    const empty: MultilingualValue = {};
+    return {
+        [DayOfWeek.MONDAY]: settings?.monday_label ?? empty,
+        [DayOfWeek.TUESDAY]: settings?.tuesday_label ?? empty,
+        [DayOfWeek.WEDNESDAY]: settings?.wednesday_label ?? empty,
+        [DayOfWeek.THURSDAY]: settings?.thursday_label ?? empty,
+        [DayOfWeek.FRIDAY]: settings?.friday_label ?? empty,
+        [DayOfWeek.SATURDAY]: settings?.saturday_label ?? empty,
+        [DayOfWeek.SUNDAY]: settings?.sunday_label ?? empty,
+    };
+}
+
+function labelsToMultilingual(labels: AllDayLabels): MultilingualSettingsInterface {
+    return {
+        monday_label: labels[DayOfWeek.MONDAY],
+        tuesday_label: labels[DayOfWeek.TUESDAY],
+        wednesday_label: labels[DayOfWeek.WEDNESDAY],
+        thursday_label: labels[DayOfWeek.THURSDAY],
+        friday_label: labels[DayOfWeek.FRIDAY],
+        saturday_label: labels[DayOfWeek.SATURDAY],
+        sunday_label: labels[DayOfWeek.SUNDAY],
+    };
 }
 
 export default function OpeningHoursClient() {
@@ -34,31 +65,49 @@ export default function OpeningHoursClient() {
 
     const { data: serverHours } = useOpeningHours(axiosAuthInstance);
     const { data: serverGlobalSettings } = useGlobalSettings(axiosPureInstance);
+    const { data: serverMultilingualSettings } = useMultilingualSettings(axiosPureInstance);
 
     const [openingHours, setOpeningHoursState] = useState<OpeningHoursDto[]>(serverHours ?? []);
     const [enabled, setEnabled] = useState(serverGlobalSettings?.enable_opening_hours ?? false);
     const [override, setOverride] = useState<OverrideOption>(
         serverGlobalSettings?.opening_hours_override ?? "off",
     );
-
+    const [dayLabels, setDayLabels] = useState<AllDayLabels>(
+        labelsFromMultilingual(serverMultilingualSettings),
+    );
+    const [kioskOpenOffset, setKioskOpenOffset] = useState(
+        serverGlobalSettings?.kiosk_open_offset ?? 0,
+    );
+    const [tvCloseOffset, setTvCloseOffset] = useState(serverGlobalSettings?.tv_close_offset ?? 0);
     const hasChanges = (() => {
-        if (!serverHours || !serverGlobalSettings) return false;
+        if (!serverHours || !serverGlobalSettings || !serverMultilingualSettings) return false;
         if (
             enabled !== serverGlobalSettings.enable_opening_hours ||
-            override !== serverGlobalSettings.opening_hours_override
+            override !== serverGlobalSettings.opening_hours_override ||
+            kioskOpenOffset !== serverGlobalSettings.kiosk_open_offset ||
+            tvCloseOffset !== serverGlobalSettings.tv_close_offset
         )
             return true;
         if (openingHours.length !== serverHours.length) return true;
-        return openingHours.some((hour, idx) => {
-            const original = serverHours[idx];
-            if (!original) return true;
-            return (
-                hour.day_of_week !== original.day_of_week ||
-                hour.is_closed !== original.is_closed ||
-                hour.open_time !== original.open_time ||
-                hour.close_time !== original.close_time
-            );
-        });
+        if (
+            openingHours.some((hour, idx) => {
+                const original = serverHours[idx];
+                if (!original) return true;
+                return (
+                    hour.day_of_week !== original.day_of_week ||
+                    hour.is_closed !== original.is_closed ||
+                    hour.open_time !== original.open_time ||
+                    hour.close_time !== original.close_time
+                );
+            })
+        )
+            return true;
+        const serverLabels = labelsFromMultilingual(serverMultilingualSettings);
+        return daysOfWeek.some((day) =>
+            Object.values(LangCode).some(
+                (lang) => (dayLabels[day][lang] ?? null) !== (serverLabels[day][lang] ?? null),
+            ),
+        );
     })();
 
     const saveMutation = useMutation({
@@ -75,13 +124,20 @@ export default function OpeningHoursClient() {
 
             await setOpeningHours({ opening_hours: sanitizedHours }, axiosAuthInstance);
             await setGlobalSettings(
-                { enable_opening_hours: enabled, opening_hours_override: override },
+                {
+                    enable_opening_hours: enabled,
+                    opening_hours_override: override,
+                    kiosk_open_offset: kioskOpenOffset,
+                    tv_close_offset: tvCloseOffset,
+                },
                 axiosAuthInstance,
             );
+            await setMultilingualSettings(labelsToMultilingual(dayLabels), axiosAuthInstance);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["openingHours"] });
             queryClient.invalidateQueries({ queryKey: ["globalSettings"] });
+            queryClient.invalidateQueries({ queryKey: ["multilingualSettings"] });
             showToast.success(t("opening_hours_saved"));
         },
         onError: (error: unknown) => {
@@ -90,7 +146,6 @@ export default function OpeningHoursClient() {
         },
     });
 
-    // Replaces a single day's data in local state
     function handleDayChange(updated: OpeningHoursDto) {
         const next = [...openingHours];
         next[openingHours.findIndex((h) => h.day_of_week === updated.day_of_week)] = updated;
@@ -102,6 +157,11 @@ export default function OpeningHoursClient() {
         if (serverGlobalSettings) {
             setEnabled(serverGlobalSettings.enable_opening_hours);
             setOverride(serverGlobalSettings.opening_hours_override);
+            setKioskOpenOffset(serverGlobalSettings.kiosk_open_offset);
+            setTvCloseOffset(serverGlobalSettings.tv_close_offset);
+        }
+        if (serverMultilingualSettings) {
+            setDayLabels(labelsFromMultilingual(serverMultilingualSettings));
         }
         showToast.info(t("schedule_restored_from_database"));
     }
@@ -129,6 +189,34 @@ export default function OpeningHoursClient() {
                         <option value="override_to_open">{t("force_open_description")}</option>
                         <option value="override_to_close">{t("force_closed_description")}</option>
                     </Select>
+                    <div>
+                        <label className="text-text-1 mb-1 block text-sm font-medium">
+                            {t("kiosk_open_offset")}
+                        </label>
+                        <NumericStepper
+                            value={kioskOpenOffset}
+                            onChange={setKioskOpenOffset}
+                            min={0}
+                            max={59}
+                            hint={t("kiosk_open_offset_description")}
+                            disabled={!enabled}
+                            className="w-fit"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-text-1 mb-1 block text-sm font-medium">
+                            {t("tv_close_offset")}
+                        </label>
+                        <NumericStepper
+                            value={tvCloseOffset}
+                            onChange={setTvCloseOffset}
+                            min={0}
+                            max={59}
+                            hint={t("tv_close_offset_description")}
+                            disabled={!enabled}
+                            className="w-fit"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -144,6 +232,10 @@ export default function OpeningHoursClient() {
                             }
                             onChange={handleDayChange}
                             disabled={!enabled}
+                            labels={dayLabels[day]}
+                            onLabelsChange={(updated) =>
+                                setDayLabels((prev) => ({ ...prev, [day]: updated }))
+                            }
                         />
                     ))}
                 </div>

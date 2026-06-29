@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsNotEmpty } from "class-validator";
+import { DeskResponseDto } from "src/desks/dto/desk.dto";
 
 export class DeviceRegistrationResponseDto {
     @ApiProperty({
@@ -32,6 +33,14 @@ export class AuthInfoResponseDto {
         required: false,
     })
     username?: string;
+
+    @ApiProperty({
+        description: "Default desk (only for User/Admin roles, null if not set)",
+        type: () => DeskResponseDto,
+        required: false,
+        nullable: true,
+    })
+    default_desk?: DeskResponseDto | null;
 }
 
 export class AuthLoginUserDto {

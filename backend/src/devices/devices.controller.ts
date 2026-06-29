@@ -57,7 +57,7 @@ export class DevicesController {
     @Patch(":id")
     @Roles(["Admin"])
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @ApiOperation({ summary: "Update device status (enable/disable)" })
+    @ApiOperation({ summary: "Update device status and/or comment" })
     @ApiParam({ name: "id", description: "Device ID", type: "number" })
     @ApiBody({ type: DevicePatchDto })
     @ApiResponse({
