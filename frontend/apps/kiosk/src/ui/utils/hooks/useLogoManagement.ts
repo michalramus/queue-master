@@ -1,18 +1,20 @@
-import { useEffect } from "react";
-import { LangCode, LogoID, getLogoUrl, useLogoAvailabilities } from "shared-utils";
+import { useEffect, useState } from "react";
+import { LangCode, LogoID, getLogoUrl, sseEvents, useLogoAvailabilities } from "shared-utils";
 import { axiosPureInstance } from "@/utils/axiosInstances/axiosPureInstance";
 import { useTranslation } from "react-i18next";
 import { useAppConfig } from "@/utils/hooks/useAppConfig";
+import { useSse } from "@/utils/hooks/useSse";
 
 function getLangLogoUrl(
     logoAvailability: Record<string, LogoID[]> | undefined,
     logoId: LogoID,
     currentLang: LangCode,
     backendUrl: string | undefined,
+    cacheBuster: number,
 ): string | null {
     if (!backendUrl || !logoAvailability) return null;
     if (logoAvailability[currentLang]?.includes(logoId)) {
-        return getLogoUrl(backendUrl, currentLang, logoId);
+        return `${getLogoUrl(backendUrl, currentLang, logoId)}?v=${cacheBuster}`;
     }
     return null;
 }
@@ -21,6 +23,7 @@ function getLangLogoUrl(
 function usePreloadLogos(
     logoAvailability: Record<LangCode, LogoID[]> | undefined,
     backendUrl: string | undefined,
+    cacheBuster: number,
 ): void {
     useEffect(() => {
         if (!logoAvailability || !backendUrl) return;
@@ -28,10 +31,10 @@ function usePreloadLogos(
             const logoIds = logoAvailability[lang] ?? [];
             for (const logoId of logoIds) {
                 const img = new Image();
-                img.src = getLogoUrl(backendUrl, lang, logoId);
+                img.src = `${getLogoUrl(backendUrl, lang, logoId)}?v=${cacheBuster}`;
             }
         }
-    }, [logoAvailability, backendUrl]);
+    }, [logoAvailability, backendUrl, cacheBuster]);
 }
 
 export function useLogoManagement(
@@ -41,8 +44,21 @@ export function useLogoManagement(
     const { i18n } = useTranslation();
     const { data: appConfig } = useAppConfig();
     const { data: logoAvailability, isLoading } = useLogoAvailabilities(axiosPureInstance);
+    const { addEventListener, removeEventListener } = useSse();
+    const [cacheBuster, setCacheBuster] = useState(() => Date.now());
 
-    usePreloadLogos(logoAvailability, appConfig?.backendUrl);
+    useEffect(() => {
+        function onLogoAvailabilityChanged() {
+            setCacheBuster(Date.now());
+        }
+
+        addEventListener(sseEvents.LogoAvailabilityChanged, onLogoAvailabilityChanged);
+        return () => {
+            removeEventListener(sseEvents.LogoAvailabilityChanged, onLogoAvailabilityChanged);
+        };
+    }, [addEventListener, removeEventListener]);
+
+    usePreloadLogos(logoAvailability, appConfig?.backendUrl, cacheBuster);
 
     const currentLang = i18n.language as LangCode;
 
@@ -51,12 +67,14 @@ export function useLogoManagement(
         mainLogoId,
         currentLang,
         appConfig?.backendUrl,
+        cacheBuster,
     );
     const secondaryLogoUrl = getLangLogoUrl(
         logoAvailability,
         secondaryLogoId,
         currentLang,
         appConfig?.backendUrl,
+        cacheBuster,
     );
 
     return { mainLogoUrl, secondaryLogoUrl, isLoading };
