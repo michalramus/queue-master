@@ -133,7 +133,6 @@ export default function KioskPage({
                     openingHours={openingHours || []}
                     multilingualSettings={multilingualSettings}
                     className="mt-10"
-                    large={true}
                 />
             )}
 
