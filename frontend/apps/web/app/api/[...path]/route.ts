@@ -39,9 +39,8 @@ async function proxyRequest(req: Request, path: string, method: string) {
             headers: response.headers,
         });
     } catch (error) {
-        console.error(
-            "Error while connecting to backend:",
-            error instanceof Error ? error.message : error,
+        process.stderr.write(
+            `Error while connecting to backend: ${method} ${backendUrl} — ${error instanceof Error ? error.message : String(error)}\n`,
         );
         return new Response("Error while connecting to backend", { status: 502 });
     }
