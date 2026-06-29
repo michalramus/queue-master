@@ -60,7 +60,9 @@ jobs:
             dist/ \
             node_modules/ \
             prisma/ \
-            package.json
+            package.json \
+            yarn.lock \
+            .yarnrc.yml
 
       - name: Upload artifact
         if: github.event_name != 'workflow_dispatch'
