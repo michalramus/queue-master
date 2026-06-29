@@ -5,7 +5,7 @@ import QueuePanel from "./QueuePanel";
 import UserPanel from "./UserPanel";
 
 import { SmallHeader } from "shared-components";
-import { getClients, getUserSettings } from "shared-utils";
+import { getClients, getUserSettings, getDesk } from "shared-utils";
 import { getCachedAuthInfo } from "@/utils/server/getCachedAuthInfo";
 
 export default async function DeskPage() {
@@ -34,6 +34,10 @@ export default async function DeskPage() {
             ["inServiceClients", deskId],
             clients.filter((c) => c.status === "InService" && c.desk?.id === deskId),
         );
+        await queryClient.prefetchQuery({
+            queryKey: ["desk", deskId],
+            queryFn: () => getDesk(axiosAuthInstance, deskId),
+        });
     }
 
     return (
