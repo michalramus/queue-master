@@ -13,7 +13,7 @@ export default function Header({
                     <Logo width={96} height={96} className="mx-2" />
                     <p className="text-6xl">Master</p>
                 </div>
-                <p className="text-right text-xl">By Michał Ramus</p>
+                <p className="text-right text-xl">by Michał Ramus</p>
             </div>
         </div>
     );
