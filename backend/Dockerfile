@@ -2,7 +2,7 @@ FROM node:24.18.0-alpine3.24 AS build
 WORKDIR /app
 
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN yarn install --frozen-lockfile
+RUN corepack enable && yarn install --immutable
 
 COPY src/ src/
 COPY prisma/ prisma/
@@ -16,7 +16,7 @@ FROM node:24.18.0-alpine3.24 AS prod
 WORKDIR /app
 
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN yarn install --frozen-lockfile --production
+RUN corepack enable && yarn workspaces focus --production
 
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma

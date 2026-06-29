@@ -6,7 +6,7 @@ COPY frontend/apps/web/package.json ./frontend/apps/web/
 COPY frontend/packages/shared-components/package.json ./frontend/packages/shared-components/
 COPY frontend/packages/shared-utils/package.json ./frontend/packages/shared-utils/
 
-RUN cd frontend && yarn install --frozen-lockfile
+RUN corepack enable && cd frontend && yarn install --immutable
 
 
 FROM node:24.18.0-alpine3.24 AS build
@@ -15,7 +15,7 @@ WORKDIR /app
 COPY --from=deps /app/frontend/node_modules ./frontend/node_modules
 COPY frontend/ ./frontend/
 
-RUN cd frontend && yarn build:web
+RUN corepack enable && cd frontend && yarn build:web
 
 
 FROM node:24.18.0-alpine3.24 AS runner

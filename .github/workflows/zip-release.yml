@@ -9,7 +9,7 @@ on:
       version:
         description: "Version (e.g. v1.2.3). Defaults to 'manual' if omitted."
         required: false
-        default: "manual"
+        default: "0.0.0"
 
 env:
   RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
@@ -21,10 +21,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: backend/.nvmrc
           cache: yarn
@@ -36,7 +39,11 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
+
+      - name: Generate Prisma client
+        working-directory: backend
+        run: yarn prisma generate
 
       - name: Build
         working-directory: backend
@@ -45,10 +52,6 @@ jobs:
       - name: Install production dependencies only
         working-directory: backend
         run: yarn workspaces focus --production
-
-      - name: Generate Prisma client
-        working-directory: backend
-        run: yarn prisma generate
 
       - name: Create archive
         working-directory: backend
@@ -60,7 +63,8 @@ jobs:
             package.json
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/upload-artifact@v6
         with:
           name: backend-zip
           path: backend-${{ env.RELEASE_VERSION }}.zip
@@ -71,10 +75,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: frontend/.nvmrc
           cache: yarn
@@ -86,7 +93,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Build
         working-directory: frontend
@@ -102,7 +109,8 @@ jobs:
           cd web-dist && zip -r "../../web-${{ env.RELEASE_VERSION }}.zip" .
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/upload-artifact@v6
         with:
           name: web-zip
           path: web-${{ env.RELEASE_VERSION }}.zip
@@ -113,10 +121,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: frontend/.nvmrc
           cache: yarn
@@ -128,14 +139,15 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Build
         working-directory: frontend/apps/kiosk
         run: yarn dist:linux
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/upload-artifact@v6
         with:
           name: kiosk-linux
           path: |
@@ -148,14 +160,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: frontend/.nvmrc
-          cache: yarn
-          cache-dependency-path: frontend/yarn.lock
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Set version from tag
         shell: bash
@@ -164,14 +177,15 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Build
         working-directory: frontend/apps/kiosk
         run: yarn dist:win
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/upload-artifact@v6
         with:
           name: kiosk-windows
           path: |
@@ -180,6 +194,7 @@ jobs:
 
   create-release:
     name: Create GitHub Release
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: [build-backend, build-web, build-kiosk-linux, build-kiosk-windows]
     permissions:
@@ -187,7 +202,7 @@ jobs:
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: release-assets
           merge-multiple: true

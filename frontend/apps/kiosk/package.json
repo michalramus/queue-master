@@ -23,8 +23,8 @@
         "preview": "vite preview",
         "transpile:electron": "tsc -p src/electron/tsconfig.json",
         "dist:mac": "yarn run transpile:electron && yarn run build && electron-builder --mac --arm64",
-        "dist:win": "yarn run transpile:electron && yarn run build && electron-builder --win --x64",
-        "dist:linux": "yarn run transpile:electron && yarn run build && electron-builder --linux --x64",
+        "dist:win": "yarn run transpile:electron && yarn run build && electron-builder --win --x64 --publish never",
+        "dist:linux": "yarn run transpile:electron && yarn run build && electron-builder --linux --x64 --publish never",
         "pre-push": "tsc -p src/electron/tsconfig.json --noEmit && tsc -b --noEmit"
     },
     "dependencies": {

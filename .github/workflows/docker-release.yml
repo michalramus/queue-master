@@ -4,9 +4,16 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (e.g. v1.2.3). Defaults to 'manual' if omitted."
+        required: false
+        default: "0.0.0"
 
 env:
   REGISTRY: ghcr.io
+  RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
 
 jobs:
   build-backend:
@@ -18,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set version from tag
-        run: npm pkg set version="${GITHUB_REF_NAME#v}"
+        run: npm pkg set version="${RELEASE_VERSION#v}"
         working-directory: backend
 
       - name: Set up QEMU
@@ -68,10 +75,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set version from tag
-        run: npm pkg set version="${GITHUB_REF_NAME#v}"
+        run: npm pkg set version="${RELEASE_VERSION#v}"
         working-directory: frontend/apps/web
 
       - name: Set up QEMU
