@@ -25,6 +25,12 @@ export default function UserSettingsModal({ isOpen, onClose }: UserSettingsModal
     const [notificationPermission, setNotificationPermission] =
         useState<NotificationPermission | null>(null);
 
+    useEffect(() => {
+        if (isOpen && typeof Notification !== "undefined") {
+            setNotificationPermission(Notification.permission);
+        }
+    }, [isOpen]);
+
     // Update local settings state when server settings are loaded
     useEffect(() => {
         if (serverSettings) {
