@@ -11,6 +11,7 @@ import i18n from "./i18n";
 import { isKioskOpen } from "./utils/isKioskOpen";
 import { axiosAuthInstance } from "./utils/axiosInstances/axiosAuthInstance";
 import { useAppConfig } from "./utils/hooks/useAppConfig";
+import { useSse } from "./utils/hooks/useSse";
 
 export default function App() {
     const { data: globalSettings, isError: globalSettingsError } =
@@ -125,6 +126,8 @@ export default function App() {
         }
     }, [globalSettings?.locale]);
 
+    const { isConnected, backoffMs } = useSse();
+
     if (appConfigLoading) {
         return <StartupScreen status="loading" title="Starting up…" />;
     }
@@ -166,6 +169,12 @@ export default function App() {
                 title="Invalid mode"
                 details={`Current: "${appConfig.mode}". Valid values: "kiosk", "tv". Check config file.`}
             />
+        );
+    }
+
+    if (!isConnected && backoffMs >= 2000) {
+        return (
+            <StartupScreen status="connecting" title="SSE not connected. Connecting to server..." />
         );
     }
 
