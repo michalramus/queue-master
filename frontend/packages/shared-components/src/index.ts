@@ -1,6 +1,7 @@
 export { default as Badge } from "./Badge";
 export { default as Checkbox } from "./Checkbox";
 export { default as Button } from "./Buttons/Button";
+export { default as IconButton } from "./Buttons/IconButton";
 
 export { default as AcceptIcon } from "./svg/AcceptIcon";
 export { default as RejectIcon } from "./svg/RejectIcon";

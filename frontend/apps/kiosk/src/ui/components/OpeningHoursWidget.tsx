@@ -1,11 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { LangCode, MultilingualSettingsInterface, OpeningHoursDto } from "shared-utils";
+import { IconButton, RejectIcon } from "shared-components";
 
 interface OpeningHoursWidgetProps {
     openingHours: OpeningHoursDto[];
     multilingualSettings?: MultilingualSettingsInterface;
     className?: string;
     large?: boolean;
+    onClose?: () => void;
 }
 
 //TODO: Correct sizes
@@ -14,14 +16,20 @@ export default function OpeningHoursWidget({
     multilingualSettings,
     className = "",
     large = false,
+    onClose,
 }: OpeningHoursWidgetProps) {
     const { t, i18n } = useTranslation();
     return (
         <div
-            className={`border-primary-1 mx-auto w-full ${
+            className={`border-primary-1 relative mx-auto w-full ${
                 large ? "max-w-2xl p-8" : "max-w-md p-6"
             } rounded-xl border bg-white shadow-md ${className}`}
         >
+            {onClose && (
+                <IconButton onClick={onClose} className="absolute top-4 right-4 h-14 w-14">
+                    <RejectIcon />
+                </IconButton>
+            )}
             <h2
                 className={`text-primary-1 mb-8 text-center font-bold ${
                     large ? "text-4xl" : "text-2xl"

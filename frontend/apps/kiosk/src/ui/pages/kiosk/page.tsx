@@ -1,6 +1,6 @@
 import CategoriesForm from "./CategoriesForm";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { Button, Header, SmallHeader, StartupScreen } from "shared-components";
+import { Button, Header, Modal, SmallHeader, StartupScreen } from "shared-components";
 import {
     LogoID,
     MultilingualSettingsInterface,
@@ -110,22 +110,7 @@ export default function KioskPage({
 
             {mainLogoUrl === null && <Header />}
 
-            {showOpeningHours && kioskOpen ? (
-                <div className="mx-auto flex w-full max-w-md flex-col items-center">
-                    <OpeningHoursWidget
-                        openingHours={openingHours || []}
-                        multilingualSettings={multilingualSettings}
-                        className="mt-10"
-                    />
-                    <Button
-                        onClick={handleCloseOpeningHours}
-                        className="border-primary-1 relative! m-3! flex! w-full! items-center! justify-center! rounded-3xl! border-2! p-6! text-3xl!"
-                        color="secondary"
-                    >
-                        {t("close")}
-                    </Button>
-                </div>
-            ) : kioskOpen || !appConfig?.openingHoursEnableBanner ? (
+            {kioskOpen || !appConfig?.openingHoursEnableBanner ? (
                 <CategoriesForm categories={categories!} />
             ) : (
                 <OpeningHoursWidget
@@ -133,6 +118,18 @@ export default function KioskPage({
                     multilingualSettings={multilingualSettings}
                     className="mt-10"
                 />
+            )}
+
+            {showOpeningHours && kioskOpen && (
+                <Modal transparent>
+                    <OpeningHoursWidget
+                        openingHours={openingHours || []}
+                        multilingualSettings={multilingualSettings}
+                        large
+                        onClose={handleCloseOpeningHours}
+                        className="border-0"
+                    />
+                </Modal>
             )}
 
             <div className="fixed right-0 bottom-0 m-7">
