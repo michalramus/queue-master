@@ -6,7 +6,7 @@ import TVPage from "@/pages/tv/page";
 
 import { useGlobalSettings, useMultilingualSettings, useOpeningHours } from "shared-utils";
 import { axiosPureInstance } from "./utils/axiosInstances/axiosPureInstance";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import i18n from "./i18n";
 import { isKioskOpen } from "./utils/isKioskOpen";
 import { axiosAuthInstance } from "./utils/axiosInstances/axiosAuthInstance";
@@ -38,8 +38,38 @@ export default function App() {
     const { data: multilingualSettings } = useMultilingualSettings(axiosPureInstance);
 
     //TODO: Fix multi calls to scripts when app starts
-    const [kioskOpen, setKioskOpen] = useState<boolean | "notSet">("notSet"); //TODO: use openingHoursLoading instead of "notSet"
-    const [tvOpen, setTvOpen] = useState<boolean | "notSet">("notSet");
+    const [tick, setTick] = useState(false); //Used to trigger recomputation of kioskOpen/tvOpen every minute
+
+    // Toggle tick aligned to minute boundaries to trigger kioskOpen/tvOpen recomputation
+    useEffect(() => {
+        const now = new Date();
+        const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+        let interval: ReturnType<typeof setInterval>;
+
+        const timeout = setTimeout(() => {
+            setTick((t) => !t);
+            interval = setInterval(() => setTick((t) => !t), 60000);
+        }, msToNextMinute);
+
+        return () => {
+            clearTimeout(timeout);
+            if (interval) clearInterval(interval);
+        };
+    }, []);
+
+    //TODO: use openingHoursLoading instead of "notSet"
+    const kioskOpen = useMemo((): boolean | "notSet" => {
+        if (!openingHours || !globalSettings) return "notSet";
+        return isKioskOpen(openingHours, globalSettings, globalSettings.kiosk_open_offset);
+        // tick is intentionally included to recompute every minute
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [openingHours, globalSettings, tick]);
+
+    const tvOpen = useMemo((): boolean | "notSet" => {
+        if (!openingHours || !globalSettings) return "notSet";
+        return isKioskOpen(openingHours, globalSettings, 0, globalSettings.tv_close_offset);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [openingHours, globalSettings, tick]);
 
     const executeOpeningHoursScripts = useCallback(
         (isOpen: boolean) => {
@@ -59,66 +89,6 @@ export default function App() {
         if (kioskOpen === "notSet") return;
         executeOpeningHoursScripts(kioskOpen);
     }, [kioskOpen, executeOpeningHoursScripts]);
-
-    // Set initial kioskOpen and tvOpen states
-    useEffect(() => {
-        if (!openingHours || !globalSettings) return;
-        setKioskOpen(isKioskOpen(openingHours, globalSettings, globalSettings.kiosk_open_offset));
-        setTvOpen(isKioskOpen(openingHours, globalSettings, 0, globalSettings.tv_close_offset));
-    }, [openingHours, globalSettings]);
-
-    // Set up periodic checks for kiosk/tv state changes
-    useEffect(() => {
-        // Calculate ms until next full minute
-        const now = new Date();
-        const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-        let interval: ReturnType<typeof setInterval>;
-
-        const timeout = setTimeout(() => {
-            const newKioskOpen = isKioskOpen(
-                openingHours || [],
-                globalSettings,
-                globalSettings?.kiosk_open_offset ?? 0,
-            );
-            if (newKioskOpen !== kioskOpen) {
-                setKioskOpen(newKioskOpen);
-            }
-            const newTvOpen = isKioskOpen(
-                openingHours || [],
-                globalSettings,
-                0,
-                globalSettings?.tv_close_offset ?? 0,
-            );
-            if (newTvOpen !== tvOpen) {
-                setTvOpen(newTvOpen);
-            }
-
-            interval = setInterval(() => {
-                const newKioskOpen = isKioskOpen(
-                    openingHours || [],
-                    globalSettings,
-                    globalSettings?.kiosk_open_offset ?? 0,
-                );
-                if (newKioskOpen !== kioskOpen) {
-                    setKioskOpen(newKioskOpen);
-                }
-                const newTvOpen = isKioskOpen(
-                    openingHours || [],
-                    globalSettings,
-                    0,
-                    globalSettings?.tv_close_offset ?? 0,
-                );
-                if (newTvOpen !== tvOpen) {
-                    setTvOpen(newTvOpen);
-                }
-            }, 60000);
-        }, msToNextMinute);
-        return () => {
-            clearTimeout(timeout);
-            if (interval) clearInterval(interval);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [openingHours, globalSettings]);
 
     useEffect(() => {
         if (globalSettings?.locale) {
