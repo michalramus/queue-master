@@ -4,7 +4,7 @@ import { Button, Card } from "shared-components";
 import {
     callAgainForClient,
     ClientInterface,
-    // removeClient,
+    removeClient,
     setClientAsInService,
 } from "shared-utils";
 import { axiosAuthInstance } from "@/utils/axiosInstances/axiosAuthInstance";
@@ -50,11 +50,11 @@ export default function InServicePanel({
     }, [clientNumber, currentTicketText]);
 
     //Handlers
-    // function finishClientHandler() {
-    //     if (clientNumber) {
-    //         removeClient(clientNumber, axiosAuthInstance);
-    //     }
-    // }
+    function finishClientHandler() {
+        if (clientNumber) {
+            removeClient(clientNumber, axiosAuthInstance);
+        }
+    }
 
     async function nextClientHandler() {
         setLockNextClientButton(true);
@@ -99,14 +99,14 @@ export default function InServicePanel({
 
                 <div className="mt-4 flex flex-row justify-center">
                     {/* TODO: change from finighClient to waitingRoom */}
-                    {/* <Button
+                    <Button
                         onClick={finishClientHandler}
                         color="red"
                         disabled={clientNumber ? false : true}
                         className="h-28 w-1/3 text-2xl!"
                     >
                         {t("finish")}
-                    </Button> */}
+                    </Button>
 
                     <Button
                         onClick={callAgainHandler}
