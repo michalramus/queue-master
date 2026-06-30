@@ -24,6 +24,9 @@ export class ClientsService {
     private readonly deskSelect = { id: true, desk_number: true, desk_name: true } as const;
 
     async create(createClientDto: ClientCreateDto, entity: Entity): Promise<ClientResponseDto> {
+        // Reset counter if conditions are met, then re-fetch category to get updated counter
+        await this.resetCounterAfterTime(createClientDto.categoryId);
+
         // Check if category exists
         const category = await this.databaseService.category.findUnique({
             where: { id: createClientDto.categoryId },
@@ -34,9 +37,6 @@ export class ClientsService {
             );
             throw new NotFoundException("Category not found");
         }
-
-        // Reset counter if conditions are met, then re-fetch category to get updated counter
-        await this.resetCounterAfterTime(createClientDto.categoryId);
 
         // Prepare client number
         let counter = category.counter + 1;
