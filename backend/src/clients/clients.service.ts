@@ -27,47 +27,48 @@ export class ClientsService {
         // Reset counter if conditions are met, then re-fetch category to get updated counter
         await this.resetCounterAfterTime(createClientDto.categoryId);
 
-        // Check if category exists
-        const category = await this.databaseService.category.findUnique({
-            where: { id: createClientDto.categoryId },
-        });
-        if (!category) {
-            this.logger.warn(
-                `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
-            );
-            throw new NotFoundException("Category not found");
-        }
+        const dbClient = await this.databaseService.$transaction(async (tx) => {
+            // Check if category exists
+            const category = await tx.category.findUnique({
+                where: { id: createClientDto.categoryId },
+            });
+            if (!category) {
+                this.logger.warn(
+                    `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
+                );
+                throw new NotFoundException("Category not found");
+            }
 
-        // Prepare client number
-        let counter = category.counter + 1;
-        if (counter > this.maxClientsCounter) {
-            this.logger.log(
-                `Counter exceeded ${this.maxClientsCounter}. Resetting counter to 1 for category ${category.short_name}`,
-            );
-            counter = 1;
-        }
+            // Prepare client number
+            let counter = category.counter + 1;
+            if (counter > this.maxClientsCounter) {
+                this.logger.log(
+                    `Counter exceeded ${this.maxClientsCounter}. Resetting counter to 1 for category ${category.short_name}`,
+                );
+                counter = 1;
+            }
 
-        await this.databaseService.category.update({
-            where: { id: createClientDto.categoryId },
-            data: { counter: counter },
-        });
+            await tx.category.update({
+                where: { id: createClientDto.categoryId },
+                data: { counter: counter },
+            });
 
-        // Create client
-        const dbClient = await this.databaseService.client.create({
-            data: {
-                number: counter,
-                status: "Waiting",
-                language: createClientDto.language,
-                category: {
-                    connect: {
-                        id: createClientDto.categoryId,
+            return tx.client.create({
+                data: {
+                    number: counter,
+                    status: "Waiting",
+                    language: createClientDto.language,
+                    category: {
+                        connect: {
+                            id: createClientDto.categoryId,
+                        },
                     },
                 },
-            },
-            include: {
-                category: true,
-                desk: { select: this.deskSelect },
-            },
+                include: {
+                    category: true,
+                    desk: { select: this.deskSelect },
+                },
+            });
         });
 
         const queueLength =
