@@ -82,13 +82,13 @@ export default function InServicePanel({
     }
 
     return (
-        <div className="w-full lg:ml-2">
+        <div className="w-full xl:ml-2">
             <Card className="w-full">
-                <h5 className="mb-2 text-center text-2xl tracking-tight">
+                <h5 className="mb-2 text-center text-lg tracking-tight sm:text-xl lg:text-2xl">
                     <span>
                         {t("number")}:
                         <span
-                            className={`text-3xl font-bold transition-opacity duration-300 ease-in-out ${
+                            className={`text-xl font-bold transition-opacity duration-300 ease-in-out sm:text-2xl lg:text-3xl ${
                                 isCurrentTicketTextAnimating ? "opacity-0" : "opacity-100"
                             }`}
                         >
@@ -103,7 +103,7 @@ export default function InServicePanel({
                         onClick={finishClientHandler}
                         color="red"
                         disabled={clientNumber ? false : true}
-                        className="h-28 w-1/3 text-2xl!"
+                        className="h-28 w-1/3 text-base! sm:text-xl! lg:text-2xl!"
                     >
                         {t("finish")}
                     </Button>
@@ -112,14 +112,16 @@ export default function InServicePanel({
                         onClick={callAgainHandler}
                         color={clientNumber ? "blue" : "gray"}
                         disabled={!clientNumber || isCallAgainLoading}
-                        className={`h-28 w-1/3 text-2xl! transition-all duration-200 ${
+                        className={`h-28 w-1/3 text-base! transition-all duration-200 sm:text-xl! lg:text-2xl! ${
                             isCallAgainLoading ? "scale-95 animate-pulse" : "scale-100"
                         }`}
                     >
                         {isCallAgainLoading ? (
                             <div className="flex items-center justify-center gap-1 px-1">
                                 <div className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                <span className="text-lg">{t("calling")}...</span>
+                                <span className="text-sm sm:text-base lg:text-lg">
+                                    {t("calling")}...
+                                </span>
                             </div>
                         ) : (
                             t("call_again")
@@ -129,7 +131,7 @@ export default function InServicePanel({
                         onClick={nextClientHandler}
                         color={nextClientNumber ? "green" : "gray"}
                         disabled={nextClientNumber && !lockNextClientButton ? false : true}
-                        className="h-28 w-1/3 text-2xl!"
+                        className="h-28 w-1/3 text-base! sm:text-xl! lg:text-2xl!"
                     >
                         {t("next")}
                     </Button>

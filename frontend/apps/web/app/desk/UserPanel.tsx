@@ -32,21 +32,35 @@ export default function UserPanel({
     };
 
     return (
-        <Card className="flex flex-nowrap items-center py-0!">
-            <p className="mr-2">
+        <Card className="flex flex-col items-center py-2! sm:flex-row sm:py-0!">
+            <p className="mb-1 text-xs whitespace-nowrap sm:mr-2 sm:mb-0 sm:text-sm">
                 {t("user")}: {username}
             </p>
-            {adminButton && (
-                <Button onClick={handleAdminClick} color="blue">
-                    {t("admin_dashboard")}
+            <div className="flex flex-nowrap items-center">
+                {adminButton && (
+                    <Button
+                        onClick={handleAdminClick}
+                        color="blue"
+                        className="text-xs! whitespace-nowrap sm:text-sm!"
+                    >
+                        {t("admin_dashboard")}
+                    </Button>
+                )}
+                <Button
+                    onClick={() => setIsSettingsModalOpen(true)}
+                    color="primary"
+                    className="text-xs! whitespace-nowrap sm:text-sm!"
+                >
+                    {t("settings")}
                 </Button>
-            )}
-            <Button onClick={() => setIsSettingsModalOpen(true)} color="primary">
-                {t("settings")}
-            </Button>
-            <Button color="red" onClick={handleLogout}>
-                {t("logout")}
-            </Button>
+                <Button
+                    color="red"
+                    onClick={handleLogout}
+                    className="text-xs! whitespace-nowrap sm:text-sm!"
+                >
+                    {t("logout")}
+                </Button>
+            </div>
             <UserSettingsModal
                 isOpen={isSettingsModalOpen}
                 onClose={() => setIsSettingsModalOpen(false)}

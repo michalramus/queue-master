@@ -21,7 +21,7 @@ export default function Table({
                 <thead className={`text-md border-gray-1 text-text-2 border-b-2 ${theadClassName}`}>
                     <tr>
                         {columns.map((column, index) => (
-                            <th key={index} scope="col" className="px-6 py-1">
+                            <th key={index} scope="col" className="px-2 py-1 sm:px-4 lg:px-6">
                                 {column}
                             </th>
                         ))}
@@ -34,7 +34,10 @@ export default function Table({
                             className={`border-gray-1 border-opacity-50 border-b-2 ${tbodyClassName}`}
                         >
                             {row.map((element, elementIndex) => (
-                                <td key={elementIndex} className={`px-6 py-2 ${tdBodyClassName}`}>
+                                <td
+                                    key={elementIndex}
+                                    className={`px-2 py-2 sm:px-4 lg:px-6 ${tdBodyClassName}`}
+                                >
                                     {element}
                                 </td>
                             ))}

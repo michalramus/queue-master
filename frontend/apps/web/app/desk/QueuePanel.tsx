@@ -122,18 +122,18 @@ export default function QueuePanel({ clients }: { clients: ClientInterface[] }) 
 
     return (
         <div className="flex flex-row flex-wrap-reverse justify-center self-start pt-10">
-            <div className="w-full lg:w-6/12">
+            <div className="w-full min-w-0 xl:w-6/12">
                 {authInfo && !deskId ? (
                     <div className="border-yellow-1 mb-5 w-fit rounded-lg border-2 px-3 py-2">
                         <p className="text-text-1 font-semibold">{t("no_desk_assigned")}</p>
                         <p className="text-text-2 text-sm">{t("no_desk_assigned_description")}</p>
                     </div>
                 ) : deskName || activeCategoryBadges.length > 0 ? (
-                    <div className="border-primary-1 mb-5 w-fit rounded-lg border-2 px-2">
+                    <div className="border-primary-1 mb-5 flex w-fit items-center gap-4 rounded-lg border-2 px-2 py-2">
                         {deskName && <p className="text-text-1 font-semibold">{deskName}</p>}
                         <p>{t("active_categories")}</p>
                         {activeCategoryBadges.length > 0 ? (
-                            <div className="mb-3 flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 {activeCategoryBadges.map((cat) => (
                                     <Badge key={cat.id} color="primary">
                                         {cat.short_name}
@@ -141,7 +141,7 @@ export default function QueuePanel({ clients }: { clients: ClientInterface[] }) 
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-text-2 mb-3 text-sm">{t("no_active_categories")}</p>
+                            <p className="text-text-2 text-sm">{t("no_active_categories")}</p>
                         )}
                     </div>
                 ) : null}
@@ -152,7 +152,7 @@ export default function QueuePanel({ clients }: { clients: ClientInterface[] }) 
                     />
                 )}
             </div>
-            <div className="mb-5 flex w-full flex-col items-center lg:w-6/12">
+            <div className="mb-5 flex w-full flex-col items-center xl:w-6/12">
                 <div
                     className={`grid w-full transition-[grid-template-rows] duration-300 ease-in-out ${showWarning ? "mb-4 grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
                 >

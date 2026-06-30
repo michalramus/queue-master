@@ -78,10 +78,10 @@ export default function ClientTable({
     const rows: (string | number | ReactNode | null)[][] = [];
     filteredClientNumbers?.forEach((client, index) =>
         rows.push([
-            <span key={index} className="text-2xl font-bold">
+            <span key={index} className="text-lg font-bold sm:text-xl lg:text-2xl">
                 {client.category?.short_name + client.number}
             </span>,
-            <span key={index} className="text-text-2 text-lg">
+            <span key={index} className="text-text-2 text-sm sm:text-base lg:text-lg">
                 {client.category.name[locale as LangCode] || client.category.short_name}
             </span>,
             <span key={index} className="flex items-center justify-center">
@@ -93,20 +93,23 @@ export default function ClientTable({
                     className="rounded border border-gray-300"
                 />
             </span>,
-            <span key={index} className="text-base">
+            <span key={index} className="text-xs sm:text-sm lg:text-base">
                 {new Date(client.creation_date).toLocaleTimeString("pl-PL")}
                 <br />
                 <span className="text-text-2">
                     {new Date(client.creation_date).toISOString().split("T")[0]}
                 </span>
             </span>,
-            <span key={index} className="flex grow flex-wrap-reverse justify-center">
+            <span
+                key={index}
+                className="flex flex-col-reverse items-center sm:flex-row sm:flex-wrap-reverse sm:justify-center"
+            >
                 <Button
                     onClick={() => handleDeleteClick(client)}
                     color="red"
                     className="flex items-center"
                 >
-                    <span className="mr-2">{t("delete")}</span>
+                    <span className="mr-2 hidden sm:inline">{t("delete")}</span>
                     <RejectIcon />
                 </Button>
                 <Button
@@ -114,7 +117,7 @@ export default function ClientTable({
                     color="green"
                     className="flex items-center"
                 >
-                    <span className="mr-2">{t("choose")}</span>
+                    <span className="mr-2 hidden sm:inline">{t("choose")}</span>
                     <AcceptIcon />
                 </Button>
             </span>,
