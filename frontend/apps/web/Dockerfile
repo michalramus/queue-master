@@ -3,6 +3,7 @@ WORKDIR /app
 
 COPY frontend/package.json frontend/yarn.lock frontend/.yarnrc.yml ./frontend/
 COPY frontend/apps/web/package.json ./frontend/apps/web/
+COPY frontend/apps/kiosk/package.json ./frontend/apps/kiosk/
 COPY frontend/packages/shared-components/package.json ./frontend/packages/shared-components/
 COPY frontend/packages/shared-utils/package.json ./frontend/packages/shared-utils/
 
