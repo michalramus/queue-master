@@ -65,7 +65,7 @@ export class ClientsService {
                     },
                 },
                 include: {
-                    category: true,
+                    category: { select: { id: true, short_name: true } },
                     desk: { select: this.deskSelect },
                 },
             });
@@ -74,7 +74,7 @@ export class ClientsService {
         const queueLength =
             (await this.databaseService.client.count({
                 where: { status: "Waiting", category_id: createClientDto.categoryId },
-            })) - 1;
+            })) - 1; // Subtract 1 to exclude the newly created client
 
         const client = await this.addCategoryNameFieldToClient({ queue_length: queueLength, ...dbClient });
 
@@ -141,7 +141,7 @@ export class ClientsService {
             where: { id: id, NOT: { status: updateClientDto.status } },
             data: { status: updateClientDto.status, desk_id: updateClientDto.desk_id },
             include: {
-                category: true,
+                category: { select: { id: true, short_name: true } },
                 desk: { select: this.deskSelect },
             },
         });
@@ -163,7 +163,7 @@ export class ClientsService {
         // Check if client exists
         const dbClient = await this.databaseService.client.findUnique({
             where: { id: id },
-            include: { category: true, desk: { select: this.deskSelect } },
+            include: { category: { select: { id: true, short_name: true } }, desk: { select: this.deskSelect } },
         });
         if (!dbClient) {
             this.logger.warn(`NotFoundException: Client with id ${id} not found when calling again`);
@@ -189,7 +189,7 @@ export class ClientsService {
 
         const dbClient = await this.databaseService.client.delete({
             where: { id: id },
-            include: { category: true, desk: { select: this.deskSelect } },
+            include: { category: { select: { id: true, short_name: true } }, desk: { select: this.deskSelect } },
         });
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
