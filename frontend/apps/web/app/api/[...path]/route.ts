@@ -5,6 +5,32 @@ export const maxDuration = 300;
 // Regex at the end to remove trailing slash if any
 const BACKEND_URL = process.env.BACKEND_URL?.replace(/\/$/, "") || "http://localhost:3001";
 
+// Keep track of active backend fetch requests to kill them instantly on Ctrl+C
+const activeControllers = new Set<AbortController>();
+
+// Register process listeners only once (safeguard against hot-reloads)
+if (typeof process !== "undefined" && !(globalThis as any).__SIGINT_HANDLER_SET) {
+    (globalThis as any).__SIGINT_HANDLER_SET = true;
+
+    const cleanExit = () => {
+        if (activeControllers.size > 0) {
+            process.stdout.write(
+                `\nStopping proxy: Force aborting ${activeControllers.size} active connections...\n`,
+            );
+            for (const controller of activeControllers) {
+                try {
+                    controller.abort();
+                } catch {}
+            }
+            activeControllers.clear();
+        }
+        process.exit(0);
+    };
+
+    process.once("SIGINT", cleanExit);
+    process.once("SIGTERM", cleanExit);
+}
+
 async function proxyRequest(req: Request, path: string, method: string) {
     const url = new URL(req.url);
     const backendUrl = `${BACKEND_URL}/api/${path}${url.search}`;
@@ -14,11 +40,13 @@ async function proxyRequest(req: Request, path: string, method: string) {
 
     // Create an independent AbortController for the backend fetch
     const backendController = new AbortController();
+    activeControllers.add(backendController);
 
     // Link the client's disconnect to the backend fetch directly
-    req.signal.addEventListener("abort", () => {
+    const onAbort = () => {
         backendController.abort();
-    });
+    };
+    req.signal.addEventListener("abort", onAbort);
 
     try {
         const response = await fetch(backendUrl, {
@@ -48,8 +76,8 @@ async function proxyRequest(req: Request, path: string, method: string) {
             headers: response.headers,
         });
     } catch (error) {
-        // If the browser simply disconnected, respond with a standard 499 quietly
-        if (req.signal.aborted) {
+        // If the browser disconnected or process exited, respond quietly
+        if (req.signal.aborted || backendController.signal.aborted) {
             return new Response("Client disconnected", { status: 499 });
         }
 
@@ -57,8 +85,13 @@ async function proxyRequest(req: Request, path: string, method: string) {
             `Error while connecting to backend: ${method} ${backendUrl} — ${error instanceof Error ? error.message : String(error)}\n`,
         );
         return new Response("Error while connecting to backend", { status: 502 });
+    } finally {
+        // Cleanup to prevent event listener and set tracking leaks
+        req.signal.removeEventListener("abort", onAbort);
+        activeControllers.delete(backendController);
     }
 }
+
 export async function GET(request: Request, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
     return proxyRequest(request, path.join("/"), "GET");
