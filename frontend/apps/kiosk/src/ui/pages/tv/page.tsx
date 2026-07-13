@@ -52,6 +52,7 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
         function onClientToShow(event: MessageEvent) {
             const client: ClientInterface = JSON.parse(event.data);
             setNewClientsQueue((e) => [...e, client]);
+            console.log(`New client to show: ${client.category.short_name}${client.number}`);
         }
 
         addEventListener(sseEvents.ClientInService, onClientToShow);
@@ -68,6 +69,19 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
         currentClientRef.current = currentClient;
         previousClientsRef.current = previousClients;
     }, [currentClient, previousClients]);
+
+    //TODO: Remove this log after testing
+    useEffect(() => {
+        if (previousClientsRef.current?.length !== 0) {
+            console.log(
+                `Previous clients updated: ${previousClientsRef.current?.map((e) => e.category.short_name + e.number).join(", ")}`,
+            );
+        }
+        if (currentClientRef.current)
+            console.log(
+                `Current client updated: ${currentClientRef.current?.category.short_name}${currentClientRef.current?.number}`,
+            );
+    }, [previousClients, currentClient]);
 
     /**
      * Play audio and update previousClients and currentClient in order to show it on the screen
