@@ -29,6 +29,8 @@ export class OpeningHoursService {
     }
 
     async create(createDto: CreateOpeningHoursDto, entity: Entity): Promise<Opening_Hours[]> {
+        const updatedHours: DayOfWeek[] = [];
+
         for (const dayHours of createDto.opening_hours) {
             if (!dayHours.is_closed) {
                 if (!dayHours.open_time || !dayHours.close_time) {
@@ -78,7 +80,7 @@ export class OpeningHoursService {
                     where: { day_of_week: dayHours.day_of_week },
                     data: updateData,
                 });
-                this.logger.log(`[${entity.name}] Overriding existing opening hours for ${dayHours.day_of_week}`);
+                updatedHours.push(dayHours.day_of_week);
             } else {
                 // Create new opening hours
                 await this.databaseService.opening_Hours.create({
@@ -89,7 +91,7 @@ export class OpeningHoursService {
                         close_time: dayHours.close_time || "17:00",
                     },
                 });
-                this.logger.log(`[${entity.name}] Creating new opening hours for ${dayHours.day_of_week}`);
+                this.logger.log(`[${entity.name}] Created new opening hours for ${dayHours.day_of_week}`);
             }
         }
 
@@ -97,7 +99,7 @@ export class OpeningHoursService {
 
         const results = await this.findAll();
 
-        this.logger.log(`[${entity.name}] Successfully processed ${results.length} opening hours entries`);
+        this.logger.log(`[${entity.name}] Successfully updated opening hours for ${updatedHours.join(", ")}`);
 
         return results;
     }
