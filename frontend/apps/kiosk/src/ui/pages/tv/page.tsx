@@ -52,7 +52,6 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
         function onClientToShow(event: MessageEvent) {
             const client: ClientInterface = JSON.parse(event.data);
             setNewClientsQueue((e) => [...e, client]);
-            console.log(`New client to show: ${client.category.short_name}${client.number}`);
         }
 
         addEventListener(sseEvents.ClientInService, onClientToShow);
@@ -70,23 +69,10 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
         previousClientsRef.current = previousClients;
     }, [currentClient, previousClients]);
 
-    //TODO: Remove this log after testing
-    useEffect(() => {
-        if (previousClientsRef.current?.length !== 0) {
-            console.log(
-                `Previous clients updated: ${previousClientsRef.current?.map((e) => e.category.short_name + e.number).join(", ")}`,
-            );
-        }
-        if (currentClientRef.current)
-            console.log(
-                `Current client updated: ${currentClientRef.current?.category.short_name}${currentClientRef.current?.number}`,
-            );
-    }, [previousClients, currentClient]);
-
     /**
      * Play audio and update previousClients and currentClient in order to show it on the screen
      * Processes one client at a time; next client is triggered by audioSynthesizerComplete IPC event
-     * If number is already in previousClients it won't be added again, but audio will be played
+     * If client id is already in previousClients it won't be added again, but audio will be played
      */
     const showNextClient = useCallback(async () => {
         //Protect from multiple calls at the same time
@@ -101,8 +87,8 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
         }
 
         if (
-            currentClientRef.current?.number != client.number &&
-            previousClientsRef.current?.findIndex((e) => e.number === client.number) === -1
+            currentClientRef.current?.id !== client.id &&
+            previousClientsRef.current?.findIndex((e) => e.id === client.id) === -1
         ) {
             //Update previousClients and currentClient
             setPreviousClients((e) => {
@@ -112,6 +98,9 @@ export default function TVPage({ tvOpen, openingHours, multilingualSettings }: T
                 return newClients.slice(0, maxHistory);
             });
             setCurrentClient(client);
+            console.log(
+                `Showing client: ${client.category.short_name}${client.number}, desk: ${client.desk?.desk_number ?? "none"}`,
+            );
         }
 
         //Play audio - mutex released when audioSynthesizerComplete IPC arrives
