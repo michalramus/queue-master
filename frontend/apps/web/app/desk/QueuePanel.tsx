@@ -2,7 +2,7 @@
 
 import ClientTable from "./ClientTable";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import InServicePanel from "./InServicePanel";
 import {
@@ -96,6 +96,17 @@ export default function QueuePanel({ clients }: { clients: ClientInterface[] }) 
             removeEventListener(sseEvents.UserChanged, onUserChanged);
         };
     }, [queryClient, deskId, authInfo, addEventListener, removeEventListener]);
+
+    // Re-sync clients on SSE reconnect: events emitted while disconnected are lost,
+    // so a false->true transition of isConnected refetches the current lists
+    const prevConnected = useRef<boolean>(isConnected);
+    useEffect(() => {
+        if (!prevConnected.current && isConnected) {
+            queryClient.invalidateQueries({ queryKey: ["waitingClients"] });
+            queryClient.invalidateQueries({ queryKey: ["inServiceClients", deskId] });
+        }
+        prevConnected.current = isConnected;
+    }, [isConnected, queryClient, deskId]);
 
     // Request notification permission on component mount
     useEffect(() => {

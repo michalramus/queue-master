@@ -1,9 +1,14 @@
+import { Agent } from "undici";
+
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 // Regex at the end to remove trailing slash if any
 const BACKEND_URL = process.env.BACKEND_URL?.replace(/\/$/, "") || "http://localhost:3001";
+
+// SSE connections must never hit undici's default 5-min body timeout
+const sseAgent = new Agent({ bodyTimeout: 0, headersTimeout: 60_000 });
 
 // Keep track of active backend fetch requests to kill them instantly on Ctrl+C
 const activeControllers = new Set<AbortController>();
@@ -48,13 +53,19 @@ async function proxyRequest(req: Request, path: string, method: string) {
     };
     req.signal.addEventListener("abort", onAbort);
 
+    const isSSE = path === "sse/events";
+
     try {
-        const response = await fetch(backendUrl, {
+        const fetchOptions: RequestInit & { dispatcher?: Agent } = {
             method,
             headers,
             body: method !== "GET" && method !== "HEAD" ? await req.arrayBuffer() : undefined,
             signal: backendController.signal,
-        });
+        };
+        if (isSSE) {
+            fetchOptions.dispatcher = sseAgent;
+        }
+        const response = await fetch(backendUrl, fetchOptions);
 
         const contentType = response.headers.get("content-type");
 
