@@ -1,11 +1,9 @@
 import { Agent } from "undici";
+import { getBackendUrl } from "@/utils/getBackendUrl";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 300;
-
-// Regex at the end to remove trailing slash if any
-const BACKEND_URL = process.env.BACKEND_URL?.replace(/\/$/, "") || "http://localhost:3001";
 
 // SSE connections must never hit undici's default 5-min body timeout
 const sseAgent = new Agent({ bodyTimeout: 0, headersTimeout: 60_000 });
@@ -38,7 +36,7 @@ if (typeof process !== "undefined" && !(globalThis as any).__SIGINT_HANDLER_SET)
 
 async function proxyRequest(req: Request, path: string, method: string) {
     const url = new URL(req.url);
-    const backendUrl = `${BACKEND_URL}/api/${path}${url.search}`;
+    const backendUrl = `${getBackendUrl()}/api/${path}${url.search}`;
 
     const headers = new Headers(req.headers);
     headers.delete("host");

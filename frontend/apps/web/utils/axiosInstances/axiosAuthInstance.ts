@@ -1,14 +1,12 @@
 import axios from "axios";
+import { getBackendUrl } from "@/utils/getBackendUrl";
 import { getCookie } from "cookies-next";
 import { AxiosAuthInstance, logout, refreshJWTToken } from "shared-utils";
 import { axiosPureInstance } from "./axiosPureInstance";
 
 export const axiosAuthInstance: AxiosAuthInstance = {
     auth: axios.create({
-        baseURL:
-            typeof window === "undefined"
-                ? `${process.env.BACKEND_URL?.replace(/\/$/, "") || "http://localhost:3001"}/api`
-                : "/api",
+        baseURL: typeof window === "undefined" ? `${getBackendUrl()}/api` : "/api",
         withCredentials: true,
     }),
 };

@@ -1,12 +1,10 @@
 import axios from "axios";
+import { getBackendUrl } from "@/utils/getBackendUrl";
 import { AxiosPureInstance } from "shared-utils";
 
 export const axiosPureInstance: AxiosPureInstance = {
     pure: axios.create({
-        baseURL:
-            typeof window === "undefined"
-                ? `${process.env.BACKEND_URL?.replace(/\/$/, "") || "http://localhost:3001"}/api`
-                : "/api",
+        baseURL: typeof window === "undefined" ? `${getBackendUrl()}/api` : "/api",
         withCredentials: true,
     }),
 };
