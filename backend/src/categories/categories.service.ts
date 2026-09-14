@@ -26,9 +26,17 @@ export class CategoriesService {
         desk_name: true,
     } as const;
 
+    private readonly categorySelect = {
+        id: true,
+        short_name: true,
+        is_enabled: true,
+        categories_desks: { select: { desk: { select: this.deskSelect } } },
+    } as const;
+
     private async buildCategoryResponse(category: {
         id: number;
         short_name: string;
+        is_enabled: boolean;
         categories_desks: { desk: DeskResponseDto }[];
     }): Promise<CategoryResponseDto> {
         const name = await this.multilingualTextService.getMultilingualText(
@@ -38,6 +46,7 @@ export class CategoriesService {
         return {
             id: category.id,
             short_name: category.short_name,
+            is_enabled: category.is_enabled,
             name,
             desks: category.categories_desks.map((cd) => cd.desk),
         };
@@ -46,11 +55,7 @@ export class CategoriesService {
     async findAll(): Promise<CategoryResponseDto[]> {
         const categories = await this.databaseService.category.findMany({
             orderBy: [{ id: "asc" }],
-            select: {
-                id: true,
-                short_name: true,
-                categories_desks: { select: { desk: { select: this.deskSelect } } },
-            },
+            select: this.categorySelect,
         });
 
         this.logger.debug(`Retrieved ${categories.length} categories`);
@@ -60,11 +65,7 @@ export class CategoriesService {
     async findOne(id: number): Promise<CategoryResponseDto> {
         const category = await this.databaseService.category.findUnique({
             where: { id },
-            select: {
-                id: true,
-                short_name: true,
-                categories_desks: { select: { desk: { select: this.deskSelect } } },
-            },
+            select: this.categorySelect,
         });
 
         if (!category) {
@@ -93,12 +94,14 @@ export class CategoriesService {
         const category = await this.databaseService.category.create({
             data: {
                 short_name: createCategoryDto.short_name,
+                is_enabled: createCategoryDto.is_enabled ?? true,
                 counter: 0, // Initialize counter to 0
                 last_counter_reset: new Date(), // Set to current date
             },
             select: {
                 id: true,
                 short_name: true,
+                is_enabled: true,
             },
         });
 
@@ -116,6 +119,7 @@ export class CategoriesService {
         return {
             id: category.id,
             short_name: category.short_name,
+            is_enabled: category.is_enabled,
             name: createCategoryDto.name,
             desks: [],
         };
@@ -147,12 +151,13 @@ export class CategoriesService {
             }
         }
 
-        // Update category short name if provided
-        if (updateCategoryDto.short_name) {
+        // Update category short name and/or enabled flag if provided
+        if (updateCategoryDto.short_name || updateCategoryDto.is_enabled !== undefined) {
             await this.databaseService.category.update({
                 where: { id },
                 data: {
                     short_name: updateCategoryDto.short_name,
+                    is_enabled: updateCategoryDto.is_enabled,
                 },
             });
         }
@@ -169,11 +174,7 @@ export class CategoriesService {
         // Fetch updated category
         const updatedCategory = await this.databaseService.category.findUnique({
             where: { id },
-            select: {
-                id: true,
-                short_name: true,
-                categories_desks: { select: { desk: { select: this.deskSelect } } },
-            },
+            select: this.categorySelect,
         });
 
         this.sseService.emit(sseEvents.CategoriesChanged, null);
@@ -255,11 +256,7 @@ export class CategoriesService {
 
         const updated = await this.databaseService.category.findUnique({
             where: { id },
-            select: {
-                id: true,
-                short_name: true,
-                categories_desks: { select: { desk: { select: this.deskSelect } } },
-            },
+            select: this.categorySelect,
         });
         return this.buildCategoryResponse(updated);
     }
@@ -286,11 +283,7 @@ export class CategoriesService {
 
         const updated = await this.databaseService.category.findUnique({
             where: { id },
-            select: {
-                id: true,
-                short_name: true,
-                categories_desks: { select: { desk: { select: this.deskSelect } } },
-            },
+            select: this.categorySelect,
         });
         return this.buildCategoryResponse(updated);
     }

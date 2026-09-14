@@ -11,7 +11,7 @@ const deskSelect = {
     desk_name: true,
     categories_desks: {
         select: {
-            category: { select: { id: true, short_name: true } },
+            category: { select: { id: true, short_name: true, is_enabled: true } },
         },
     },
 } as const;
@@ -20,7 +20,7 @@ function mapDeskResponse(desk: {
     id: number;
     desk_number: number;
     desk_name: string;
-    categories_desks: { category: { id: number; short_name: string } }[];
+    categories_desks: { category: { id: number; short_name: string; is_enabled: boolean } }[];
 }): DeskResponseDto {
     return {
         id: desk.id,
