@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import { networkInterfaces } from "os";
 import path from "path";
 import { ClientInterface } from "shared-utils";
+import { loadAppConfig } from "./appConfig.js";
 
 let config: AppConfigInterface;
 let mainWindow: BrowserWindow;
@@ -199,14 +200,9 @@ function createWindow(zoomFactor: number = 1) {
     }
 }
 
-async function fetchConfig() {
-    const configPath = path.resolve(process.argv[process.argv.length - 1]);
-
-    //TODO: Use config engine
+function fetchConfig(): void {
     try {
-        const _config = await import(configPath, { with: { type: "json" } });
-        //TODO: validate config
-        config = _config.default;
+        config = loadAppConfig();
         config.backendUrl = config.backendUrl.replace(/\/$/, "") + "/api"; //Add /api backend prefix
     } catch (e) {
         console.error(e);
@@ -215,7 +211,7 @@ async function fetchConfig() {
 }
 
 app.on("ready", async () => {
-    await fetchConfig();
+    fetchConfig();
 
     ipcMain.on("executePrintTicket", onExecutePrintTicket);
     ipcMain.on("executeOpenKioskScript", onExecuteOpenKioskScript);

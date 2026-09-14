@@ -1,0 +1,13 @@
+{
+    "JWTToken": "device-jwt-goes-here",
+    "backendUrl": "http://localhost:3001",
+    "mode": "kiosk",
+    "zoomFactor": 1.0,
+    "printingScript": "",
+    "printingDialogueShowTime": 1000,
+    "audioSynthesizerScript": "",
+    "openingHoursEnableBanner": true,
+    "openingHoursEnableScripts": false,
+    "openingHoursOpenScript": "",
+    "openingHoursCloseScript": ""
+}
