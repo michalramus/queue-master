@@ -6,10 +6,20 @@ import { LoggingInterceptor } from "./middleware/logging.interceptor";
 import cookieParser = require("cookie-parser");
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { ValidationPipe } from "@nestjs/common";
+import { ValidationPipe, Logger } from "@nestjs/common";
+import { loadAppConfig } from "./settings/appConfig.loader";
 
 async function bootstrap() {
-    ConfigModule.forRoot();
+    ConfigModule.forRoot(); // Puts .env into the environment, below the external config file
+
+    try {
+        loadAppConfig();
+    } catch (error) {
+        new Logger("AppConfig").fatal(
+            `Invalid configuration: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        process.exit(1);
+    }
 
     let log_level: ("verbose" | "debug" | "log" | "warn" | "error" | "fatal")[];
     switch (process.env.NODE_ENV) {
