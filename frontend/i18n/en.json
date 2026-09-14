@@ -22,6 +22,11 @@
     "category": "Category",
     "categories": "Categories",
     "category_list_is_empty": "Category list is empty",
+    "category_enabled": "Category enabled",
+    "category_enabled_description": "When disabled, clients cannot take new tickets for this category",
+    "category_disabled_description": "Category is disabled - clients cannot take new tickets for it",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
     "choose": "Choose",
     "choose_category": "Choose category",
     "close": "Close",
@@ -322,7 +327,6 @@
     "preview_title": "Title",
     "text_shown_on_kiosk": "Text shown on kiosk",
     "use_mdx_editor": "Use MDX editor",
-    "active_categories": "Active categories:",
-    "no_active_categories": "No active categories",
+    "no_categories": "No categories",
     "sse_disconnected_warning": "Connection to server lost. Data may be outdated."
 }

@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Modal, Button, Spinner, Input, Select, Badge, RejectIcon } from "shared-components";
+import {
+    Modal,
+    Button,
+    Spinner,
+    Input,
+    Select,
+    Badge,
+    Checkbox,
+    RejectIcon,
+} from "shared-components";
 import { showToast } from "@/utils/toast";
 import { LangCode, useDesks } from "shared-utils";
 import type { CategoryInterface, CategoryCreateDto, CategoryUpdateDto } from "shared-utils";
@@ -38,6 +47,7 @@ export default function CategoryModal({
 
     const [shortName, setShortName] = useState<string>("");
     const [name, setName] = useState<Record<LangCode, string>>(() => initLangRecord(() => ""));
+    const [isEnabled, setIsEnabled] = useState<boolean>(true);
     const [selectedDeskId, setSelectedDeskId] = useState<string>("");
     const [localDeskIds, setLocalDeskIds] = useState<number[]>([]);
 
@@ -47,6 +57,7 @@ export default function CategoryModal({
         if (!isOpen) return;
         setShortName(editingCategory?.short_name ?? "");
         setName(initLangRecord((lang) => editingCategory?.name[lang] ?? ""));
+        setIsEnabled(editingCategory?.is_enabled ?? true);
         setLocalDeskIds(editingCategory?.desks?.map((d) => d.id) ?? []);
         setSelectedDeskId("");
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,9 +86,16 @@ export default function CategoryModal({
             const originalIds = new Set(editingCategory.desks?.map((d) => d.id) ?? []);
             const addedDeskIds = localDeskIds.filter((id) => !originalIds.has(id));
             const removedDeskIds = [...originalIds].filter((id) => !localSet.has(id));
-            onUpdate({ short_name: shortName, name: filteredName }, addedDeskIds, removedDeskIds);
+            onUpdate(
+                { short_name: shortName, name: filteredName, is_enabled: isEnabled },
+                addedDeskIds,
+                removedDeskIds,
+            );
         } else {
-            onCreate({ short_name: shortName, name: filteredName }, localDeskIds);
+            onCreate(
+                { short_name: shortName, name: filteredName, is_enabled: isEnabled },
+                localDeskIds,
+            );
         }
     };
 
@@ -132,6 +150,13 @@ export default function CategoryModal({
                             }
                         />
                     ))}
+
+                    <Checkbox
+                        label={t("category_enabled")}
+                        hint={t("category_enabled_description")}
+                        checked={isEnabled}
+                        onChange={(e) => setIsEnabled(e.target.checked)}
+                    />
 
                     <div>
                         <label className="text-text-1 mb-2 block text-sm font-medium">
