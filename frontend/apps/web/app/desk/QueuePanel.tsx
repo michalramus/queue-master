@@ -142,18 +142,33 @@ export default function QueuePanel({ clients }: { clients: ClientInterface[] }) 
                 ) : deskName || activeCategoryBadges.length > 0 ? (
                     <div className="border-primary-1 mb-5 flex w-fit items-center gap-4 rounded-lg border-2 px-2 py-2">
                         {deskName && <p className="text-text-1 font-semibold">{deskName}</p>}
-                        <p>{t("active_categories")}</p>
-                        {activeCategoryBadges.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                                {activeCategoryBadges.map((cat) => (
-                                    <Badge key={cat.id} color="primary">
-                                        {cat.short_name}
-                                    </Badge>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-text-2 text-sm">{t("no_active_categories")}</p>
-                        )}
+                        <div className="flex items-center gap-2">
+                            <p>{t("categories")}</p>
+                            {activeCategoryBadges.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {activeCategoryBadges.map((cat) => (
+                                        <Badge
+                                            key={cat.id}
+                                            color={cat.is_enabled ? "primary" : "gray"}
+                                            title={
+                                                cat.is_enabled
+                                                    ? undefined
+                                                    : t("category_disabled_description")
+                                            }
+                                        >
+                                            {cat.short_name}
+                                            {cat.is_enabled ? null : (
+                                                <span className="ml-1 cursor-help font-bold">
+                                                    ?
+                                                </span>
+                                            )}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-text-2 text-sm">{t("no_categories")}</p>
+                            )}
+                        </div>
                     </div>
                 ) : null}
                 {waitingClientsFiltered && (
