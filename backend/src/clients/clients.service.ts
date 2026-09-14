@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { LangCode } from "@prisma/client";
 import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
@@ -24,6 +24,24 @@ export class ClientsService {
     private readonly deskSelect = { id: true, desk_number: true, desk_name: true } as const;
 
     async create(createClientDto: ClientCreateDto, entity: Entity): Promise<ClientResponseDto> {
+        // Reject disabled categories before touching the counter
+        const requestedCategory = await this.databaseService.category.findUnique({
+            where: { id: createClientDto.categoryId },
+            select: { short_name: true, is_enabled: true },
+        });
+        if (!requestedCategory) {
+            this.logger.warn(
+                `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
+            );
+            throw new NotFoundException("Category not found");
+        }
+        if (!requestedCategory.is_enabled) {
+            this.logger.warn(
+                `BadRequestException: Cannot create new client. Category ${requestedCategory.short_name} is disabled`,
+            );
+            throw new BadRequestException("Category is disabled");
+        }
+
         // Reset counter if conditions are met, then re-fetch category to get updated counter
         await this.resetCounterAfterTime(createClientDto.categoryId);
 
@@ -65,7 +83,7 @@ export class ClientsService {
                     },
                 },
                 include: {
-                    category: { select: { id: true, short_name: true } },
+                    category: { select: { id: true, short_name: true, is_enabled: true } },
                     desk: { select: this.deskSelect },
                 },
             });
@@ -92,7 +110,7 @@ export class ClientsService {
                 id: true,
                 number: true,
                 category_id: true,
-                category: { select: { id: true, short_name: true } },
+                category: { select: { id: true, short_name: true, is_enabled: true } },
                 status: true,
                 desk: { select: this.deskSelect },
                 language: true,
@@ -141,7 +159,7 @@ export class ClientsService {
             where: { id: id, NOT: { status: updateClientDto.status } },
             data: { status: updateClientDto.status, desk_id: updateClientDto.desk_id },
             include: {
-                category: { select: { id: true, short_name: true } },
+                category: { select: { id: true, short_name: true, is_enabled: true } },
                 desk: { select: this.deskSelect },
             },
         });
@@ -163,7 +181,10 @@ export class ClientsService {
         // Check if client exists
         const dbClient = await this.databaseService.client.findUnique({
             where: { id: id },
-            include: { category: { select: { id: true, short_name: true } }, desk: { select: this.deskSelect } },
+            include: {
+                category: { select: { id: true, short_name: true, is_enabled: true } },
+                desk: { select: this.deskSelect },
+            },
         });
         if (!dbClient) {
             this.logger.warn(`NotFoundException: Client with id ${id} not found when calling again`);
@@ -189,7 +210,10 @@ export class ClientsService {
 
         const dbClient = await this.databaseService.client.delete({
             where: { id: id },
-            include: { category: { select: { id: true, short_name: true } }, desk: { select: this.deskSelect } },
+            include: {
+                category: { select: { id: true, short_name: true, is_enabled: true } },
+                desk: { select: this.deskSelect },
+            },
         });
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
@@ -277,7 +301,7 @@ export class ClientsService {
         language: LangCode;
         creation_date: Date;
         queue_length?: number;
-        category: { id: number; short_name: string };
+        category: { id: number; short_name: string; is_enabled: boolean };
     }): Promise<ClientResponseDto> {
         const clientWithCategoryName = {
             ...client,
