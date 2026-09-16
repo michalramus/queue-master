@@ -8,12 +8,14 @@ import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.int
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe, Logger } from "@nestjs/common";
 import { loadAppConfig } from "./settings/appConfig.loader";
+import { AppConfigInterface } from "./settings/appConfig.schema";
 
 async function bootstrap() {
     ConfigModule.forRoot(); // Puts .env into the environment, below the external config file
 
+    let appConfig: AppConfigInterface;
     try {
-        loadAppConfig();
+        appConfig = loadAppConfig();
     } catch (error) {
         new Logger("AppConfig").fatal(
             `Invalid configuration: ${error instanceof Error ? error.message : String(error)}`,
@@ -127,6 +129,6 @@ Token is automatically saved in cookies, so you don't have to do anything more.
         SwaggerModule.setup("api", app, document, swaggerOptions);
     }
 
-    await app.listen(process.env.PORT);
+    await app.listen(appConfig.port);
 }
 bootstrap();
