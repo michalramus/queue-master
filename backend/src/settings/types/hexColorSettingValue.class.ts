@@ -5,7 +5,7 @@ export class HexColorSettingValue extends CustomSettingValue {
 
     constructor(color?: string) {
         super();
-        if (this.isValueCorrect(color)) {
+        if (color !== undefined && this.isValueCorrect(color)) {
             this.color = color;
         } else {
             this.color = "#000000";
@@ -24,6 +24,8 @@ export class HexColorSettingValue extends CustomSettingValue {
         if (typeof value === "number") {
             return false;
         }
+        // Matches a "#" followed by exactly 3 or 6 case-insensitive hex digits and nothing else.
+        // Matches: "#fff", "#27ce5e". Rejects: "27ce5e" (no "#"), "#ggg" (not hex), "#ffff" (wrong length).
         const hexColorPattern = /^#([0-9A-F]{3}|[0-9A-F]{6})$/i;
         return hexColorPattern.test(value);
     }
