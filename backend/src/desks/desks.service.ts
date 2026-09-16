@@ -153,6 +153,10 @@ export class DesksService {
         this.logger.log(`[${entity.name}] Assigned category ${dto.category_id} to desk ${id}`);
         this.sseService.emit(sseEvents.CategoriesDesksChanged, null);
         const updated = await this.databaseService.desk.findUnique({ where: { id }, select: deskSelect });
+        if (!updated) {
+            throw new NotFoundException(`Desk with ID ${id} not found`);
+        }
+
         return mapDeskResponse(updated);
     }
 
@@ -176,6 +180,10 @@ export class DesksService {
         this.logger.log(`[${entity.name}] Removed category ${categoryId} from desk ${id}`);
         this.sseService.emit(sseEvents.CategoriesDesksChanged, null);
         const updated = await this.databaseService.desk.findUnique({ where: { id }, select: deskSelect });
+        if (!updated) {
+            throw new NotFoundException(`Desk with ID ${id} not found`);
+        }
+
         return mapDeskResponse(updated);
     }
 

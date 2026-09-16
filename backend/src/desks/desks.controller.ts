@@ -5,6 +5,7 @@ import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import { AuthenticatedRequest } from "src/auth/types/authenticatedRequest.type";
 import {
     ApiTags,
     ApiOperation,
@@ -31,7 +32,7 @@ export class DesksController {
     @ApiBadRequestResponse({ description: "Invalid input data" })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Admin access required" })
-    create(@Body() createDeskDto: DeskCreateDto, @Request() req): Promise<DeskResponseDto> {
+    create(@Body() createDeskDto: DeskCreateDto, @Request() req: AuthenticatedRequest): Promise<DeskResponseDto> {
         return this.desksService.create(createDeskDto, Entity.convertFromReq(req));
     }
 
@@ -73,7 +74,7 @@ export class DesksController {
     update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updateDeskDto: DeskUpdateDto,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<DeskResponseDto> {
         return this.desksService.update(id, updateDeskDto, Entity.convertFromReq(req));
     }
@@ -87,7 +88,7 @@ export class DesksController {
     @ApiNotFoundResponse({ description: "Desk not found" })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Admin access required" })
-    remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<DeskResponseDto> {
+    remove(@Param("id", ParseIntPipe) id: number, @Request() req: AuthenticatedRequest): Promise<DeskResponseDto> {
         return this.desksService.remove(id, Entity.convertFromReq(req));
     }
 
@@ -104,7 +105,7 @@ export class DesksController {
     assignCategory(
         @Param("id", ParseIntPipe) id: number,
         @Body() dto: DeskCategoryDto,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<DeskResponseDto> {
         return this.desksService.assignCategory(id, dto, Entity.convertFromReq(req));
     }
@@ -122,7 +123,7 @@ export class DesksController {
     removeCategory(
         @Param("id", ParseIntPipe) id: number,
         @Param("categoryId", ParseIntPipe) categoryId: number,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<DeskResponseDto> {
         return this.desksService.removeCategory(id, categoryId, Entity.convertFromReq(req));
     }

@@ -38,11 +38,9 @@ export class UserSettingsService {
         const settings: { [key: string]: SettingSupportedTypes } = {};
 
         Object.keys(userSettingsList).forEach((key) => {
-            if (rawSettings.some((setting) => setting.key === key)) {
-                const setting = userSettingsList[key].convertSettingFromString(
-                    rawSettings.find((setting) => setting.key === key).value,
-                );
-                settings[key] = setting;
+            const rawSetting = rawSettings.find((setting) => setting.key === key);
+            if (rawSetting) {
+                settings[key] = userSettingsList[key].convertSettingFromString(rawSetting.value);
             } else {
                 settings[key] = userSettingsList[key].defaultValue;
             }

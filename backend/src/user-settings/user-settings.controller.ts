@@ -4,6 +4,7 @@ import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import { AuthenticatedRequest } from "src/auth/types/authenticatedRequest.type";
 import { ResetUserSettingsDto } from "./dto/reset-settings.dto";
 import {
     ApiTags,
@@ -40,7 +41,7 @@ export class UserSettingsController {
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    findSettings(@Request() req) {
+    findSettings(@Request() req: AuthenticatedRequest) {
         return this.userSettingsService.findSettings(Entity.convertFromReq(req));
     }
 
@@ -116,7 +117,7 @@ export class UserSettingsController {
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    updateSettings(@Body() settings: { [key: string]: string | number }, @Request() req) {
+    updateSettings(@Body() settings: { [key: string]: string | number }, @Request() req: AuthenticatedRequest) {
         return this.userSettingsService.updateSettings(settings, Entity.convertFromReq(req));
     }
 
@@ -149,7 +150,7 @@ export class UserSettingsController {
     updateUserSettings(
         @Param("id", ParseIntPipe) id: number,
         @Body() settings: { [key: string]: string | number },
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.userSettingsService.updateUserSettings(id, settings, Entity.convertFromReq(req));
     }
@@ -179,7 +180,11 @@ export class UserSettingsController {
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
-    resetUserSettings(@Param("id", ParseIntPipe) id: number, @Body() resetDto: ResetUserSettingsDto, @Request() req) {
+    resetUserSettings(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() resetDto: ResetUserSettingsDto,
+        @Request() req: AuthenticatedRequest,
+    ) {
         return this.userSettingsService.resetUserSettings(id, resetDto.settings || [], Entity.convertFromReq(req));
     }
 
@@ -205,7 +210,7 @@ export class UserSettingsController {
         },
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
-    resetOwnSettings(@Body() resetDto: ResetUserSettingsDto, @Request() req) {
+    resetOwnSettings(@Body() resetDto: ResetUserSettingsDto, @Request() req: AuthenticatedRequest) {
         const entity = Entity.convertFromReq(req);
 
         return this.userSettingsService.resetUserSettings(entity.id, resetDto.settings || [], entity);

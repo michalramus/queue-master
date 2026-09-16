@@ -206,7 +206,7 @@ export class UsersService {
         if (user.role === "Admin") {
             const adminCount = await this.databaseService.user.count({ where: { role: "Admin" } });
             if (adminCount <= 1) {
-                throw new ConflictException("Nie można usunąć jedynego administratora.");
+                throw new ConflictException("Cannot delete the only administrator.");
             }
         }
 

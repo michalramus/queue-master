@@ -176,6 +176,9 @@ export class CategoriesService {
             where: { id },
             select: this.categorySelect,
         });
+        if (!updatedCategory) {
+            throw new NotFoundException(`Category with ID ${id} not found`);
+        }
 
         this.sseService.emit(sseEvents.CategoriesChanged, null);
 
@@ -258,6 +261,10 @@ export class CategoriesService {
             where: { id },
             select: this.categorySelect,
         });
+        if (!updated) {
+            throw new NotFoundException(`Category with ID ${id} not found`);
+        }
+
         return this.buildCategoryResponse(updated);
     }
 
@@ -285,6 +292,10 @@ export class CategoriesService {
             where: { id },
             select: this.categorySelect,
         });
+        if (!updated) {
+            throw new NotFoundException(`Category with ID ${id} not found`);
+        }
+
         return this.buildCategoryResponse(updated);
     }
 }

@@ -41,6 +41,7 @@ export class DeviceResponseDto {
         description: "Optional comment about the device",
         example: "Kiosk in reception area",
         required: false,
+        nullable: true,
     })
-    comment?: string;
+    comment: string | null;
 }

@@ -17,11 +17,22 @@ export class MultilingualSettingsService {
 
     private logger = new Logger(MultilingualSettingsService.name);
 
+    private isLangCode(lang: string): lang is LangCode {
+        return Object.prototype.hasOwnProperty.call(LangCode, lang);
+    }
+
+    /** Numeric enum members are reverse-mapped, so only the non-numeric keys are real setting names */
+    private isSettingName(key: string): key is MultilingualSettingKeyNames {
+        return isNaN(Number(key)) && Object.prototype.hasOwnProperty.call(MultilingualSettings, key);
+    }
+
     async findAll(): Promise<MultilingualSettingsInterface> {
         const settings: MultilingualSettingsInterface = {};
 
         // Dynamically fetch all settings based on enum
-        const settingNames = Object.keys(MultilingualSettings).filter((key) => isNaN(Number(key)));
+        const settingNames = Object.keys(MultilingualSettings).filter((key): key is MultilingualSettingKeyNames =>
+            this.isSettingName(key),
+        );
 
         for (const settingName of settingNames) {
             const keyValue: number = MultilingualSettings[settingName];
@@ -29,7 +40,7 @@ export class MultilingualSettingsService {
                 ModuleNameMultilingualText.multilingual_settings,
                 keyValue,
             );
-            settings[settingName as MultilingualSettingKeyNames] = translations;
+            settings[settingName] = translations;
         }
 
         this.logger.debug("Retrieved multilingual settings");
@@ -41,9 +52,8 @@ export class MultilingualSettingsService {
         entity: Entity,
     ): Promise<MultilingualSettingsInterface> {
         // Validate that only known properties are being updated
-        const validKeys = Object.keys(MultilingualSettings).filter((key) => isNaN(Number(key)));
         const providedKeys = Object.keys(settings);
-        const invalidKeys = providedKeys.filter((key) => !validKeys.includes(key));
+        const invalidKeys = providedKeys.filter((key) => !this.isSettingName(key));
 
         if (invalidKeys.length > 0) {
             throw new BadRequestException(`Invalid setting keys: ${invalidKeys.join(", ")}`);
@@ -65,14 +75,17 @@ export class MultilingualSettingsService {
 
         // Process each provided setting
         for (const [propertyName, languageValues] of Object.entries(settings)) {
-            if (!languageValues) continue;
+            if (!languageValues || !this.isSettingName(propertyName)) continue;
 
             const keyValue = MultilingualSettings[propertyName];
-            const updates: { [lang: string]: string } = {};
-            const deletions: string[] = [];
+            const updates: { [lang in LangCode]?: string } = {};
+            const deletions: LangCode[] = [];
 
             // Separate updates and deletions
             Object.entries(languageValues).forEach(([lang, value]) => {
+                if (!this.isLangCode(lang)) {
+                    return;
+                }
                 if (value === "" || value === null) {
                     deletions.push(lang);
                 } else if (typeof value === "string") {
