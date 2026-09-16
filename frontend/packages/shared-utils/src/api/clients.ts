@@ -65,9 +65,7 @@ export async function removeClient(
 }
 
 export async function getClients(axiosAuthInstance: AxiosAuthInstance): Promise<ClientInterface[]> {
-    const response = await axiosAuthInstance.auth.get(apiPath).catch((error) => {
-        return error.response;
-    });
+    const response = await axiosAuthInstance.auth.get(apiPath);
 
     return response.data;
 }
