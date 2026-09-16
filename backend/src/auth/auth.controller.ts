@@ -3,9 +3,10 @@ import { AuthService } from "./auth.service";
 import { JwtRefreshTokenAuthGuard } from "./guards/jwt-refreshToken-auth.guard";
 import { AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
 import { Entity } from "./types/entity.class";
+import { AuthenticatedRequest } from "./types/authenticatedRequest.type";
 import { RolesGuard } from "./guards/roles.guard";
 import { Roles } from "./roles.decorator";
-import { Response } from "express";
+import { Request as ExpressRequest, Response } from "express";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import {
     ApiTags,
@@ -43,7 +44,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
     })
     async login(
         @Body() loginUserDto: AuthLoginUserDto,
-        @Request() req,
+        @Request() req: ExpressRequest,
         @Res({ passthrough: true }) res: Response,
     ): Promise<MessageResponseDto> {
         return this.authService.login(loginUserDto, req.ip, res);
@@ -57,7 +58,10 @@ Token is automatically saved in cookies, so you don't have to do anything more.
     @ApiUnauthorizedResponse({ description: "Invalid refresh token" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    async refresh(@Request() req, @Res({ passthrough: true }) res: Response): Promise<MessageResponseDto> {
+    async refresh(
+        @Request() req: AuthenticatedRequest,
+        @Res({ passthrough: true }) res: Response,
+    ): Promise<MessageResponseDto> {
         return this.authService.refresh(Entity.convertFromReq(req), req.ip, res);
     }
 
@@ -87,7 +91,7 @@ Token is automatically saved in cookies, so you don't have to do anything more.
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    async getInfo(@Request() req): Promise<AuthInfoResponseDto> {
+    async getInfo(@Request() req: AuthenticatedRequest): Promise<AuthInfoResponseDto> {
         return this.authService.getInfo(Entity.convertFromReq(req));
     }
 }
