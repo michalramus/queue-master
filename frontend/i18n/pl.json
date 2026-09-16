@@ -22,6 +22,11 @@
     "category": "Kategoria",
     "categories": "Kategorie",
     "category_list_is_empty": "Lista kategorii jest pusta",
+    "category_enabled": "Kategoria włączona",
+    "category_enabled_description": "Gdy wyłączona, klienci nie mogą pobierać nowych numerków dla tej kategorii",
+    "category_disabled_description": "Kategoria jest wyłączona - klienci nie mogą pobierać dla niej nowych numerków",
+    "enabled": "Włączona",
+    "disabled": "Wyłączona",
     "choose": "Wybierz",
     "choose_category": "Wybierz kategorię",
     "close": "Zamknij",
@@ -323,7 +328,6 @@
     "preview_title": "Tytuł",
     "text_shown_on_kiosk": "Tekst wyświetlany w kiosku",
     "use_mdx_editor": "Użyj edytora MDX",
-    "active_categories": "Aktywne kategorie:",
-    "no_active_categories": "Brak aktywnych kategorii",
+    "no_categories": "Brak kategorii",
     "sse_disconnected_warning": "Utracono połączenie z serwerem. Dane mogą być nieaktualne."
 }

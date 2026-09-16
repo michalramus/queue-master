@@ -2017,6 +2017,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/convict@npm:^6.1.6":
+  version: 6.1.6
+  resolution: "@types/convict@npm:6.1.6"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/e5d6daa471c9a002f1e511de5f1df07ab86501e44847c124bac3ddc247d1a4d6286748a024b635cea4d7dcd11571f3259c81c38301dab50499ce8c925e78af4a
+  languageName: node
+  linkType: hard
+
 "@types/debug@npm:^4.0.0, @types/debug@npm:^4.1.6":
   version: 4.1.12
   resolution: "@types/debug@npm:4.1.12"
@@ -3599,6 +3608,16 @@ __metadata:
   version: 2.0.0
   resolution: "convert-source-map@npm:2.0.0"
   checksum: 10c0/8f2f7a27a1a011cc6cc88cc4da2d7d0cfa5ee0369508baae3d98c260bb3ac520691464e5bbe4ae7cdf09860c1d69ecc6f70c63c6e7c7f7e3f18ec08484dc7d9b
+  languageName: node
+  linkType: hard
+
+"convict@npm:^6.2.5":
+  version: 6.2.5
+  resolution: "convict@npm:6.2.5"
+  dependencies:
+    lodash.clonedeep: "npm:^4.5.0"
+    yargs-parser: "npm:^20.2.7"
+  checksum: 10c0/4773180a3d02eb9d5cf6a3b6ec2b6bc94e6b8dd5073cbf6035cb55f615286835af1fe7f549aee085909a1130f6b461476f9b6a0d1fdbdee733402289e5196c1e
   languageName: node
   linkType: hard
 
@@ -6459,6 +6478,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.clonedeep@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.clonedeep@npm:4.5.0"
+  checksum: 10c0/2caf0e4808f319d761d2939ee0642fa6867a4bbf2cfce43276698828380756b99d4c4fa226d881655e6ac298dd453fe12a5ec8ba49861777759494c534936985
+  languageName: node
+  linkType: hard
+
 "lodash@npm:^4.0.1, lodash@npm:^4.17.15":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
@@ -8235,6 +8261,7 @@ __metadata:
     "@tailwindcss/typography": "npm:^0.5.20"
     "@tanstack/eslint-plugin-query": "npm:^5.101.2"
     "@tanstack/react-query": "npm:^5.101.2"
+    "@types/convict": "npm:^6.1.6"
     "@types/dompurify": "npm:^3.2.0"
     "@types/node": "npm:^24.13.2"
     "@types/react": "npm:^19.2.17"
@@ -8244,6 +8271,7 @@ __metadata:
     "@uiw/react-md-editor": "npm:^4.1.1"
     "@uiw/react-textarea-code-editor": "npm:^3.1.1"
     axios: "npm:^1.18.1"
+    convict: "npm:^6.2.5"
     cookies-next: "npm:^6.1.1"
     dompurify: "npm:^3.4.11"
     eslint: "npm:^10.6.0"
@@ -8276,10 +8304,12 @@ __metadata:
     "@tailwindcss/postcss": "npm:^4.3.1"
     "@tailwindcss/typography": "npm:^0.5.20"
     "@tanstack/react-query": "npm:^5.101.2"
+    "@types/convict": "npm:^6.1.6"
     "@types/react": "npm:^19.2.17"
     "@types/react-dom": "npm:^19.2.3"
     "@vitejs/plugin-react": "npm:^6.0.3"
     axios: "npm:^1.18.1"
+    convict: "npm:^6.2.5"
     cross-env: "npm:^10.1.0"
     electron: "npm:42.5.0"
     electron-builder: "npm:26.15.6"
@@ -10657,6 +10687,13 @@ __metadata:
   bin:
     yaml: bin.mjs
   checksum: 10c0/f340718df45e97a9551b9bf9dac61c80050bc464513b710debfb5067c380c8472e3b67809cffacb4ab5ffb5e66ef9310816c88b05f371cec60abfedd8c88e0a2
+  languageName: node
+  linkType: hard
+
+"yargs-parser@npm:^20.2.7":
+  version: 20.2.9
+  resolution: "yargs-parser@npm:20.2.9"
+  checksum: 10c0/0685a8e58bbfb57fab6aefe03c6da904a59769bd803a722bb098bd5b0f29d274a1357762c7258fb487512811b8063fb5d2824a3415a0a4540598335b3b086c72
   languageName: node
   linkType: hard
 

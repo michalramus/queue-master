@@ -16,7 +16,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
         return () => ipcRenderer.removeListener("audioSynthesizerComplete", callback);
     },
 
-    getTranslation: (lang: string): Promise<{ [key: string]: any }> =>
+    getTranslation: (lang: string): Promise<Record<string, unknown>> =>
         ipcRenderer.invoke("getTranslation", lang),
     getAppConfig: (): Promise<AppConfigInterface> => ipcRenderer.invoke("getAppConfig"),
     getLocalIpAddress: (): Promise<string> => ipcRenderer.invoke("getLocalIpAddress"),

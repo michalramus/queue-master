@@ -3,6 +3,7 @@ import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import { networkInterfaces } from "os";
 import path from "path";
 import { ClientInterface } from "shared-utils";
+import { loadAppConfig } from "./appConfig.js";
 
 let config: AppConfigInterface;
 let mainWindow: BrowserWindow;
@@ -116,12 +117,19 @@ function handleInvokeAudioSynthesizer(_event: IpcMainInvokeEvent, client: Client
 async function handleGetTranslation(
     _event: IpcMainInvokeEvent,
     lang: string,
-): Promise<{ [key: string]: any }> {
-    const i18nPath: string = path.join(
+): Promise<Record<string, unknown>> {
+    const i18nDir: string = path.resolve(
         app.getAppPath(),
         process.env.NODE_ENV == "development" ? "../.." : "..",
-        `/i18n/${lang}.json`,
+        "i18n",
     );
+    const i18nPath: string = path.resolve(i18nDir, `${lang}.json`);
+
+    // Reject path traversal: resolved file must stay directly inside i18nDir
+    if (path.dirname(i18nPath) !== i18nDir) {
+        console.error(`Rejected translation request for invalid language: ${lang}`);
+        return {};
+    }
 
     try {
         const translation = await import(i18nPath, { with: { type: "json" } });
@@ -199,14 +207,9 @@ function createWindow(zoomFactor: number = 1) {
     }
 }
 
-async function fetchConfig() {
-    const configPath = path.resolve(process.argv[process.argv.length - 1]);
-
-    //TODO: Use config engine
+function fetchConfig(): void {
     try {
-        const _config = await import(configPath, { with: { type: "json" } });
-        //TODO: validate config
-        config = _config.default;
+        config = loadAppConfig();
         config.backendUrl = config.backendUrl.replace(/\/$/, "") + "/api"; //Add /api backend prefix
     } catch (e) {
         console.error(e);
@@ -215,7 +218,7 @@ async function fetchConfig() {
 }
 
 app.on("ready", async () => {
-    await fetchConfig();
+    fetchConfig();
 
     ipcMain.on("executePrintTicket", onExecutePrintTicket);
     ipcMain.on("executeOpenKioskScript", onExecuteOpenKioskScript);

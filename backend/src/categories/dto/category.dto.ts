@@ -4,6 +4,7 @@ import { DeskResponseDto } from "src/desks/dto/desk.dto";
 import {
     IsNotEmpty,
     IsEnum,
+    IsBoolean,
     IsObject,
     IsOptional,
     ValidatorConstraint,
@@ -59,6 +60,16 @@ export class CategoryCreateDto {
     @IsNotEmpty()
     @Validate(IsValidMultilingualText)
     name: { [lang in LangCode]?: string };
+
+    @ApiProperty({
+        description: "Whether clients can take tickets for this category",
+        example: true,
+        required: false,
+        default: true,
+    })
+    @IsBoolean()
+    @IsOptional()
+    is_enabled?: boolean;
 }
 
 export class CategoryUpdateDto {
@@ -81,6 +92,15 @@ export class CategoryUpdateDto {
     @IsOptional()
     @Validate(IsValidMultilingualText)
     name?: { [lang in LangCode]?: string };
+
+    @ApiProperty({
+        description: "Whether clients can take tickets for this category",
+        example: false,
+        required: false,
+    })
+    @IsBoolean()
+    @IsOptional()
+    is_enabled?: boolean;
 }
 
 export class CategoryResponseDto {
@@ -89,6 +109,12 @@ export class CategoryResponseDto {
 
     @ApiProperty({ description: "Category short name", example: "A" })
     short_name: string;
+
+    @ApiProperty({
+        description: "Whether clients can take tickets for this category",
+        example: true,
+    })
+    is_enabled: boolean;
 
     @ApiProperty({
         description: "Multilingual category name dictionary",

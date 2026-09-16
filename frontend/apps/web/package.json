@@ -21,11 +21,13 @@
     "dependencies": {
         "@tailwindcss/typography": "^0.5.20",
         "@tanstack/react-query": "^5.101.2",
+        "@types/convict": "^6.1.6",
         "@types/dompurify": "^3.2.0",
         "@types/react-color": "^3.0.13",
         "@uiw/react-md-editor": "^4.1.1",
         "@uiw/react-textarea-code-editor": "^3.1.1",
         "axios": "^1.18.1",
+        "convict": "^6.2.5",
         "cookies-next": "^6.1.1",
         "dompurify": "^3.4.11",
         "flag-icons": "^7.5.0",

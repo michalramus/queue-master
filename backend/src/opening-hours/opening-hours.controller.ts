@@ -14,6 +14,7 @@ import { Roles } from "../auth/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Entity } from "../auth/types/entity.class";
+import { AuthenticatedRequest } from "src/auth/types/authenticatedRequest.type";
 
 @ApiTags("opening-hours")
 @Controller("opening-hours")
@@ -48,7 +49,7 @@ export class OpeningHoursController {
     @ApiResponse({
         status: 201,
         description:
-            "Opening hours created/overridden successfully. When marking a day as closed, existing hours are preserved unless new ones are provided. Invalid time ranges are skipped.",
+            "Opening hours created/overridden successfully. When marking a day as closed, existing hours are preserved unless new ones are provided. The whole request is rejected with 400 when any day has missing times or an invalid time range.",
         type: [OpeningHoursDto],
     })
     @ApiResponse({
@@ -57,7 +58,10 @@ export class OpeningHoursController {
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Admin access required" })
-    async create(@Body() createDto: CreateOpeningHoursDto, @Request() req): Promise<Opening_Hours[]> {
+    async create(
+        @Body() createDto: CreateOpeningHoursDto,
+        @Request() req: AuthenticatedRequest,
+    ): Promise<Opening_Hours[]> {
         return this.openingHoursService.create(createDto, Entity.convertFromReq(req));
     }
 }

@@ -18,14 +18,17 @@ interface AppConfigInterface {
 }
 
 interface ElectronAPIInterface {
-    executePrintTicket: (client: ClientInterface, printingTicketTemplate: string) => Promise<void>;
+    executePrintTicket: (
+        client: import("shared-utils").ClientInterface,
+        printingTicketTemplate: string,
+    ) => Promise<void>;
     executeOpenKioskScript: () => Promise<void>;
     executeCloseKioskScript: () => Promise<void>;
 
-    invokeAudioSynthesizer: (client: ClientInterface) => Promise<void>;
+    invokeAudioSynthesizer: (client: import("shared-utils").ClientInterface) => Promise<void>;
     onAudioSynthesizerComplete: (callback: () => void) => () => void;
 
-    getTranslation: (lang: string) => Promise<{ [key: string]: any }>;
+    getTranslation: (lang: string) => Promise<Record<string, unknown>>;
     getAppConfig: () => Promise<AppConfigInterface>;
     getLocalIpAddress: () => Promise<string>;
 }

@@ -1,0 +1,10 @@
+{
+    "port": 3001,
+    "logLevel": "log",
+    "databaseUrl": "postgresql://user:password@localhost:5432/queue_master",
+    "jwtSecretKey": "change-me",
+    "jwtRefreshTokenKey": "change-me-too",
+    "uploadsPath": "./uploads",
+    "seedAdminUsername": "admin",
+    "seedAdminPassword": ""
+}

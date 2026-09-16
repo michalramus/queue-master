@@ -13,11 +13,13 @@ interface BadgeProps {
     color: BadgeColor;
     children: React.ReactNode;
     className?: React.ComponentProps<"span">["className"];
+    title?: string;
 }
 
-export default function Badge({ color, children, className }: BadgeProps) {
+export default function Badge({ color, children, className, title }: BadgeProps) {
     return (
         <span
+            title={title}
             className={`rounded px-2 py-1 text-xs font-medium ${colorClasses[color]} ${className ?? ""}`}
         >
             {children}

@@ -17,6 +17,7 @@ import { Roles } from "../auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import { AuthenticatedRequest } from "src/auth/types/authenticatedRequest.type";
 import {
     ApiTags,
     ApiOperation,
@@ -47,7 +48,7 @@ export class UsersController {
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     @ApiConflictResponse({ description: "Username already exists" })
     // @ApiBearerAuth("JWT-auth")
-    async create(@Body() userCreateDto: UserCreateDto, @Request() req): Promise<UserResponseDto> {
+    async create(@Body() userCreateDto: UserCreateDto, @Request() req: AuthenticatedRequest): Promise<UserResponseDto> {
         return this.usersService.create(userCreateDto, Entity.convertFromReq(req));
     }
 
@@ -103,7 +104,7 @@ export class UsersController {
     async updateUser(
         @Param("id", ParseIntPipe) id: number,
         @Body() userUpdateDto: UserUpdateDto,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<UserResponseDto> {
         return this.usersService.updateUser(id, userUpdateDto, Entity.convertFromReq(req));
     }
@@ -126,7 +127,7 @@ export class UsersController {
     async updatePassword(
         @Param("id", ParseIntPipe) id: number,
         @Body() userPasswordUpdateDto: UserPasswordUpdateDto,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<MessageResponseDto> {
         return this.usersService.updatePassword(id, userPasswordUpdateDto, Entity.convertFromReq(req));
     }
@@ -148,7 +149,10 @@ export class UsersController {
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     @ApiNotFoundResponse({ description: "User not found" })
     // @ApiBearerAuth("JWT-auth")
-    async remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<UserResponseDto> {
+    async remove(
+        @Param("id", ParseIntPipe) id: number,
+        @Request() req: AuthenticatedRequest,
+    ): Promise<UserResponseDto> {
         return this.usersService.remove(id, Entity.convertFromReq(req));
     }
 }

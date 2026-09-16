@@ -40,6 +40,7 @@ model Desk {
 model Category {
     id                 Int                 @id @default(autoincrement())
     short_name         Category_Short_Name @unique
+    is_enabled         Boolean             @default(true)
     counter            Int
     last_counter_reset DateTime
     clients            Client[]

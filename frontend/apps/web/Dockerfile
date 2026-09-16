@@ -31,4 +31,10 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 EXPOSE 3000
 
+# Configuration lives outside the image, so an upgrade is just a new image:
+#   docker run -v ./config.json:/app/apps/web/config.json ...
+# Override the location with -e CONFIG_PATH=/etc/queue-master-web.json.
+# Precedence: CLI argument > config file > environment variable > default.
+# PORT and HOSTNAME stay environment variables - Next reads them before the config file is loaded.
+
 CMD ["node", "apps/web/server.js"]

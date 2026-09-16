@@ -5,6 +5,7 @@ import { LangCode } from "../types/LangCode";
 export interface CategoryInterface {
     id: number;
     short_name: string;
+    is_enabled: boolean;
     name: { [lang in LangCode]: string };
     desks?: DeskInterface[];
 }
@@ -12,11 +13,13 @@ export interface CategoryInterface {
 export interface CategoryCreateDto {
     short_name: string;
     name: { [lang in LangCode]?: string };
+    is_enabled?: boolean;
 }
 
 export interface CategoryUpdateDto {
     short_name?: string;
     name?: { [lang in LangCode]?: string };
+    is_enabled?: boolean;
 }
 
 const apiPath = "/categories";

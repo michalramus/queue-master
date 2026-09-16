@@ -5,6 +5,7 @@ import { Roles } from "../auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import { AuthenticatedRequest } from "src/auth/types/authenticatedRequest.type";
 import {
     ApiTags,
     ApiOperation,
@@ -33,7 +34,7 @@ export class DevicesController {
     // @ApiBearerAuth("JWT-auth")
     async registerDevice(
         @Body() deviceCreateDto: DeviceCreateDto,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<DeviceRegistrationResponseDto> {
         return this.devicesService.createDevice(deviceCreateDto, Entity.convertFromReq(req));
     }
@@ -71,7 +72,7 @@ export class DevicesController {
     async updateDevice(
         @Param("id", ParseIntPipe) id: number,
         @Body() devicePatchDto: DevicePatchDto,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<DeviceResponseDto> {
         return this.devicesService.updateDevice(id, devicePatchDto, Entity.convertFromReq(req));
     }
@@ -89,7 +90,10 @@ export class DevicesController {
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Insufficient permissions" })
     // @ApiBearerAuth("JWT-auth")
-    async remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<DeviceResponseDto> {
+    async remove(
+        @Param("id", ParseIntPipe) id: number,
+        @Request() req: AuthenticatedRequest,
+    ): Promise<DeviceResponseDto> {
         return this.devicesService.remove(id, Entity.convertFromReq(req));
     }
 }

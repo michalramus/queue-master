@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
 import { globalSettingsList } from "./global-settings.list";
 import { SettingSupportedTypes } from "src/settings/setting.class";
@@ -21,11 +21,9 @@ export class GlobalSettingsService {
         const settings: { [key: string]: SettingSupportedTypes } = {};
 
         Object.keys(globalSettingsList).forEach((key) => {
-            if (rawSettings.some((setting) => setting.key === key)) {
-                const setting = globalSettingsList[key].convertSettingFromString(
-                    rawSettings.find((setting) => setting.key === key).value,
-                );
-                settings[key] = setting;
+            const rawSetting = rawSettings.find((setting) => setting.key === key);
+            if (rawSetting) {
+                settings[key] = globalSettingsList[key].convertSettingFromString(rawSetting.value);
             } else {
                 settings[key] = globalSettingsList[key].defaultValue;
             }
@@ -36,10 +34,15 @@ export class GlobalSettingsService {
 
     async update(settings: { [key: string]: string | number }, entity: Entity): Promise<string> {
         this.logger.log(`[${entity.name}] Updating settings: ${JSON.stringify(settings)}`);
-        //find setting in globalSettings, convert to string and save to database
+
+        // Validate everything up front - the whole request is rejected instead of being partially persisted
+        const unknownKeys: string[] = [];
+        const invalidValues: string[] = [];
+
         for (const [key, setting] of Object.entries(settings)) {
             if (!Object.prototype.hasOwnProperty.call(globalSettingsList, key)) {
                 this.logger.warn(`Setting with key '${key}' and value '${setting}' not found in globalSettings.`);
+                unknownKeys.push(key);
                 continue;
             }
 
@@ -47,9 +50,23 @@ export class GlobalSettingsService {
                 this.logger.warn(
                     `Trying to set setting with key '${key}' and value '${setting}' - setting is not correct.`,
                 );
-                continue;
+                invalidValues.push(`${key}: '${setting}'`);
             }
+        }
 
+        if (unknownKeys.length > 0 || invalidValues.length > 0) {
+            const messages: string[] = [];
+            if (unknownKeys.length > 0) {
+                messages.push(`Unknown setting keys: ${unknownKeys.join(", ")}`);
+            }
+            if (invalidValues.length > 0) {
+                messages.push(`Invalid setting values: ${invalidValues.join(", ")}`);
+            }
+            throw new BadRequestException(messages.join(". "));
+        }
+
+        //find setting in globalSettings, convert to string and save to database
+        for (const [key, setting] of Object.entries(settings)) {
             await this.databaseService.global_Setting.deleteMany({
                 where: {
                     key: key.toString(),
@@ -64,7 +81,7 @@ export class GlobalSettingsService {
             });
         }
 
-        const newSettings = this.findAll();
+        const newSettings = await this.findAll();
 
         //emit SSE event on globalSettings change
         this.sseService.emit(sseEvents.GlobalSettingsChanged, newSettings);

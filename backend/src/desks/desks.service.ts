@@ -11,7 +11,7 @@ const deskSelect = {
     desk_name: true,
     categories_desks: {
         select: {
-            category: { select: { id: true, short_name: true } },
+            category: { select: { id: true, short_name: true, is_enabled: true } },
         },
     },
 } as const;
@@ -20,7 +20,7 @@ function mapDeskResponse(desk: {
     id: number;
     desk_number: number;
     desk_name: string;
-    categories_desks: { category: { id: number; short_name: string } }[];
+    categories_desks: { category: { id: number; short_name: string; is_enabled: boolean } }[];
 }): DeskResponseDto {
     return {
         id: desk.id,
@@ -153,6 +153,10 @@ export class DesksService {
         this.logger.log(`[${entity.name}] Assigned category ${dto.category_id} to desk ${id}`);
         this.sseService.emit(sseEvents.CategoriesDesksChanged, null);
         const updated = await this.databaseService.desk.findUnique({ where: { id }, select: deskSelect });
+        if (!updated) {
+            throw new NotFoundException(`Desk with ID ${id} not found`);
+        }
+
         return mapDeskResponse(updated);
     }
 
@@ -176,6 +180,10 @@ export class DesksService {
         this.logger.log(`[${entity.name}] Removed category ${categoryId} from desk ${id}`);
         this.sseService.emit(sseEvents.CategoriesDesksChanged, null);
         const updated = await this.databaseService.desk.findUnique({ where: { id }, select: deskSelect });
+        if (!updated) {
+            throw new NotFoundException(`Desk with ID ${id} not found`);
+        }
+
         return mapDeskResponse(updated);
     }
 

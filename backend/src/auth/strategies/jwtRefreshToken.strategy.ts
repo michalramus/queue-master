@@ -1,10 +1,14 @@
 import { Strategy } from "passport-jwt";
 import { PassportStrategy } from "@nestjs/passport";
 import { Injectable } from "@nestjs/common";
+import { Request } from "express";
+import { Entity } from "src/auth/types/entity.class";
+import { JwtPayload } from "src/auth/strategies/jwt.strategy";
+import { requireEnv } from "src/settings/appConfig.loader";
 
-export function refreshTokenExtractor(req: any) {
-    let token = null;
-    if (req && req.cookies) {
+export function refreshTokenExtractor(req: Request): string | null {
+    let token: string | null = null;
+    if (req && req.cookies && typeof req.cookies["jwt_refresh"] === "string") {
         token = req.cookies["jwt_refresh"];
     }
     return token;
@@ -16,11 +20,11 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(Strategy, "jwtRefr
         super({
             jwtFromRequest: refreshTokenExtractor,
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_REFRESH_TOKEN_KEY,
+            secretOrKey: requireEnv("JWT_REFRESH_TOKEN_KEY"),
         });
     }
 
-    async validate(payload: any) {
-        return { id: payload.sub, type: payload.type, name: payload.name };
+    async validate(payload: JwtPayload): Promise<Entity> {
+        return new Entity(payload.sub, payload.type, payload.name);
     }
 }

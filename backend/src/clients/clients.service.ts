@@ -1,5 +1,5 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { LangCode } from "@prisma/client";
+import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { LangCode, Prisma } from "@prisma/client";
 import { ClientResponseDto, ClientCreateDto, ClientUpdateDto } from "./dto/client.dto";
 import { DatabaseService } from "src/database/database.service";
 import { DeskResponseDto } from "src/desks/dto/desk.dto";
@@ -24,11 +24,32 @@ export class ClientsService {
     private readonly deskSelect = { id: true, desk_number: true, desk_name: true } as const;
 
     async create(createClientDto: ClientCreateDto, entity: Entity): Promise<ClientResponseDto> {
+        // Fast-fail before resetCounterAfterTime, which deletes stale clients and may reset the
+        // counter - side effects we must not apply to a request we are about to reject. This is
+        // only a cheap pre-check; the authoritative guard runs inside the transaction below, so a
+        // category disabled between these two points is still caught. Do not remove either one.
+        const requestedCategory = await this.databaseService.category.findUnique({
+            where: { id: createClientDto.categoryId },
+            select: { short_name: true, is_enabled: true },
+        });
+        if (!requestedCategory) {
+            this.logger.warn(
+                `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
+            );
+            throw new NotFoundException("Category not found");
+        }
+        if (!requestedCategory.is_enabled) {
+            this.logger.warn(
+                `BadRequestException: Cannot create new client. Category ${requestedCategory.short_name} is disabled`,
+            );
+            throw new BadRequestException("Category is disabled");
+        }
+
         // Reset counter if conditions are met, then re-fetch category to get updated counter
         await this.resetCounterAfterTime(createClientDto.categoryId);
 
         const dbClient = await this.databaseService.$transaction(async (tx) => {
-            // Check if category exists
+            // Check if category exists and is enabled - inside the transaction to avoid races with admin changes
             const category = await tx.category.findUnique({
                 where: { id: createClientDto.categoryId },
             });
@@ -37,6 +58,12 @@ export class ClientsService {
                     `NotFoundException: Cannot create new client. Category with id ${createClientDto.categoryId} not found`,
                 );
                 throw new NotFoundException("Category not found");
+            }
+            if (!category.is_enabled) {
+                this.logger.warn(
+                    `BadRequestException: Cannot create new client. Category ${category.short_name} is disabled`,
+                );
+                throw new BadRequestException("Category is disabled");
             }
 
             // Prepare client number
@@ -65,7 +92,7 @@ export class ClientsService {
                     },
                 },
                 include: {
-                    category: { select: { id: true, short_name: true } },
+                    category: { select: { id: true, short_name: true, is_enabled: true } },
                     desk: { select: this.deskSelect },
                 },
             });
@@ -92,7 +119,7 @@ export class ClientsService {
                 id: true,
                 number: true,
                 category_id: true,
-                category: { select: { id: true, short_name: true } },
+                category: { select: { id: true, short_name: true, is_enabled: true } },
                 status: true,
                 desk: { select: this.deskSelect },
                 language: true,
@@ -100,9 +127,22 @@ export class ClientsService {
             },
         });
 
-        const clients = dbClients.map(async (client) => await this.addCategoryNameFieldToClient(client));
+        // Fetch all category translations in a single query to avoid N+1 queries
+        const categoryNames = await this.multilingualTextService.getMultilingualTextForKeys(
+            ModuleNameMultilingualText.categories,
+            dbClients.map((client) => client.category.id),
+        );
+
+        const clients: ClientResponseDto[] = dbClients.map((client) => ({
+            ...client,
+            category: {
+                ...client.category,
+                name: categoryNames.get(client.category.id) ?? {},
+            },
+        }));
+
         this.logger.debug(`Fetched ${dbClients.length} clients`);
-        return Promise.all(clients);
+        return clients;
     }
 
     /**
@@ -137,17 +177,30 @@ export class ClientsService {
 
         //IMPORTANT: This query updates only clients that state is changing - protection against concurrency calls
         // Update client
-        const dbClient = await this.databaseService.client.update({
-            where: { id: id, NOT: { status: updateClientDto.status } },
-            data: { status: updateClientDto.status, desk_id: updateClientDto.desk_id },
+        let dbClient: Prisma.ClientGetPayload<{
             include: {
-                category: { select: { id: true, short_name: true } },
-                desk: { select: this.deskSelect },
-            },
-        });
-
-        if (dbClient == null) {
-            throw new NotFoundException("Client not found or already in the desired status");
+                category: { select: { id: true; short_name: true; is_enabled: true } };
+                desk: { select: { id: true; desk_number: true; desk_name: true } };
+            };
+        }>;
+        try {
+            dbClient = await this.databaseService.client.update({
+                where: { id: id, NOT: { status: updateClientDto.status } },
+                data: { status: updateClientDto.status, desk_id: updateClientDto.desk_id },
+                include: {
+                    category: { select: { id: true, short_name: true, is_enabled: true } },
+                    desk: { select: this.deskSelect },
+                },
+            });
+        } catch (error) {
+            // P2025 - record to update not found, meaning the client is already in the desired status
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+                this.logger.warn(
+                    `NotFoundException: Cannot update client with id ${id}. Client not found or already in status ${updateClientDto.status}`,
+                );
+                throw new NotFoundException("Client not found or already in the desired status");
+            }
+            throw error;
         }
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
@@ -163,7 +216,10 @@ export class ClientsService {
         // Check if client exists
         const dbClient = await this.databaseService.client.findUnique({
             where: { id: id },
-            include: { category: { select: { id: true, short_name: true } }, desk: { select: this.deskSelect } },
+            include: {
+                category: { select: { id: true, short_name: true, is_enabled: true } },
+                desk: { select: this.deskSelect },
+            },
         });
         if (!dbClient) {
             this.logger.warn(`NotFoundException: Client with id ${id} not found when calling again`);
@@ -189,7 +245,10 @@ export class ClientsService {
 
         const dbClient = await this.databaseService.client.delete({
             where: { id: id },
-            include: { category: { select: { id: true, short_name: true } }, desk: { select: this.deskSelect } },
+            include: {
+                category: { select: { id: true, short_name: true, is_enabled: true } },
+                desk: { select: this.deskSelect },
+            },
         });
 
         const client = await this.addCategoryNameFieldToClient(dbClient);
@@ -217,7 +276,7 @@ export class ClientsService {
         );
     }
 
-    async resetCounterAfterTime(categoryId: number) {
+    async resetCounterAfterTime(categoryId: number): Promise<void> {
         const category = await this.databaseService.category.findUnique({ where: { id: categoryId } });
         if (!category) {
             this.logger.warn(
@@ -238,7 +297,7 @@ export class ClientsService {
 
         //Delete clients older than resetTime
         const deletedClients = await this.databaseService.client.deleteMany({
-            where: { creation_date: { lt: resetTime } },
+            where: { category_id: categoryId, creation_date: { lt: resetTime } },
         });
         this.logger.log(`Deleted ${deletedClients.count} clients older than ${resetTime} for category ${categoryId}`);
 
@@ -277,7 +336,7 @@ export class ClientsService {
         language: LangCode;
         creation_date: Date;
         queue_length?: number;
-        category: { id: number; short_name: string };
+        category: { id: number; short_name: string; is_enabled: boolean };
     }): Promise<ClientResponseDto> {
         const clientWithCategoryName = {
             ...client,

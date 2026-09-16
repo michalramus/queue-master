@@ -19,6 +19,7 @@ import {
     ApiBody,
 } from "@nestjs/swagger";
 import { Entity } from "src/auth/types/entity.class";
+import { AuthenticatedRequest } from "src/auth/types/authenticatedRequest.type";
 
 @ApiTags("categories")
 @Controller("categories")
@@ -34,7 +35,10 @@ export class CategoriesController {
     @ApiBadRequestResponse({ description: "Invalid input data" })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Admin access required" })
-    create(@Body() createCategoryDto: CategoryCreateDto, @Request() req): Promise<CategoryResponseDto> {
+    create(
+        @Body() createCategoryDto: CategoryCreateDto,
+        @Request() req: AuthenticatedRequest,
+    ): Promise<CategoryResponseDto> {
         return this.categoriesService.create(createCategoryDto, Entity.convertFromReq(req));
     }
 
@@ -73,7 +77,7 @@ export class CategoriesController {
     update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updateCategoryDto: CategoryUpdateDto,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<CategoryResponseDto> {
         return this.categoriesService.update(id, updateCategoryDto, Entity.convertFromReq(req));
     }
@@ -86,7 +90,7 @@ export class CategoriesController {
     @ApiNotFoundResponse({ description: "Category not found" })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Admin access required" })
-    async remove(@Param("id", ParseIntPipe) id: number, @Request() req): Promise<void> {
+    async remove(@Param("id", ParseIntPipe) id: number, @Request() req: AuthenticatedRequest): Promise<void> {
         return this.categoriesService.remove(id, Entity.convertFromReq(req));
     }
 
@@ -117,7 +121,7 @@ export class CategoriesController {
     assignDesk(
         @Param("id", ParseIntPipe) id: number,
         @Body("desk_id", ParseIntPipe) deskId: number,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<CategoryResponseDto> {
         return this.categoriesService.assignDesk(id, deskId, Entity.convertFromReq(req));
     }
@@ -135,7 +139,7 @@ export class CategoriesController {
     removeDesk(
         @Param("id", ParseIntPipe) id: number,
         @Param("deskId", ParseIntPipe) deskId: number,
-        @Request() req,
+        @Request() req: AuthenticatedRequest,
     ): Promise<CategoryResponseDto> {
         return this.categoriesService.removeDesk(id, deskId, Entity.convertFromReq(req));
     }

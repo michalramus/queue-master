@@ -1,5 +1,5 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { DayOfWeek, Opening_Hours } from "@prisma/client";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
+import { DayOfWeek, Opening_Hours, Prisma } from "@prisma/client";
 import { DatabaseService } from "../database/database.service";
 import { OpeningHoursDto, CreateOpeningHoursDto } from "./dto/opening-hours.dto";
 import { SseService } from "../sse/sse.service";
@@ -31,42 +31,52 @@ export class OpeningHoursService {
     async create(createDto: CreateOpeningHoursDto, entity: Entity): Promise<Opening_Hours[]> {
         const updatedHours: DayOfWeek[] = [];
 
+        // Validate the whole payload up front - nothing is persisted when any day is invalid
+        const missingTimes: DayOfWeek[] = [];
+        const invalidRanges: string[] = [];
+
         for (const dayHours of createDto.opening_hours) {
-            if (!dayHours.is_closed) {
-                if (!dayHours.open_time || !dayHours.close_time) {
-                    this.logger.warn(
-                        `[${entity.name}] Missing times for ${dayHours.day_of_week} when not closed. Skipping.`,
-                    );
-                    continue;
-                }
+            if (!dayHours.is_closed && (!dayHours.open_time || !dayHours.close_time)) {
+                this.logger.warn(`[${entity.name}] Missing times for ${dayHours.day_of_week} when not closed.`);
+                missingTimes.push(dayHours.day_of_week);
+                continue;
             }
 
-            if (dayHours.open_time && dayHours.close_time) {
-                if (!this.isValidTimeRange(dayHours.open_time, dayHours.close_time)) {
-                    this.logger.warn(
-                        `[${entity.name}] Invalid time range for ${dayHours.day_of_week}: ${dayHours.open_time} - ${dayHours.close_time}. Skipping.`,
-                    );
-                    continue;
-                }
+            if (
+                dayHours.open_time &&
+                dayHours.close_time &&
+                !this.isValidTimeRange(dayHours.open_time, dayHours.close_time)
+            ) {
+                this.logger.warn(
+                    `[${entity.name}] Invalid time range for ${dayHours.day_of_week}: ${dayHours.open_time} - ${dayHours.close_time}.`,
+                );
+                invalidRanges.push(`${dayHours.day_of_week} (${dayHours.open_time} - ${dayHours.close_time})`);
             }
+        }
 
+        if (missingTimes.length > 0 || invalidRanges.length > 0) {
+            const messages: string[] = [];
+            if (missingTimes.length > 0) {
+                messages.push(`Missing open_time or close_time for days: ${missingTimes.join(", ")}`);
+            }
+            if (invalidRanges.length > 0) {
+                messages.push(`Invalid time ranges for days: ${invalidRanges.join(", ")}`);
+            }
+            throw new BadRequestException(messages.join(". "));
+        }
+
+        for (const dayHours of createDto.opening_hours) {
             // Check if opening hours already exist for this day and override them
             const existing = await this.findByDayInternal(dayHours.day_of_week);
 
             if (existing) {
                 // Override existing opening hours
-                const updateData: any = {
+                const updateData: Prisma.Opening_HoursUpdateInput = {
                     is_closed: dayHours.is_closed,
                 };
 
                 // Only update times if not closing the day or if providing new times
                 if (!dayHours.is_closed) {
-                    if (!dayHours.open_time || !dayHours.close_time) {
-                        this.logger.warn(
-                            `[${entity.name}] Missing times for ${dayHours.day_of_week} when not closed. Skipping.`,
-                        );
-                        continue;
-                    }
                     updateData.open_time = dayHours.open_time;
                     updateData.close_time = dayHours.close_time;
                 } else if (dayHours.open_time && dayHours.close_time) {
@@ -152,7 +162,8 @@ export class OpeningHoursService {
 
     private getCurrentDayOfWeek(date: Date): DayOfWeek {
         const day = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
-        const dayMap = {
+        // Indexed by Date.getDay(), which is always 0 (Sunday) to 6 (Saturday)
+        const dayMap: Record<number, DayOfWeek> = {
             0: DayOfWeek.SUNDAY,
             1: DayOfWeek.MONDAY,
             2: DayOfWeek.TUESDAY,

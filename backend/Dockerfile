@@ -26,7 +26,11 @@ COPY entrypoint.sh ./
 RUN chmod +x entrypoint.sh
 
 ENV NODE_ENV=production
-ENV PORT=3001
 EXPOSE 3001
+
+# Configuration lives outside the image, so an upgrade is just a new image:
+#   docker run -v ./config.json:/app/config.json ...
+# Override the location with -e CONFIG_PATH=/etc/queue-master.json or `--config <path>`.
+# Precedence: CLI argument > config file > environment variable > default.
 
 ENTRYPOINT ["sh", "entrypoint.sh"]

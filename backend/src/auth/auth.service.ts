@@ -4,6 +4,7 @@ import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { Entity } from "./types/entity.class";
 import { Response } from "express";
+import { AuthenticatedRequest } from "./types/authenticatedRequest.type";
 import { DatabaseService } from "src/database/database.service";
 import { AuthInfoResponseDto, AuthLoginUserDto } from "./dto/auth.dto";
 import { DevicesService } from "src/devices/devices.service";
@@ -24,7 +25,7 @@ export class AuthService {
     readonly accessTokenExpirationTime = "1d";
     readonly refreshTokenExpirationTime = "90d";
 
-    async login(loginUserDto: AuthLoginUserDto, ip: string, response: Response) {
+    async login(loginUserDto: AuthLoginUserDto, ip: string | undefined, response: Response) {
         const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
 
         if (!user) {
@@ -62,7 +63,7 @@ export class AuthService {
         return { message: "Successful login" }; //TODO return token
     }
 
-    async refresh(entity: Entity, ip: string, response: Response) {
+    async refresh(entity: Entity, ip: string | undefined, response: Response) {
         const payload = entity.getJwtPayload();
 
         // Check if entity still exists
@@ -108,21 +109,28 @@ export class AuthService {
         return { message: "Logged out successfully" };
     }
 
-    async getInfo(entity: Entity) {
+    async getInfo(entity: Entity): Promise<AuthInfoResponseDto> {
         if (entity.type == "Device") {
             const device = await this.devicesService.findOne(entity.id);
-            return { id: device.id, role: "Device" } as AuthInfoResponseDto;
-        } else if (entity.type == "User") {
-            const user = await this.usersService.findOneById(entity.id);
-            return {
-                id: user.id,
-                username: user.username,
-                role: user.role,
-                default_desk: user.default_desk,
-            } as AuthInfoResponseDto;
+            if (!device) {
+                this.logger.warn(`[${entity.name}] UnauthorizedException: Deleted device requested its info`);
+                throw new UnauthorizedException("Device is deleted");
+            }
+            return { id: device.id, role: "Device" };
         }
 
-        return;
+        const user = await this.usersService.findOneById(entity.id);
+        if (!user) {
+            this.logger.warn(`[${entity.name}] UnauthorizedException: Deleted user requested its info`);
+            throw new UnauthorizedException("User is deleted");
+        }
+
+        return {
+            id: user.id,
+            username: user.username,
+            role: user.role,
+            default_desk: user.default_desk,
+        };
     }
 
     async validateUser(username: string, password: string) {
@@ -135,10 +143,7 @@ export class AuthService {
         return null;
     }
 
-    async validateRoles(
-        request: { ip; method; url; user; body },
-        roles: ("Device" | "User" | "Admin")[],
-    ): Promise<boolean> {
+    async validateRoles(request: AuthenticatedRequest, roles: ("Device" | "User" | "Admin")[]): Promise<boolean> {
         const entity = Entity.convertFromReq(request);
         const { ip, method, url } = request;
 

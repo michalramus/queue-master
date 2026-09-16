@@ -9,7 +9,9 @@ export function useCategories(
     return useQuery({
         queryKey: ["categories"],
         queryFn: () => getCategories(axiosAuthInstance),
-        select: (data) => data?.sort((a, b) => a.short_name.localeCompare(b.short_name)),
+        // Copy before sorting — `sort` mutates in place and would rewrite the React Query cache
+        select: (data) =>
+            [...(data ?? [])].sort((a, b) => a.short_name.localeCompare(b.short_name)),
         ...options,
     });
 }
