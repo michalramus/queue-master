@@ -11,7 +11,17 @@ export const axiosAuthInstance: AxiosAuthInstance = {
     }),
 };
 
-let JWTRefreshTokenPromise: Promise<Response> | null = null;
+/**
+ * In-flight refresh deduplication.
+ *
+ * WARNING: this is module scope, which on the Next.js server is shared by EVERY request handled by
+ * the process — i.e. by every user. Reusing a cached promise there would make one user await
+ * another user's refresh and then copy that user's `Set-Cookie` into their own request headers,
+ * authenticating them as the wrong person. It is therefore only ever read/written on the client,
+ * where the process belongs to a single user. Server-side refreshes always issue a fresh call with
+ * that request's own cookies. Do not lift this back into the shared path.
+ */
+let clientJWTRefreshTokenPromise: Promise<Response> | null = null;
 
 //Request part
 axiosAuthInstance.auth.interceptors.request.use(
@@ -77,22 +87,34 @@ axiosAuthInstance.auth.interceptors.request.use(
             refreshTokenExpirationDate.getTime() - new Date().getTime() >
                 tokenInvalidationTimeOffset
         ) {
-            if (!JWTRefreshTokenPromise) {
-                if (serverSideCookies) {
-                    JWTRefreshTokenPromise = refreshJWTToken(axiosPureInstance, serverSideCookies);
-                } else {
-                    JWTRefreshTokenPromise = refreshJWTToken(axiosPureInstance);
-                }
-            }
-
-            const refreshJWTTokenResponse = await JWTRefreshTokenPromise;
-
             if (serverSideCookies) {
+                // Server side: never share the promise across requests (see warning above).
+                const refreshJWTTokenResponse: Response = await refreshJWTToken(
+                    axiosPureInstance,
+                    serverSideCookies,
+                );
+
                 config.headers["Cookie"] = refreshJWTTokenResponse.headers
                     .getSetCookie()
                     .toString();
+
+                return config;
             }
-            JWTRefreshTokenPromise = null;
+
+            // Client side: one browser process = one user, so deduplicating concurrent refreshes
+            // is safe here.
+            if (!clientJWTRefreshTokenPromise) {
+                clientJWTRefreshTokenPromise = refreshJWTToken(axiosPureInstance);
+            }
+
+            try {
+                await clientJWTRefreshTokenPromise;
+            } finally {
+                // Reset on failure too, otherwise a rejected promise stays cached and poisons
+                // every subsequent request.
+                clientJWTRefreshTokenPromise = null;
+            }
+
             return config;
         }
 
