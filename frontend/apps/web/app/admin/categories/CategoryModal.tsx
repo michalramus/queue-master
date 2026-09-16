@@ -152,6 +152,7 @@ export default function CategoryModal({
                     ))}
 
                     <Checkbox
+                        id="category_enabled"
                         label={t("category_enabled")}
                         hint={t("category_enabled_description")}
                         checked={isEnabled}
