@@ -99,3 +99,18 @@ export function loadAppConfig(argv: string[] = process.argv, env: NodeJS.Process
 
     return properties;
 }
+
+/**
+ * Read a value the schema marks as required, after `loadAppConfig` mirrored it into the environment.
+ *
+ * Every required entry is validated at bootstrap, so a missing value here means the process was
+ * started without the loader - failing loudly beats signing tokens with an undefined secret.
+ */
+export function requireEnv(envVar: string, env: NodeJS.ProcessEnv = process.env): string {
+    const value = env[envVar];
+    if (value === undefined || value === "") {
+        throw new Error(`Missing required configuration value: ${envVar}`);
+    }
+
+    return value;
+}
