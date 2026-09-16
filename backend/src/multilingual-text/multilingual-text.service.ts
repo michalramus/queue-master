@@ -1,4 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { LangCode } from "@prisma/client";
 import { DatabaseService } from "../database/database.service";
 import { ModuleNameMultilingualText } from "./types/multilingualTextCategories.enum";
 
@@ -30,6 +31,41 @@ export class MultilingualTextService {
     }
 
     /**
+     * Batch version of getMultilingualText - fetches translations for many keys in a single query.
+     * @param moduleName
+     * @param keys list of keys to fetch translations for
+     * @returns Map of key to JSON in format { lang: translatedText }. Keys without translations map to an empty object.
+     */
+    async getMultilingualTextForKeys(
+        moduleName: ModuleNameMultilingualText,
+        keys: number[],
+    ): Promise<Map<number, { [lang: string]: string }>> {
+        const uniqueKeys = [...new Set(keys)];
+        const result = new Map<number, { [lang: string]: string }>();
+        uniqueKeys.forEach((key) => result.set(key, {}));
+
+        if (uniqueKeys.length === 0) {
+            return result;
+        }
+
+        const translations = await this.databaseService.multilingual_Text.findMany({
+            where: {
+                module_name: moduleName,
+                key: { in: uniqueKeys },
+            },
+        });
+
+        translations.forEach((translation) => {
+            const translationsForKey = result.get(translation.key) ?? {};
+            translationsForKey[translation.lang] = translation.value;
+            result.set(translation.key, translationsForKey);
+        });
+
+        this.logger.debug(`Fetched translations for module ${moduleName} and ${uniqueKeys.length} keys`);
+        return result;
+    }
+
+    /**
      * Update multilingual text entries
      * @param moduleName
      * @param key
@@ -38,22 +74,30 @@ export class MultilingualTextService {
     async updateMultilingualText(
         moduleName: ModuleNameMultilingualText,
         key: number,
-        translations: { [lang: string]: string },
+        translations: { [lang in LangCode]?: string },
     ): Promise<void> {
-        // Delete existing translations
-        await this.deleteMultilingualText(moduleName, key);
+        const data = Object.values(LangCode)
+            .map((lang) => ({ lang: lang, value: translations[lang] }))
+            .filter((entry): entry is { lang: LangCode; value: string } => entry.value !== undefined)
+            .map((entry) => ({
+                module_name: moduleName,
+                key: key,
+                lang: entry.lang,
+                value: entry.value,
+            }));
 
-        // Create new translations
-        const data = Object.entries(translations).map(([lang, value]) => ({
-            module_name: moduleName,
-            key: key,
-            lang: lang as any, // Cast to enum type
-            value: value,
-        }));
-
-        await this.databaseService.multilingual_Text.createMany({
-            data: data,
-        });
+        // Replace translations atomically - a partial failure must not drop existing translations
+        await this.databaseService.$transaction([
+            this.databaseService.multilingual_Text.deleteMany({
+                where: {
+                    module_name: moduleName,
+                    key: key,
+                },
+            }),
+            this.databaseService.multilingual_Text.createMany({
+                data: data,
+            }),
+        ]);
 
         this.logger.debug(`Updated multilingual text for module ${moduleName} key ${key}`);
     }
@@ -64,12 +108,12 @@ export class MultilingualTextService {
      * @param key
      * @param lang - Optional language code to delete specific language entry
      */
-    async deleteMultilingualText(moduleName: ModuleNameMultilingualText, key: number, lang?: string): Promise<void> {
+    async deleteMultilingualText(moduleName: ModuleNameMultilingualText, key: number, lang?: LangCode): Promise<void> {
         await this.databaseService.multilingual_Text.deleteMany({
             where: {
                 module_name: moduleName,
                 key: key,
-                ...(lang && { lang: lang as any }),
+                ...(lang && { lang: lang }),
             },
         });
 
