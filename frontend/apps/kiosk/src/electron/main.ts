@@ -117,12 +117,19 @@ function handleInvokeAudioSynthesizer(_event: IpcMainInvokeEvent, client: Client
 async function handleGetTranslation(
     _event: IpcMainInvokeEvent,
     lang: string,
-): Promise<{ [key: string]: any }> {
-    const i18nPath: string = path.join(
+): Promise<Record<string, unknown>> {
+    const i18nDir: string = path.resolve(
         app.getAppPath(),
         process.env.NODE_ENV == "development" ? "../.." : "..",
-        `/i18n/${lang}.json`,
+        "i18n",
     );
+    const i18nPath: string = path.resolve(i18nDir, `${lang}.json`);
+
+    // Reject path traversal: resolved file must stay directly inside i18nDir
+    if (path.dirname(i18nPath) !== i18nDir) {
+        console.error(`Rejected translation request for invalid language: ${lang}`);
+        return {};
+    }
 
     try {
         const translation = await import(i18nPath, { with: { type: "json" } });
