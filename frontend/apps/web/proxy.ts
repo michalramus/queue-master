@@ -24,19 +24,21 @@ const pages: Page[] = [
 ];
 
 export async function proxy(request: NextRequest) {
-    for (let page of pages) {
+    for (const page of pages) {
         if (request.nextUrl.pathname.startsWith(page.matcher)) {
-            try {
-                const info = await getCachedAuthInfo();
+            // `getCachedAuthInfo` never throws — it returns null when the visitor has no valid
+            // session — so the unauthenticated case must be branched on explicitly.
+            const info = await getCachedAuthInfo();
 
-                if (!info || page.roles.indexOf(info.role) < 0) {
-                    return NextResponse.redirect(
-                        new URL(page.error403Redirect + "?redirect=" + page.matcher, request.url),
-                    );
-                }
-            } catch (error) {
+            if (!info) {
                 return NextResponse.redirect(
                     new URL(page.error401Redirect + "?redirect=" + page.matcher, request.url),
+                );
+            }
+
+            if (!page.roles.includes(info.role)) {
+                return NextResponse.redirect(
+                    new URL(page.error403Redirect + "?redirect=" + page.matcher, request.url),
                 );
             }
         }
