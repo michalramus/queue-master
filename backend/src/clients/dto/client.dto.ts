@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsIn, IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { LangCode } from "@prisma/client";
 import { CategoryResponseDto } from "src/categories/dto/category.dto";
@@ -32,6 +32,7 @@ export class ClientUpdateDto {
     })
     @IsString()
     @IsNotEmpty()
+    @IsIn(["Waiting", "InService"])
     status: "Waiting" | "InService";
 
     @ApiProperty({
