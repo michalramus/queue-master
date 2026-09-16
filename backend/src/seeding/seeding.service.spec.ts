@@ -23,6 +23,13 @@ describe("SeedingService", () => {
         service = module.get<SeedingService>(SeedingService);
     });
 
+    afterEach(() => {
+        // Guard the random-password assertion above against a leak from the env-var test below,
+        // which would otherwise survive a mid-test failure
+        delete process.env.SEED_ADMIN_USERNAME;
+        delete process.env.SEED_ADMIN_PASSWORD;
+    });
+
     it("should be defined", () => {
         expect(service).toBeDefined();
     });
@@ -51,7 +58,9 @@ describe("SeedingService", () => {
         expect(mockUsersService.create).toHaveBeenCalledTimes(1);
         const [dto, entity] = mockUsersService.create.mock.calls[0];
         expect(dto.username).toBe("admin");
-        expect(dto.password).toBe("admin");
+        // No SEED_ADMIN_PASSWORD set, so the service generates randomBytes(16) as hex and logs it
+        // once. It must never fall back to a guessable default.
+        expect(dto.password).toMatch(/^[0-9a-f]{32}$/);
         expect(dto.role).toBe(UserRole.Admin);
         expect(entity.name).toBe("system");
     });
