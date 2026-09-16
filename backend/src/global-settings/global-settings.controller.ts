@@ -4,6 +4,7 @@ import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Entity } from "src/auth/types/entity.class";
+import { AuthenticatedRequest } from "src/auth/types/authenticatedRequest.type";
 import { ResetGlobalSettingsDto } from "./dto/reset-settings.dto";
 import {
     ApiTags,
@@ -57,10 +58,17 @@ export class GlobalSettingsController {
             example: '{"color_background": "#fbfefb", "locale": en}',
         },
     })
+    @ApiResponse({
+        status: 400,
+        description: "Unknown setting keys or invalid setting values - no settings were updated",
+    })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
     // @ApiBearerAuth("JWT-auth")
-    update(@Body() settings: { [key: string]: string | number }, @Request() req) {
+    update(
+        @Body() settings: { [key: string]: string | number },
+        @Request() req: AuthenticatedRequest,
+    ): Promise<string> {
         return this.globalSettingsService.update(settings, Entity.convertFromReq(req));
     }
 
@@ -84,7 +92,7 @@ export class GlobalSettingsController {
     })
     @ApiUnauthorizedResponse({ description: "Unauthorized" })
     @ApiForbiddenResponse({ description: "Forbidden - Admin role required" })
-    reset(@Body() resetDto: ResetGlobalSettingsDto, @Request() req) {
+    reset(@Body() resetDto: ResetGlobalSettingsDto, @Request() req: AuthenticatedRequest) {
         return this.globalSettingsService.reset(resetDto.settings || [], Entity.convertFromReq(req));
     }
 }
